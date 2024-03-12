@@ -41,7 +41,7 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 			//cout<<"Start of searching for hits"<<endl;
 			short ADC = abs(ADCs.at(j)-pedestal);
 			if (ADC > 10){
-				noise.push_back(0.0);
+				noise.push_back(0.0f);
 				//continue;
 			}
 			else{
@@ -51,6 +51,7 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 		}
 		//noise_channels.push_back(noise);
 	//}
+	cout<<"Noise: "<<noise[0]<<endl;
 	return noise;
 
 }
@@ -71,22 +72,27 @@ double Noise_levels(vector<short> noise_channels){
 	cout<<"Size:"<<sum<<endl;
 	return RMS;	
 }
-vector<short> Coherent_RMS(vector<vector<short>>* noise_group){
+vector<short> Coherent_RMS(vector<vector<short>> noise_group){
 	vector<short> waveform;
 	short tick;
 	for (int i = 0; i<noise_group[0].size();i++){
 		vector<short> ADCs;
+		
 		for (int j = 0; j<noise_group.size();j++){
 			ADCs.push_back(noise_group[j][i]);
+			//cout<<"ADC Size: "<<noise_group.size()<<endl;
 		}
 		sort(ADCs.begin(), ADCs.end());
-    	if (ADCs.size() % 2 == 0) { // Even number of elements
+    	if (ADCs.size()+1 % 2 == 0) { // Even number of elements
         	tick = (ADCs[ADCs.size() / 2 - 1] + ADCs[ADCs.size()/ 2]) / 2.0;
+		cout<<"Tick"<<tick<< endl;
     	} else { // Odd number of elements
         	tick = ADCs[ADCs.size() / 2];
     	}
+		//cout<<"Tick"<<tick<< endl;
 		waveform.push_back(tick);
 	}
+	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
 
@@ -120,30 +126,46 @@ void LoadRawDigits(TFile *inFile)
 		cout<<"Grabbed ADCs"<<endl;
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<vector<short>> channel_group;
+		vector<short> noise_channels(ADC.size(),0);
+		bool responsive_channel = false;
 		for(int ki=0; ki<myADC.GetSize();ki++){
+			//cout<<ki<<endl;
 			for(int ji=0; ji<myADC.GetSize();ji++){
-			cout<<myADC[ji].Channel()<<endl;
+			//cout<<myADC[ji].Channel()<<endl;
 			int channel = myADC[ji].Channel();
 			if (channel ==ki){
-				vector<short> noise_channels = Hit_removal(myADC[ji].ADCs(),myADC[ji].GetPedestal());
-				cout<<"Completed noise removal"<<endl;
+				noise_channels = Hit_removal(myADC[ji].ADCs(),myADC[ji].GetPedestal());
+				cout<<"Completed noise removal"<<channel<<endl;
+				responsive_channel = true;
 				break;
 			}
+			
 			else{
+				responsive_channel = false;
 				continue;
 			}
 		}
-			if ((ki+1)%8 == 0){
-				vector<short> coherent_waveform = Coherent_RMS(&channel_group);
+			if ((ki+1)%32 == 0 && responsive_channel == true){
+				vector<short> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
-				for (int kh=0; kh < 8; kh++){
+				for (int kh=0; kh < 32; kh++){
 					RMS_total[ki-kh] =  RMS_total.at(ki-kh)+Coh_RMS;
 				}
 				
 			}
+			else if ((ki+1)%32 == 0 && responsive_channel == false){
+				channel_group.clear();
+				float Coh_RMS = 0.0;
+                                cout<<"Coh RMS:"<<Coh_RMS<<endl;
+				for (int kh=0; kh < 32; kh++){
+                                        RMS_total[ki-kh] =  RMS_total.at(ki-kh)+Coh_RMS;
+                                }
+
+			}
 			else{
+				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
 				channel_group.push_back(noise_channels);
 			}
 
@@ -154,7 +176,7 @@ void LoadRawDigits(TFile *inFile)
 		//break;
 	}
 	
-	TFile* file = new TFile("noise_output.root", "RECREATE");
+	TFile* file = new TFile("noise_output_coh.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
 	//vector<float> avg_FFT;
@@ -196,13 +218,13 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run10926/run_10926.root")
+void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11552/run_11552.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
 	TFile *inFile = TFile::Open(inputFile.Data());
 	cout<<"Got File"<<endl;
-	LoadRawDigits(&inFile);
+	LoadRawDigits(inFile);
 }
 /*void Hit_removal(auto channels)
 {

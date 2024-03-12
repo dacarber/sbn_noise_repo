@@ -34,17 +34,17 @@
 
 using namespace std;
 
-vector<double> Hit_removal(vector<double> channels,float Pedestal){	
+vector<short> Hit_removal(vector<short> channels,float Pedestal){	
 	vector<short> noise_channels;
 	//for (int i = 0; i <=channels.GetSize();i++){
 	//cout<<"Start of Hit Removal"<<endl;
-		vector<double> ADCs = channels;
+		vector<short> ADCs = channels;
 		float pedestal = Pedestal;
-		vector<double> noise;
+		vector<short> noise;
 		noise.clear();
 		for (int j = 0; j < channels.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
-			double ADC = abs(ADCs.at(j)-pedestal);
+			short ADC = abs(ADCs.at(j)-pedestal);
 			if (ADC > 10){
 				//noise.push_back(ADC);
 				continue;
@@ -60,7 +60,7 @@ vector<double> Hit_removal(vector<double> channels,float Pedestal){
 
 }
 
-double Noise_levels(vector<double> noise_channels){
+double Noise_levels(vector<short> noise_channels){
 	double RMS;
 	float square;
 	float sum;
@@ -85,60 +85,68 @@ double Noise_levels(vector<double> noise_channels){
 		coherent_RMS = (channel_group[64] + channel_group[63])/2.0;
 	}
 }*/
-vector<double> FFT(vector<double> noise_channel){
+vector<float> FFT(vector<short> noise_channel){
 	//vector<float> FFT;
 	int vec_size = noise_channel.size();
 	Int_t size = vec_size;
 	//vector<double> noise_vector(noise_channel.begin(), noise_channel.end());
-	double inputSignalDouble[vec_size];
+	std::vector<Double_t> inputSignalDouble(vec_size);
 	cout<<"Turn vector into Double_t"<<endl;
     	for (size_t i = 0; i < vec_size; ++i) {
-        	inputSignalDouble[i] = noise_channel[i];
+        	inputSignalDouble[i] = static_cast<Double_t>(noise_channel[i]);
     	}
 	noise_channel.clear();
 	//size_t* vectorSize = &size;
 	//Int_t intVectorSize = static_cast<Int_t>(vectorSize);
 	cout<<"Transforming"<<endl;
-	//TVirtualFFT::SetTransform(0);
-	cout<<"Size of waveform: "<<size<<endl;
-   	TVirtualFFT* fft = TVirtualFFT::FFT(1, &size, "R2C ES K");
+	TVirtualFFT::SetTransform(0);
+   	TVirtualFFT* fft = TVirtualFFT::FFT(1, &size, "R2C");
 	if (!fft) {
-        std::cerr << "Error: Failed to initialize FFT." << std::endl;
-        return vector<double>();
-    }
-    
-    fft->SetPoints(inputSignalDouble);
-    fft->Transform();
+        	std::cerr << "Error: Failed to initialize FFT." << std::endl;
+        	return vector<float>();
+    	}
+    	fft->SetPoints(inputSignalDouble.data());
+    	fft->Transform();
 	cout<<"Grabbing real and imag"<<endl;
-	double fftReal=0;
-        double fftImag=0;
-	vector<double> fftMag(vec_size / 2 + 1);
-	for(size_t k=1;k<vec_size / 2 + 1;k++){
-	fft->GetPointComplex(k,fftReal, fftImag);
-	//delete fft;
-		fftMag[k] = TMath::Sqrt(fftReal*fftReal + fftImag*fftImag);
-	}
-	//float fftMag[vec_size / 2 + 1];
+	std::vector<Double_t> fftReal(vec_size / 2 + 1);
+    	std::vector<Double_t> fftImag(vec_size / 2 + 1);
+	fft->GetPoints(fftReal.data(), fftImag.data());
+	delete fft;
+	std::vector<float> fftMagnitude(vec_size / 2 + 1);
 	cout<<"Getting magnitude"<<vec_size<<endl;
-	//transform(fftReal.begin(),fftReal.end(),fftReal.begin(),fftReal.begin(),multiplies<Double_t>());
-	//transform(fftImag.begin(),fftImag.end(),fftImag.begin(),fftImag.begin(),multiplies<Double_t>());
-	//transform(fftReal.begin(),fftReal.end(),fftImag.begin(),fftMag.begin(),plus<Double_t>());
-	//delete fft;
-	cout<<"Finished"<<fftMag[0]<<endl;
+   	for (auto i = 0; i <fftReal.size(); ++i) {
+		//cout<<"Find Mag"<<endl;
+		//int j = static_cast<int>(i);
+        	fftMagnitude[i] = static_cast<float>(sqrt(fftReal[0] * fftReal[0] + fftImag[0] * fftImag[0]));
+		cout<<"Mag:"<<fftMagnitude[i]<<endl;
+		fftReal.erase(fftReal.begin());
+		fftImag.erase(fftImag.begin());
+    	}
+	cout<<"Finished mad"<<endl;
 	//fftReal.clear();
 	//fftImag.clear();
-	return fftMag;
+	return fftMagnitude;
 		
 }
 
 void LoadRawDigits(TFile *inFile)
 {	
+	//TTree *Events = (TTree*)inFile->Get("Events;1");
+	//TString rootfilename(filename.c_str());	
+	//TFile *inFile = TFile::Open(rootfilename.Data());	
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
-	//vector<float> RMS_total(11264,0.0f);
-	vector<vector<double>> FFT_total(11264,vector<double>(3415/2+1,0));
+	//TTreeReaderArray<int> myADC(Events, "raw::RawDigits_daq__DetSim.obj.fADC");
+
+	//TTreeReaderArray<Float_t> myPedestal(Events, "raw::RawDigits_daq__DECODER.obj.fPedestal");
+	//vector<short> ADC;
+	//vector<uint32_t> Pedestal;
+	//cout<<myADC.GetSize()<<endl;
+	//size_t channel_size = 2000;
+	vector<float> RMS_total(11264,0.0f);
+	vector<vector<float>> FFT_total(11264);
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
@@ -151,32 +159,23 @@ void LoadRawDigits(TFile *inFile)
 		cout<<"Grabbed ADCs"<<endl;
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
-		//vector<double> x(myADC.GetSize());
 		for(int p=0; p<myADC.GetSize();p++){
-                	channels.push_back(myADC[p].Channel());
-        	}
+			channels.push_back(myADC[p].Channel());
+		}
 		for(int ki=0; ki<myADC.GetSize();ki++){
-			//cout<<myADC[ki].Channel()<<endl;
-
-			auto in = find(channels.begin(),channels.end(), ki);
-            		int index = in-channels.begin();
-			vector<double> x(myADC[index].Samples(),0);
-			//cout<<"Starting noise removal"<<index<<endl;
-			if (myADC[index].NADC() < 3000){
-				continue;
-			}			
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
-			cout<<"Starting noise removal"<<endl;
-			//vector<double> noise_channels = Hit_removal(x,myADC[index].GetPedestal());
+			cout<<myADC[ki].Channel()<<endl;
+			int channel = myADC[ki].Channel();
+			auto index = find(channels.begin(),channels.end(), ki);
+			int in = index-channels.begin();
+			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
+			vector<short> noise_channels = Hit_removal(myADC[ki].ADCs(),myADC[ki].GetPedestal());
 			cout<<"Completed noise removal"<<endl;
-			vector<double> channel_fft = FFT(x); 
-			//cout<<"FFT is calculated"<<endl;
-			transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
-			cout<<"FFT is calculated"<<FFT_total[ki].size()<<endl;
+			float RMS = Noise_levels(noise_channels);
+			cout<<"RMS:"<<RMS<<endl;
+			RMS_total[channel] =  RMS_total.at(channel)+RMS;
 			//RMS_vec.push_back(RMS);
 			//delete RMS;
-			cout<<"Channel "<<ki<<endl;
-
+			//cout<<"Start FFT"<<endl;
 			//vector<float> FFT_mag = FFT(noise_channels);
 			//cout<<"Done with FFT"<<endl;			
 			//for (size_t ji = 0; ji < FFT_mag.size(); ++ji) {
@@ -186,38 +185,23 @@ void LoadRawDigits(TFile *inFile)
 			//cout<<"FFT Done"<<endl;
 
 		}
-
 		evt+=1;
-		//if (evt%8){
-		//		for(int wire = 0; wire<FFT_total.size(); wire++){
-		//			short mov_avg = 8;
-		//			transform(FFT_total[wire].begin(),FFT_total[wire].end(),FFT_total[ch].begin(),[mov_avg](float &c){ return c/mov_avg; });
-		//		}
-			//}
 		cout<<"Event:"<<evt<<endl;
 		//break;
 	}
-
 	
-	TFile* file = new TFile("fft_output.root", "RECREATE");
+	TFile* file = new TFile("noise_output.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
-	double avg_fft;
-	tree->Branch("fft_mag", &avg_fft, "avg_fft/F");
+	//vector<float> avg_FFT;
+	tree->Branch("raw_rms", &avg_rms, "avg_rms/F");
 	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
-	for(int ch = 0; ch<FFT_total.size(); ch++){
-		transform(FFT_total[ch].begin(),FFT_total[ch].end(),FFT_total[ch].begin(),[evt](double &c){ return c/evt; });
-		//for_each(FFT_total[ch].begin(), FFT_total[ch].end(), [evt](float &c){ c /= evt; });
-		//avg_fft = FFT_total[ch];
-		//cout<<FFT_total[ch][100]<<endl;
-		TString bid = "fft_mag";
-		bid +=ch;
-		//tree->Branch(bid, &avg_fft, "avg_fft/F");
-		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
-                	avg_fft = FFT_total[ch][c];
-			tree->Fill();
-                }
-		//tree->Fill();	
+	for(int ch = 0; ch<RMS_total.size(); ch++){
+		avg_rms = RMS_total.at(ch)/evt;
+		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
+                //	avg_FFT[c] = FFT_total[ch][c]/evt;
+                //}
+		tree->Fill();	
 	}
 	
 	file->Write();
@@ -248,7 +232,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_FFT_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11527/run_11527.root")
+void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
