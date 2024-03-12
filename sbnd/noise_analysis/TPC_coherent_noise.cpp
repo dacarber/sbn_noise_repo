@@ -160,7 +160,7 @@ void LoadRawDigits(TFile *inFile)
 				continue;
 			}
 			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
-			cout<<"Completed noise removal"<<channel<<endl;
+			cout<<"Completed noise removal"<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				vector<short> coherent_waveform = Coherent_RMS(channel_group);
@@ -201,7 +201,7 @@ void LoadRawDigits(TFile *inFile)
 	short coh_wave;
 	tree->Branch("coh_wave", &coh_wave, "coh_wave/F");
 	for(int ch = 0; ch<RMS_wave_total.size(); ch++){
-		transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](double &c){ return c/evt; });
+		transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](short &c){ return c/evt; });
 		//coh_wave = RMS_wave_total[ch];
 		for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
                 	coh_wave = RMS_wave_total[ch][c];
