@@ -138,7 +138,7 @@ void LoadRawDigits(TFile *inFile)
 			//cout<<ki<<endl;
 			auto in = find(channels.begin(),channels.end(), ki); //finds the the location of the channel corresponding to ki
             int index = in-channels.begin();
-			vector<double> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
+			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
 
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
 
@@ -189,27 +189,27 @@ void LoadRawDigits(TFile *inFile)
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
 	//vector<float> avg_FFT;
-	tree.Branch("raw_rms", &avg_rms, "avg_rms/F");
+	tree->Branch("raw_rms", &avg_rms, "avg_rms/F");
 	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
 	for(int ch = 0; ch<RMS_total.size(); ch++){
 		avg_rms = RMS_total.at(ch)/evt;
 		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
                 //	avg_FFT[c] = FFT_total[ch][c]/evt;
                 //}
-		tree.Fill();	
+		tree->Fill();	
 	}
-	vector<short> coh_wave;
+	short coh_wave;
 	tree->Branch("coh_wave", &coh_wave, "coh_wave/F");
 	for(int ch = 0; ch<RMS_wave_total.size(); ch++){
 		transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](double &c){ return c/evt; });
-		coh_wave = RMS_wave_total[ch]
-		//for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
-         //       	avg_fft = RMS_wave_total[ch][c];
-			tree.Fill();
+		//coh_wave = RMS_wave_total[ch];
+		for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
+                	coh_wave = RMS_wave_total[ch][c];
+			tree->Fill();
                 }
 	}
-	file.Write();
-	file.Close();
+	file->Write();
+	file->Close();
 	
 	cout<<"Got ADC and Pedestal"<<endl;
 
