@@ -51,7 +51,6 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 		}
 		//noise_channels.push_back(noise);
 	//}
-	cout<<"Noise: "<<noise[0]<<endl;
 	return noise;
 
 }
@@ -170,6 +169,7 @@ void LoadRawDigits(TFile *inFile)
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[ki-kh] =  RMS_total.at(ki-kh)+Coh_RMS;
 				}
+				cout<<"combine waveform"<<endl;
 				transform(RMS_wave_total[ki].begin(),RMS_wave_total[ki].end(),coherent_waveform.begin(),RMS_wave_total[ki].begin(),plus<short>());
 				
 			}
