@@ -114,7 +114,7 @@ void LoadRawDigits(TFile *inFile)
 	//cout<<myADC.GetSize()<<endl;
 	//size_t channel_size = 2000;
 	vector<float> RMS_total(11264,0.0f);
-	vector<vector<short>> RMS_wave_total(352,vector<double>(3415,0));
+	vector<vector<short>> RMS_wave_total(352,vector<short>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
