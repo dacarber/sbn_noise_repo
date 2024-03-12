@@ -139,7 +139,6 @@ void LoadRawDigits(TFile *inFile)
             int index = in-channels.begin();
 			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
 
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
 
 			//Checks if the channel is dead
 			if (myADC[index].NADC() < 3000 && (ki+1)%group_size != 0){
@@ -158,8 +157,9 @@ void LoadRawDigits(TFile *inFile)
 
 				continue;
 			}
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
 			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
-			cout<<"Completed noise removal"<<ki<<endl;
+			cout<<"Completed noise  "<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				vector<short> coherent_waveform = Coherent_RMS(channel_group);
@@ -169,9 +169,9 @@ void LoadRawDigits(TFile *inFile)
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[ki-kh] =  RMS_total.at(ki-kh)+Coh_RMS;
 				}
-				cout<<"combine waveform"<<endl;
-				transform(RMS_wave_total[ki].begin(),RMS_wave_total[ki].end(),coherent_waveform.begin(),RMS_wave_total[ki].begin(),plus<short>());
 				
+				transform(RMS_wave_total[ki].begin(),RMS_wave_total[ki].end(),coherent_waveform.begin(),RMS_wave_total[ki].begin(),plus<short>());
+				cout<<"combine waveform"<<endl;
 			}
 			else{
 				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
