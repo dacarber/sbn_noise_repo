@@ -137,7 +137,7 @@ void LoadRawDigits(TFile *inFile)
 			//cout<<ki<<endl;
 			auto in = find(channels.begin(),channels.end(), ki); //finds the the location of the channel corresponding to ki
             int index = in-channels.begin();
-			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
+			
 
 
 			//Checks if the channel is dead
@@ -157,6 +157,7 @@ void LoadRawDigits(TFile *inFile)
 
 				continue;
 			}
+			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
 			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
 			cout<<"Completed noise  "<<ki<<endl;
