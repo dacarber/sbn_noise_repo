@@ -200,7 +200,10 @@ void LoadRawDigits(TFile *inFile)
 			vector<double> channel_fft = FFT(x); 
 			//cout<<"FFT is calculated"<<endl;
 			cout<<getValue()<<endl;
-			transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
+			//transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
+			for (size_t k = 0; k < FFT_total[ki].size(); ++k) {
+    			FFT_total[ki][k] += channel_fft[k];
+    		}
 			cout<<"FFT is calculated"<<FFT_total[ki].size()<<endl;
 			cout<<getValue()<<endl;
 
