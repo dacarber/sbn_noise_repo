@@ -190,13 +190,16 @@ void LoadRawDigits(TFile *inFile)
 			auto in = find(channels.begin(),channels.end(), ki);
             		int index = in-channels.begin();
 			vector<double> x(myADC[index].Samples(),0);
+			cout<<getValue()<<endl;
 			//cout<<"Starting noise removal"<<index<<endl;
 			if (myADC[index].NADC() < 3000){
 				continue;
-			}			
+			}
+			cout<<getValue()<<endl;
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
 			vector<double> channel_fft = FFT(x); 
 			//cout<<"FFT is calculated"<<endl;
+			cout<<getValue()<<endl;
 			transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
 			cout<<"FFT is calculated"<<FFT_total[ki].size()<<endl;
 			cout<<getValue()<<endl;
