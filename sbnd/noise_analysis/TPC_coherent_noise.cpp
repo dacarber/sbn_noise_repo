@@ -134,7 +134,7 @@ void LoadRawDigits(TFile *inFile)
 		for(int p=0; p<myADC.GetSize();p++){		//Puts all of the channel ids into a vector in the order the files have the events
             channels.push_back(myADC[p].Channel()); 
         }
-		for(int ki=0; ki<myADC.GetSize();ki++){
+		for(int ki=0; ki<11264;ki++){
 			//cout<<ki<<endl;
 			auto in = find(channels.begin(),channels.end(), ki); //finds the the location of the channel corresponding to ki
             int index = in-channels.begin();
@@ -243,7 +243,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11552/run_11552.root")
+void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11799/run_11799.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
