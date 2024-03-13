@@ -29,10 +29,39 @@
 #include <TVirtualFFT.h>
 #include <fstream>
 #include <TChain.h>
-
+#include "sys/types.h"
+#include "sys/sysinfo.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
 //#include <bits/stdc++.h> 
 
 using namespace std;
+
+int parseLine(char* line){
+    // This assumes that a digit will be found and the line ends in " Kb".
+    int i = strlen(line);
+    const char* p = line;
+    while (*p <'0' || *p > '9') p++;
+    line[i-3] = '\0';
+    i = atoi(p);
+    return i;
+}
+
+int getValue(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmRSS:", 6) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
 
 vector<double> Hit_removal(vector<double> channels,float Pedestal){	
 	vector<short> noise_channels;
@@ -155,7 +184,7 @@ void LoadRawDigits(TFile *inFile)
 		for(int p=0; p<myADC.GetSize();p++){
                 	channels.push_back(myADC[p].Channel());
         	}
-		for(int ki=0; ki<myADC.GetSize();ki++){
+		for(int ki=0; ki<11264;ki++){
 			//cout<<myADC[ki].Channel()<<endl;
 
 			auto in = find(channels.begin(),channels.end(), ki);
@@ -166,24 +195,13 @@ void LoadRawDigits(TFile *inFile)
 				continue;
 			}			
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
-			cout<<"Starting noise removal"<<endl;
-			//vector<double> noise_channels = Hit_removal(x,myADC[index].GetPedestal());
-			cout<<"Completed noise removal"<<endl;
 			vector<double> channel_fft = FFT(x); 
 			//cout<<"FFT is calculated"<<endl;
 			transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
 			cout<<"FFT is calculated"<<FFT_total[ki].size()<<endl;
-			//RMS_vec.push_back(RMS);
-			//delete RMS;
-			cout<<"Channel "<<ki<<endl;
+			cout<<getValue()<<endl;
 
-			//vector<float> FFT_mag = FFT(noise_channels);
-			//cout<<"Done with FFT"<<endl;			
-			//for (size_t ji = 0; ji < FFT_mag.size(); ++ji) {
-        		//	FFT_total[channel][ji] = FFT_total[channel][ji] + FFT_mag[ji];
-    			//}
-			//FFT_mag.clear();
-			//cout<<"FFT Done"<<endl;
+			cout<<"Channel "<<ki<<endl;
 
 		}
 

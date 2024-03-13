@@ -71,8 +71,8 @@ double Noise_levels(vector<short> noise_channels){
 	cout<<"Size:"<<sum<<endl;
 	return RMS;	
 }
-vector<short> Coherent_RMS(vector<vector<short>> noise_group){
-	vector<short> waveform;
+vector<float> Coherent_RMS(vector<vector<short>> noise_group){
+	vector<float> waveform;
 	short tick;
 	cout<<noise_group.size()<<endl;
 	for (int i = 0; i<noise_group[0].size();i++){
@@ -114,7 +114,7 @@ void LoadRawDigits(TFile *inFile)
 	//cout<<myADC.GetSize()<<endl;
 	//size_t channel_size = 2000;
 	vector<float> RMS_total(11264,0.0f);
-	vector<vector<short>> RMS_wave_total(352,vector<short>(3415,0));
+	vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
@@ -169,7 +169,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"Completed noise  "<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
-				vector<short> coherent_waveform = Coherent_RMS(channel_group);
+				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
