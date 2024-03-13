@@ -114,7 +114,7 @@ double Noise_levels(vector<double> noise_channels){
 		coherent_RMS = (channel_group[64] + channel_group[63])/2.0;
 	}
 }*/
-vector<double> FFT(vector<double> noise_channel){
+vector<int> FFT(vector<double> noise_channel){
 	//vector<float> FFT;
 	int vec_size = noise_channel.size();
 	Int_t size = vec_size;
@@ -141,7 +141,7 @@ vector<double> FFT(vector<double> noise_channel){
 	cout<<"Grabbing real and imag"<<endl;
 	double fftReal=0;
         double fftImag=0;
-	vector<double> fftMag(vec_size / 2 + 1);
+	vector<int> fftMag(vec_size / 2 + 1);
 	for(size_t k=1;k<vec_size / 2 + 1;k++){
 	fft->GetPointComplex(k,fftReal, fftImag);
 	//delete fft;
@@ -197,7 +197,7 @@ void LoadRawDigits(TFile *inFile)
 			}
 			cout<<getValue()<<endl;
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
-			vector<double> channel_fft = FFT(x); 
+			vector<int> channel_fft = FFT(x); 
 			//cout<<"FFT is calculated"<<endl;
 			cout<<getValue()<<endl;
 			//transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
