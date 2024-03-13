@@ -172,7 +172,7 @@ void LoadRawDigits(TFile *inFile)
 	int evt = 0;
 	while (Events.Next())
 	{
-		
+		evt+=1;
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
@@ -202,7 +202,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<getValue()<<endl;
 			//transform(FFT_total[ki].begin(),FFT_total[ki].end(),channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
 			for (size_t k = 0; k < FFT_total[ki].size(); ++k) {
-    			FFT_total[ki][k] += channel_fft[k];
+    			FFT_total[ki][k] += channel_fft[k]-FFT_total[ki][k]/evt;
     		}
 			cout<<"FFT is calculated"<<FFT_total[ki].size()<<endl;
 			cout<<getValue()<<endl;
@@ -211,13 +211,16 @@ void LoadRawDigits(TFile *inFile)
 
 		}
 
-		evt+=1;
-		//if (evt%8){
+		
+		//if (evt==4){
 		//		for(int wire = 0; wire<FFT_total.size(); wire++){
-		//			short mov_avg = 8;
+		//			short mov_avg = 4;
 		//			transform(FFT_total[wire].begin(),FFT_total[wire].end(),FFT_total[ch].begin(),[mov_avg](float &c){ return c/mov_avg; });
 		//		}
-			//}
+		//	}
+		//else if (evt%4==0){
+		//
+		//}
 		cout<<"Event:"<<evt<<endl;
 		//break;
 	}
