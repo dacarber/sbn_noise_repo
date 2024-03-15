@@ -56,7 +56,7 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 
 }
 
-double Noise_levels(vector<short> noise_channels){
+double Noise_levels(vector<float> noise_channels){
 	double RMS;
 	float square;
 	float sum;
