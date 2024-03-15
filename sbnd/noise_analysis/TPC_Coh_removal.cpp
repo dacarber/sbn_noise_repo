@@ -107,7 +107,7 @@ vector<float> Coherent_removal(vector<short> noise, vector<float> coh_noise,floa
 }
 float get_wire_length(int wire_number,vector<float> wire_lengths){
 	
-	return wire_lenghts.at(wire_number);
+	return wire_lengths.at(wire_number);
 
 }
 void LoadRawDigits(TFile *inFile)
@@ -143,7 +143,7 @@ void LoadRawDigits(TFile *inFile)
 		}
 		if (entry%11==0){
 			z_1 = float(entry_string);
-			wire_lenghts.push_back(sqrt(pow(x_1-x_0,2)+pow(y_1-y_0,2)+pow(z_1-z_0,2)));
+			wire_lengths.push_back(sqrt(pow(x_1-x_0,2)+pow(y_1-y_0,2)+pow(z_1-z_0,2)));
 		}
 
 	}
