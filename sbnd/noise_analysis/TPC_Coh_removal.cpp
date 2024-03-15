@@ -208,13 +208,18 @@ void LoadRawDigits(TFile *inFile)
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+					cout<<"1"<<endl;
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
+					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-16,wire_lengths);
+					cout<<"3"<<endl;
 					vector<float> int_wave = Coh_removal(x,coherent_waveform,kh_length,mid_length);
+					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
+					cout<<"5"<<endl;
 					Int_RMS_total[channel-kh] =  Int_RMS_total.at(channel-kh)+Int_RMS;
 				}
-				
+				cout<<"6"<<endl;
 				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
 				cout<<"combine waveform"<<endl;
 			}
