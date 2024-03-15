@@ -148,7 +148,7 @@ void LoadRawDigits(TFile *inFile)
 		entry_string = 0;
 
 	}
-	cout<<"Got Wire lengths"<<wire_lengths[100]<<endl;
+	cout<<"Got Wire lengths"<<wire_lengths.size()<<endl;
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
