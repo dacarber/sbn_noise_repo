@@ -25,6 +25,7 @@
 #include <fstream>
 #include <TChain.h>
 #include <string>
+#include <bits/stdc++.h>
 
 //#include <bits/stdc++.h> 
 
@@ -126,7 +127,8 @@ void LoadRawDigits(TFile *inFile)
 	string ent;
 	vector<float> wire_lengths;
 	while(getline(wire_length_file, line)){
-		while(getline(line, ent, " ")){
+		stringstream ss(line);
+		while(getline(ss, ent, " ")){
 			entry_string = ent;
 			cout<<entry_string<<endl;
 			entry +=1;
