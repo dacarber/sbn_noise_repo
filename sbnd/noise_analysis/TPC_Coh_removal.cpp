@@ -101,7 +101,7 @@ vector<float> Coherent_removal(vector<short> noise, vector<float> coh_noise,floa
 	//short tick;
 	//cout<<noise_group.size()<<endl;
 	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
-	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),subtract<float>());
+	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return int_waveform;
 }
@@ -119,7 +119,7 @@ void LoadRawDigits(TFile *inFile)
 	float x_1;
 	float y_1;
 	float z_1;
-	string entry_string
+	float entry_string;
 	wire_length_file.open("../datafiles/Wire_lengths.txt");
 	int entry = 0;
 	vector<float> wire_lengths;
