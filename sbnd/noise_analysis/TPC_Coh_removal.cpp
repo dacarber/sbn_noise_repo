@@ -126,31 +126,31 @@ void LoadRawDigits(TFile *inFile)
 	string ent;
 	vector<float> wire_lengths;
 	while(getline(wire_length_file, line)){
-		getline(line, ent, " ");
-		entry_string = ent;
-		cout<<entry_string<<endl;
-		entry +=1;
-		if (entry%6==0){
-			x_0 = float(entry_string);
+		while(getline(line, ent, " ")){
+			entry_string = ent;
+			cout<<entry_string<<endl;
+			entry +=1;
+			if (entry%6==0){
+				x_0 = float(entry_string);
+			}
+			if (entry%7==0){
+				y_0 = float(entry_string);
+			}
+			if (entry%8==0){
+				z_0 = float(entry_string);
+			}
+			if (entry%9==0){
+				x_1 = float(entry_string);
+			}
+			if (entry%10==0){
+				y_1 = float(entry_string);
+			}
+			if (entry%11==0){
+				z_1 = float(entry_string);
+				wire_lengths.push_back(sqrt(pow(x_1-x_0,2)+pow(y_1-y_0,2)+pow(z_1-z_0,2)));
+			}
+			entry_string = 0;
 		}
-		if (entry%7==0){
-			y_0 = float(entry_string);
-		}
-		if (entry%8==0){
-			z_0 = float(entry_string);
-		}
-		if (entry%9==0){
-			x_1 = float(entry_string);
-		}
-		if (entry%10==0){
-			y_1 = float(entry_string);
-		}
-		if (entry%11==0){
-			z_1 = float(entry_string);
-			wire_lengths.push_back(sqrt(pow(x_1-x_0,2)+pow(y_1-y_0,2)+pow(z_1-z_0,2)));
-		}
-		entry_string = 0;
-
 	}
 	cout<<"Got Wire lengths"<<wire_lengths.size()<<endl;
 	cout<<"Got Events"<<endl;
