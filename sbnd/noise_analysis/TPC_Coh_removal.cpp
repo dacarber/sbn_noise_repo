@@ -145,9 +145,10 @@ void LoadRawDigits(TFile *inFile)
 			z_1 = float(entry_string);
 			wire_lengths.push_back(sqrt(pow(x_1-x_0,2)+pow(y_1-y_0,2)+pow(z_1-z_0,2)));
 		}
+		entry_string = 0;
 
 	}
-
+	cout<<"Got Wire lengths"<<wire_lengths[100]<<endl;
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
