@@ -127,7 +127,7 @@ void LoadRawDigits(TFile *inFile)
 	string ent;
 	vector<float> wire_lengths;
 	while(getline(wire_length_file, line)){
-		stringstream ss(line);
+		istringstream ss(line);
 		while(getline(ss, ent, " ")){
 			cout<<ent<<endl;
 			entry_string = float(ent);
