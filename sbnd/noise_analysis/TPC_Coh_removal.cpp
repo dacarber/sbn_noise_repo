@@ -98,9 +98,9 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 vector<float> Coherent_removal(vector<short> noise, vector<float> coh_noise,float kh_length,float mid_length){
 	vector<float> int_waveform(noise.size(),0);
 	//short tick;
-	cout<<noise_group.size()<<endl;
-	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; })
-	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),subtract<float>())
+	//cout<<noise_group.size()<<endl;
+	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
+	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),subtract<float>());
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return int_waveform;
 }
@@ -112,7 +112,13 @@ float get_wire_length(int wire_number,vector<float> wire_lengths){
 void LoadRawDigits(TFile *inFile)
 {	
 	ifstream wire_length_file;
-	wire_length_file.open("Wire_lengths.txt");
+	float x_0;
+	float y_0;
+	float z_0;
+	float x_1;
+	float y_1;
+	float z_1;
+	wire_length_file.open("../datafiles/Wire_lengths.txt");
 	int entry = 0;
 	vector<float> wire_lengths;
 	while(wire_length_file.good()){
