@@ -120,7 +120,7 @@ void LoadRawDigits(TFile *inFile)
 	float y_1;
 	float z_1;
 	float entry_string;
-	wire_length_file.open("../datafiles/Wire_lengths.txt");
+	wire_length_file.open("/exp/sbnd/app/users/dcarber/noise_analysis/sbn_noise_repo/sbnd/datafiles/Wire_lengths.txt");
 	int entry = 0;
 	vector<float> wire_lengths;
 	while(wire_length_file.good()){
