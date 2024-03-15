@@ -152,7 +152,7 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
-
+	vector<float> Int_RMS_total(11264,0.0f);
 	vector<float> RMS_total(11264,0.0f);
 	vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
@@ -161,7 +161,6 @@ void LoadRawDigits(TFile *inFile)
 	{
 		//vector<short> ADC = myADC[1].ADCs();
 		vector<vector<short>> channel_group;
-		//vector<short> noise_channels(ADC.size(),0);
 		bool responsive_channel = true;
 		vector<short> channels;
 		short group_size = 32;
@@ -199,7 +198,7 @@ void LoadRawDigits(TFile *inFile)
 			}
 			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
-			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
+			vector<short> noise_channels = Hit_removal(x,myADC[index].GetPedestal());
 			cout<<"Completed noise  "<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
@@ -212,7 +211,7 @@ void LoadRawDigits(TFile *inFile)
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					float mid_length = get_wire_length(channel-16,wire_lengths);
 					vector<float> int_wave = Coh_removal(x,coherent_waveform,kh_length,mid_length);
-					float Int_RMS = Noise_levels(int_waveform);
+					float Int_RMS = Noise_levels(int_wave);
 					Int_RMS_total[channel-kh] =  Int_RMS_total.at(channel-kh)+Int_RMS;
 				}
 				
@@ -255,6 +254,17 @@ void LoadRawDigits(TFile *inFile)
                 	coh_wave = RMS_wave_total[ch][c];
 			tree->Fill();
                 }
+	}
+	float int_rms;
+	//vector<float> avg_FFT;
+	tree->Branch("int_rms", &int_rms, "int_rms/F");
+	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	for(int ch = 0; ch<int_RMS_total.size(); ch++){
+		int_rms = int_RMS_total.at(ch)/evt;
+		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
+                //	avg_FFT[c] = FFT_total[ch][c]/evt;
+                //}
+		tree->Fill();	
 	}
 	file->Write();
 	file->Close();
