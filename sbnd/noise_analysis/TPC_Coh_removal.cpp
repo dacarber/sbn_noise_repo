@@ -161,7 +161,7 @@ void LoadRawDigits(TFile *inFile)
 	{
 		//vector<short> ADC = myADC[1].ADCs();
 		vector<vector<short>> channel_group;
-		vector<short> noise_channels(ADC.size(),0);
+		//vector<short> noise_channels(ADC.size(),0);
 		bool responsive_channel = true;
 		vector<short> channels;
 		short group_size = 32;
@@ -186,7 +186,7 @@ void LoadRawDigits(TFile *inFile)
 					channel_group.clear();
 					continue;				
 				}
-				vector<short> coherent_waveform = Coherent_RMS(channel_group);
+				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
