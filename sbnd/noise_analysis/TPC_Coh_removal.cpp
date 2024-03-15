@@ -123,8 +123,9 @@ void LoadRawDigits(TFile *inFile)
 	wire_length_file.open("/exp/sbnd/app/users/dcarber/noise_analysis/sbn_noise_repo/sbnd/datafiles/Wire_lengths.txt");
 	int entry = 0;
 	string line;
+	string ent;
 	vector<float> wire_lengths;
-	while(getline(wire_length_file, line,)){
+	while(getline(wire_length_file, line)){
 		getline(line, ent, " ");
 		entry_string = ent;
 		cout<<entry_string<<endl;
