@@ -24,6 +24,7 @@
 #include <TVirtualFFT.h>
 #include <fstream>
 #include <TChain.h>
+#include <string>
 
 //#include <bits/stdc++.h> 
 
@@ -118,6 +119,7 @@ void LoadRawDigits(TFile *inFile)
 	float x_1;
 	float y_1;
 	float z_1;
+	string entry_string
 	wire_length_file.open("../datafiles/Wire_lengths.txt");
 	int entry = 0;
 	vector<float> wire_lengths;
