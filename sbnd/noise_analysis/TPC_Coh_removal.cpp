@@ -25,7 +25,7 @@
 #include <fstream>
 #include <TChain.h>
 #include <string>
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 
 //#include <bits/stdc++.h> 
 
@@ -129,8 +129,8 @@ void LoadRawDigits(TFile *inFile)
 	while(getline(wire_length_file, line)){
 		stringstream ss(line);
 		while(getline(ss, ent, " ")){
-			entry_string = ent;
-			cout<<entry_string<<endl;
+			cout<<ent<<endl;
+			entry_string = float(ent);
 			entry +=1;
 			if (entry%6==0){
 				x_0 = float(entry_string);
