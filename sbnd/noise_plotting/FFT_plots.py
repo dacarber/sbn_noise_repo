@@ -32,12 +32,12 @@ files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/dat
 #df = {'total_0':[0]*1708,'total_1':[0]*1708,'total_2':[0]*1708}
 df= {}
 for f in range(len(files)):
-    raw_rms = files[f]['tpc_noise;3']['fft_mag'].array()
+    raw_rms = files[f]['tpc_noise;3']['avg_FFT'].array()
     df[f'total_{f}'] = [0]*1708
 #print(df['total'])
     channel = -1
-    #for i in tqdm(range(len(raw_rms))):
-    for i in tqdm(range(1708)):
+    for i in tqdm(range(len(raw_rms))):
+    #for i in tqdm(range(1708)):
         if i%1708 == 0:
             #print(channel)
             channel +=1
