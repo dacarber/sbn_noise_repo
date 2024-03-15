@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-
+from tqdm import tqdm
 import os
 from plotly.subplots import make_subplots
 from plotly import tools
@@ -20,7 +20,7 @@ import sys
 files = []
 fig = make_subplots(rows=1,cols =1)
 
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/fft_output_1000_run11541.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/fft_output_2000_run11541.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/fft_output_4000_run11541.root"))
 
@@ -32,23 +32,26 @@ files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/fft
 #df = {'total_0':[0]*1708,'total_1':[0]*1708,'total_2':[0]*1708}
 df= {}
 for f in range(len(files)):
-    raw_rms = files[f]['tpc_noise;1']['fft_mag'].array()
+    raw_rms = files[f]['tpc_noise;3']['fft_mag'].array()
     df[f'total_{f}'] = [0]*1708
 #print(df['total'])
     channel = -1
-    for i in range(len(raw_rms)):
+    #for i in tqdm(range(len(raw_rms))):
+    for i in tqdm(range(1708)):
         if i%1708 == 0:
             #print(channel)
             channel +=1
             df[f'{channel}'] = [raw_rms[i]]  
             df[f'total_{f}'][0] +=raw_rms[i]
+
         else:
             df[f'{channel}'].append(raw_rms[i])
             df[f'total_{f}'][i%1708] +=raw_rms[i]
+        #print(raw_rms[i])
 
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_{f}']-f*30,1000),marker_color = 'red'),row = 1, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = df[f'total_{f}'],marker_color = 'red'),row = 1, col = 1)
 
 
 
