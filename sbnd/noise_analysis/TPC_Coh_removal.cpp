@@ -96,7 +96,7 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
-vector<float> Coherent_removal(vector<short> noise, vector<float> coh_noise,float kh_length,float mid_length){
+vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise,float kh_length,float mid_length){
 	vector<float> int_waveform(noise.size(),0);
 	//short tick;
 	//cout<<noise_group.size()<<endl;
@@ -259,8 +259,8 @@ void LoadRawDigits(TFile *inFile)
 	//vector<float> avg_FFT;
 	tree->Branch("int_rms", &int_rms, "int_rms/F");
 	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
-	for(int ch = 0; ch<int_RMS_total.size(); ch++){
-		int_rms = int_RMS_total.at(ch)/evt;
+	for(int ch = 0; ch<Int_RMS_total.size(); ch++){
+		int_rms = Int_RMS_total.at(ch)/evt;
 		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
                 //	avg_FFT[c] = FFT_total[ch][c]/evt;
                 //}
