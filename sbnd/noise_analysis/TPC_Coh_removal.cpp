@@ -125,6 +125,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<float> wire_lengths;
 	while(wire_length_file.good()){
 		wire_length_file >> entry_string;
+		cout<<entry_string<<endl;
 		entry +=1;
 		if (entry%6==0){
 			x_0 = float(entry_string);
