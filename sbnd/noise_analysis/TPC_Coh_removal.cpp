@@ -208,7 +208,7 @@ void LoadRawDigits(TFile *inFile)
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
-					cout<<"1"<<endl;
+					cout<<"1"<<channel-kh<<endl;
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-16,wire_lengths);
