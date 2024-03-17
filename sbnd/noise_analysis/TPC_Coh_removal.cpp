@@ -130,7 +130,7 @@ void LoadRawDigits(TFile *inFile)
 		istringstream ss(line);
 		while(ss >>ent){
 			cout<<ent<<endl;
-			entry_string = float(ent);
+			entry_string = stof(ent);
 			entry +=1;
 			if (entry%6==0){
 				x_0 = float(entry_string);
