@@ -179,7 +179,7 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	vector<float> Int_RMS_total(11264,0.0f);
 	vector<float> RMS_total(11264,0.0f);
-	vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
+	vector<vector<float>> RMS_wave_total(11264/8,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
