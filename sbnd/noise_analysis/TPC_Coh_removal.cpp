@@ -78,8 +78,10 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	vector<float> mean_waveform(3415,0.0);
 	short tick;
 	int group_size = 32;
-	cout<<noise_group.size()<<endl;
+	
+
 	for (int j = 0; j<noise_group.size();j++){
+		cout<<noise_group[j].size()<<endl;
 		transform(mean_waveform.begin(),mean_waveform.end(),noise_group[j].begin(),mean_waveform.begin(),plus<float>());
 	}
 	
