@@ -103,7 +103,7 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	//}
 	transform(mean_waveform.begin(),mean_waveform.end(),mean_waveform.begin(),[group_size](float &c){ return c/group_size; });
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
-	return waveform;
+	return mean_waveform;
 }
 vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise,float kh_length,float mid_length){
 	vector<float> int_waveform(noise.size(),0);
