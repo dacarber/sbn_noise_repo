@@ -211,7 +211,7 @@ void LoadRawDigits(TFile *inFile)
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
-				channel_group.clear();
+				
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
@@ -220,7 +220,7 @@ void LoadRawDigits(TFile *inFile)
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-16,wire_lengths);
 					cout<<"3"<<endl;
-					vector<float> int_wave = Coh_removal(noise_channels,coherent_waveform,kh_length,mid_length);
+					vector<float> int_wave = Coh_removal(noise_group[kh],coherent_waveform,kh_length,mid_length);
 					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
 					cout<<"5"<<endl;
@@ -229,6 +229,7 @@ void LoadRawDigits(TFile *inFile)
 				cout<<"6"<<endl;
 				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
 				cout<<"combine waveform"<<endl;
+				channel_group.clear();
 			}
 			else{
 				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
