@@ -249,7 +249,7 @@ void LoadRawDigits(TFile *inFile)
 					Int_RMS_total[channel-kh] =  Int_RMS_total.at(channel-kh)+Int_RMS;
 				}
 				cout<<"6"<<endl;
-				transform(RMS_wave_total[channel/(group_size-1)].begin(),RMS_wave_total[channel/(group_size-1)].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
+				transform(RMS_wave_total[channel/(group_size-1)].begin(),RMS_wave_total[channel/(group_size-1)].end(),coherent_waveform.begin(),RMS_wave_total[channel/(group_size-1)].begin(),plus<short>());
 				cout<<"combine waveform"<<endl;
 				channel_group.clear();
 			}
