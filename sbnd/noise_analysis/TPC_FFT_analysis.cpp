@@ -74,8 +74,8 @@ vector<double> Hit_removal(vector<double> channels,float Pedestal){
 		for (int j = 0; j < channels.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
 			double ADC = abs(ADCs.at(j)-pedestal);
-			if (ADC > 10){
-				//noise.push_back(ADC);
+			if (ADC > 30){
+				noise.push_back(ADC);
 				continue;
 			}
 			else{

@@ -20,9 +20,9 @@ import sys
 files = []
 fig = make_subplots(rows=1,cols =1)
 
-#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11888.root"))
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_11862.root"))
-#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/fft_output_4000_run11541.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11888.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_11869.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_11541.root"))
 
 
 
@@ -37,7 +37,7 @@ for f in range(len(files)):
 #print(df['total'])
     channel = -1
     #for i in tqdm(range(len(raw_rms))):
-    for i in tqdm(range(1708*1984)):
+    for i in tqdm(range(1708*1984,1708*3968,1)):
         if i%1708 == 0:
             #print(channel)
             channel +=1
@@ -51,7 +51,7 @@ for f in range(len(files)):
 
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
-    color = ['red','green']
+    color = ['red','green','blue']
     fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_{f}'],1984),marker_color = color[f],opacity = 1/(f+1)),row = 1, col = 1)
 
 
