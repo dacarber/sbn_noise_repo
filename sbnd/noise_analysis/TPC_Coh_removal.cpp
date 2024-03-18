@@ -77,7 +77,7 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	vector<float> waveform;
 	vector<float> mean_waveform(3415,0.0);
 	short tick;
-	int group_size = 32;
+	int group_size = 8;
 	
 
 	for (int j = 0; j<noise_group.size();j++){
@@ -188,7 +188,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<vector<short>> channel_group;
 		bool responsive_channel = true;
 		vector<short> channels;
-		short group_size = 32;
+		short group_size = 8;
 		for(int p=0; p<myADC.GetSize();p++){		//Puts all of the channel ids into a vector in the order the files have the events
             channels.push_back(myADC[p].Channel()); 
         }
@@ -237,19 +237,19 @@ void LoadRawDigits(TFile *inFile)
 					cout<<"1 channel in group: "<<kh<<endl;
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					cout<<"2"<<endl;
-					float mid_length = get_wire_length(channel-16,wire_lengths);
+					float mid_length = get_wire_length(channel-group_size/2,wire_lengths);
 					cout<<"3"<<channel_group[31-kh].size()<<endl;
 					if (channel_group[31-kh].size() != 3415){
 						continue;
 					}
-					vector<float> int_wave = Coh_removal(channel_group[31-kh],coherent_waveform,kh_length,mid_length);
+					vector<float> int_wave = Coh_removal(channel_group[group_size-kh-1],coherent_waveform,kh_length,mid_length);
 					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
 					cout<<"5"<<endl;
 					Int_RMS_total[channel-kh] =  Int_RMS_total.at(channel-kh)+Int_RMS;
 				}
 				cout<<"6"<<endl;
-				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
+				transform(RMS_wave_total[channel/(group_size-1)].begin(),RMS_wave_total[channel/(group_size-1)].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
 				cout<<"combine waveform"<<endl;
 				channel_group.clear();
 			}
