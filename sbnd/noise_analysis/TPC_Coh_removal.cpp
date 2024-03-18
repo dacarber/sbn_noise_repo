@@ -238,8 +238,8 @@ void LoadRawDigits(TFile *inFile)
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-group_size/2,wire_lengths);
-					cout<<"3"<<channel_group[31-kh].size()<<endl;
-					if (channel_group[31-kh].size() != 3415){
+					cout<<"3"<<channel_group[group_size-1-kh].size()<<endl;
+					if (channel_group[group_size-1-kh].size() != 3415){
 						continue;
 					}
 					vector<float> int_wave = Coh_removal(channel_group[group_size-kh-1],coherent_waveform,kh_length,mid_length);
