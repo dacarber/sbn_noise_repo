@@ -217,7 +217,7 @@ void LoadRawDigits(TFile *inFile)
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
 				}
-				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
+				transform(RMS_wave_total[channel/(group_size-1)].begin(),RMS_wave_total[channel/(group_size-1)].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
 
 				continue;
 			}
