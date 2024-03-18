@@ -101,7 +101,7 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 		//cout<<"Tick"<<tick<< endl;
 	//	waveform.push_back(tick);
 	//}
-	transform(mean_waveform.begin(),mean_waveform.end(),mean_waveform.begin(),[group_size](float &c){ return c/group_size; })
+	transform(mean_waveform.begin(),mean_waveform.end(),mean_waveform.begin(),[group_size](float &c){ return c/group_size; });
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
