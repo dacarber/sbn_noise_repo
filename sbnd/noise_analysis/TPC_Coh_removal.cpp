@@ -101,6 +101,9 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise,float kh_
 	vector<float> int_waveform(noise.size(),0);
 	//short tick;
 	//cout<<noise_group.size()<<endl;
+	if (noise.size() != 3415){
+		return int_waveform;
+	}
 	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
