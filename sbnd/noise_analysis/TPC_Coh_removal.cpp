@@ -81,6 +81,9 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	
 
 	for (int j = 0; j<noise_group.size();j++){
+		if (noise_group[j].size() != 3415){
+			continue;
+		}
 		cout<<noise_group[j].size()<<endl;
 		transform(mean_waveform.begin(),mean_waveform.end(),noise_group[j].begin(),mean_waveform.begin(),plus<float>());
 	}
