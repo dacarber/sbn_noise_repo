@@ -220,7 +220,7 @@ void LoadRawDigits(TFile *inFile)
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-16,wire_lengths);
 					cout<<"3"<<endl;
-					vector<float> int_wave = Coh_removal(noise_group[kh],coherent_waveform,kh_length,mid_length);
+					vector<float> int_wave = Coh_removal(channel_group[kh],coherent_waveform,kh_length,mid_length);
 					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
 					cout<<"5"<<endl;
