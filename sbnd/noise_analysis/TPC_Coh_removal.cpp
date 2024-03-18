@@ -228,7 +228,7 @@ void LoadRawDigits(TFile *inFile)
 					if (channel_group[kh].size() != 3415){
 						continue;
 					}
-					vector<float> int_wave = Coh_removal(channel_group[kh],coherent_waveform,kh_length,mid_length);
+					vector<float> int_wave = Coh_removal(channel_group[31-kh],coherent_waveform,kh_length,mid_length);
 					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
 					cout<<"5"<<endl;
