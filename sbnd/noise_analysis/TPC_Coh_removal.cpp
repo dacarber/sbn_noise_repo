@@ -75,25 +75,33 @@ double Noise_levels(vector<float> noise_channels){
 }
 vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	vector<float> waveform;
+	vector<float> mean_waveform(3415,0.0);
 	short tick;
+	int group_size = 32;
 	cout<<noise_group.size()<<endl;
-	for (int i = 0; i<noise_group[0].size();i++){
-		vector<short> ADCs;
-		
-		for (int j = 0; j<noise_group.size();j++){
-			ADCs.push_back(noise_group[j][i]);
-			//cout<<"ADC Size: "<<noise_group.size()<<endl;
-		}
-		sort(ADCs.begin(), ADCs.end());
-    	if (ADCs.size()+1 % 2 == 0) { // Even number of elements
-        	tick = (ADCs[ADCs.size() / 2 - 1] + ADCs[ADCs.size()/ 2]) / 2.0;
-		cout<<"Tick"<<tick<< endl;
-    	} else { // Odd number of elements
-        	tick = ADCs[ADCs.size() / 2];
-    	}
-		//cout<<"Tick"<<tick<< endl;
-		waveform.push_back(tick);
+	for (int j = 0; j<noise_group.size();j++){
+		transform(mean_waveform.begin(),mean_waveform.end(),noise_group[j].begin(),mean_waveform.begin(),plus<float>());
 	}
+	
+	//for (int i = 0; i<noise_group[0].size();i++){
+	//	vector<short> ADCs;
+	//	
+	//	for (int j = 0; j<noise_group.size();j++){
+	//		ADCs.push_back(noise_group[j][i]);
+	//		//cout<<"ADC Size: "<<noise_group.size()<<endl;
+	//	}
+	//	sort(ADCs.begin(), ADCs.end());
+
+    //	if (ADCs.size()+1 % 2 == 0) { // Even number of elements
+    //    	tick = (ADCs[ADCs.size() / 2 - 1] + ADCs[ADCs.size()/ 2]) / 2.0;
+	//	cout<<"Tick"<<tick<< endl;
+    //	} else { // Odd number of elements
+    //   	tick = ADCs[ADCs.size() / 2];
+    //	}
+		//cout<<"Tick"<<tick<< endl;
+	//	waveform.push_back(tick);
+	//}
+	transform(mean_waveform.begin(),mean_waveform.end(),mean_waveform.begin(),[group_size](float &c){ return c/group_size; })
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
