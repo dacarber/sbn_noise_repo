@@ -105,7 +105,7 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise,float kh_
 		return int_waveform;
 	}
 	cout<<"Transforming vector"<<endl;
-	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
+	//transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	cout<<"Returning vector"<<endl;
