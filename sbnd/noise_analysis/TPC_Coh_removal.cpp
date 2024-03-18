@@ -214,6 +214,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"Completed noise  "<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
+				channel_group.push_back(noise_channels);
 				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				
