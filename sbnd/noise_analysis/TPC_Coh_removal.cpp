@@ -201,11 +201,11 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"Channel index: "<<index<<" Channel: "<< myADC[index].Channel()<<endl;
 			cout<<"Channel size: "<<myADC[index].NADC()<<endl;
 			//Checks if the channel is dead
-			if (myADC[index].NADC() < 3000 && (ki+1)%group_size != 0){
+			if (myADC[index].NADC() != 3415 && (ki+1)%group_size != 0){
 				responsive_channel = false;
 				continue;
 			}
-			else if(myADC[index].NADC() < 3000 && (ki+1)%group_size == 0){
+			else if(myADC[index].NADC() != 3415 && (ki+1)%group_size == 0){
 				if (channel_group.size() == 0){
 					channel_group.clear();
 					continue;				
