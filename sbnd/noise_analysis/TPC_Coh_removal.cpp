@@ -220,12 +220,12 @@ void LoadRawDigits(TFile *inFile)
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
-					cout<<"1"<<channel-kh<<endl;
+					cout<<"1 channel in group: "<<kh<<endl;
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-16,wire_lengths);
-					cout<<"3"<<channel_group[kh].size()<<endl;
-					if (channel_group[kh].size() != 3415){
+					cout<<"3"<<channel_group[31-kh].size()<<endl;
+					if (channel_group[31-kh].size() != 3415){
 						continue;
 					}
 					vector<float> int_wave = Coh_removal(channel_group[31-kh],coherent_waveform,kh_length,mid_length);
