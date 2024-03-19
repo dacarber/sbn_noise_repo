@@ -59,6 +59,7 @@ fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=110,text = f"M
 
 mask = Noise_df['wire_plane'] == 'VB'
 median = np.median(Noise_df['Raw_rms'][mask])
+mean = np.mean(Noise_df['Raw_rms'][mask])
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'purple',xbins=dict(start = median - 5,end = median+5,size=.05)),row = 2, col =2)
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
 fig.update_layout(xaxis4 = dict(range = [0,median+5]))
@@ -68,6 +69,7 @@ fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-130,text = f"
 
 mask = Noise_df['wire_plane'] == 'YB'
 median = np.median(Noise_df['Raw_rms'][mask])
+mean = np.mean(Noise_df['Raw_rms'][mask])
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'blue',xbins=dict(start = median - 5,end = median+5,size=.05)),row = 3, col =2)
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
 fig.update_layout(xaxis6 = dict(range = [0,median+5]))
@@ -108,6 +110,7 @@ fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=50,text = f"Me
 
 mask = Noise_df['wire_plane'] == 'VA'
 median = np.median(Noise_df['Raw_rms'][mask])
+mean = np.mean(Noise_df['Raw_rms'][mask])
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'purple',xbins=dict(start = median - 5,end = median+5,size=.05)),row = 2, col =2)
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
 fig.update_layout(xaxis4 = dict(range = [0,median+5]))
@@ -117,6 +120,7 @@ fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-190,text = f"
 
 mask = Noise_df['wire_plane'] == 'YA'
 median = np.median(Noise_df['Raw_rms'][mask])
+mean = np.mean(Noise_df['Raw_rms'][mask])
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'blue',xbins=dict(start = median - 5,end = median+5,size=.05)),row = 3, col =2)
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
 fig.update_layout(xaxis6 = dict(range = [0,median+5]))

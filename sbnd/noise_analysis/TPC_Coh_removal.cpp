@@ -117,7 +117,7 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise,float kh_
 	if (noise.size() != 3415){
 		return int_waveform;
 	}
-	cout<<"Transforming vector"<<endl;
+	cout<<"Wire lenght: "<<kh_length<<" middle wire length: "<<mid_length<<endl;
 	//transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[kh_length,mid_length](float &c){ return 0.0012502364558886422*kh_length+c-0.0012502364558886422*mid_length; });
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
@@ -179,7 +179,8 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	vector<float> Int_RMS_total(11264,0.0f);
 	vector<float> RMS_total(11264,0.0f);
-	vector<vector<float>> RMS_wave_total(11264/8,vector<float>(3415,0));
+	short group_size = 8;
+	vector<vector<float>> RMS_wave_total(11264/group_size,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
@@ -188,7 +189,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<vector<short>> channel_group;
 		bool responsive_channel = true;
 		vector<short> channels;
-		short group_size = 8;
+		
 		for(int p=0; p<myADC.GetSize();p++){		//Puts all of the channel ids into a vector in the order the files have the events
             channels.push_back(myADC[p].Channel()); 
         }
@@ -238,10 +239,11 @@ void LoadRawDigits(TFile *inFile)
 					float kh_length = get_wire_length(channel-kh,wire_lengths);
 					cout<<"2"<<endl;
 					float mid_length = get_wire_length(channel-group_size/2,wire_lengths);
-					cout<<"3"<<channel_group[group_size-1-kh].size()<<endl;
+					cout<<"3: "<<group_size-1-kh<<" "<<channel-kh<<endl;
 					if (channel_group[group_size-1-kh].size() != 3415){
 						continue;
 					}
+
 					vector<float> int_wave = Coh_removal(channel_group[group_size-kh-1],coherent_waveform,kh_length,mid_length);
 					cout<<"4"<<endl;
 					float Int_RMS = Noise_levels(int_wave);
