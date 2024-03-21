@@ -71,7 +71,6 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			channels.push_back(myADC[p].Channel());
 		}
 		for(int ki=0; ki<11264;ki++){
-			cout<<myADC[ki].Channel()<<endl;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
@@ -81,12 +80,14 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 					tick = -1000;
 					tree->Fill();
 				}
-				continue;
+				//continue;
 			}
+			else { 
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
 				tick = myADC[in].ADC(itick);
 				tree->Fill();
 
+			}
 			} 
 		
 			
