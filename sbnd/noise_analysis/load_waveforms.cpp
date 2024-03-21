@@ -66,7 +66,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		vector<short> channels;
 		float tick;
 		
-		TString branch_name = "waveform"; 
+		TString branch_name = "waveform"+to_string(evt); 
 		tree->Branch(branch_name, &tick,"tick/F");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
