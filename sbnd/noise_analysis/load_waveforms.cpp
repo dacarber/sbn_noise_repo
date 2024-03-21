@@ -53,7 +53,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	while (Events.Next())
 	{
 		if (evt != sel_evt) {
-			continue
+			continue;
 		}
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
