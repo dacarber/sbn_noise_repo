@@ -64,14 +64,16 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		cout<<"Grabbed ADCs"<<endl;
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
+		
 		float tick;
 		
-		TString branch_name = "waveform"+to_string(evt); 
-		tree->Branch(branch_name, &tick,"tick/F");
+		
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
 		for(int ki=0; ki<11264;ki++){
+			TString branch_name = "waveform"+to_string(ki); 
+		tree->Branch(branch_name, &tick,"tick/F");
 			vector<float> x;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
