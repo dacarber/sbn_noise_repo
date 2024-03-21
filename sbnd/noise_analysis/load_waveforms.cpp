@@ -61,7 +61,7 @@ void LoadRawDigits(TFile *inFile)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		float tick;
-		Tstring branch_name = "waveform_" + evt; 
+		TString branch_name = "waveform_" + evt; 
 		tree->Branch("branch_name", &tick,"tick/F");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
