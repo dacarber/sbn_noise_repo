@@ -67,13 +67,64 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		
 		float tick;
 		
-		
+		tree->Branch("UB_plane", &tick,"tick/F");
+		tree->Branch("VB_plane", &tick,"tick/F");
+		tree->Branch("YB_plane", &tick,"tick/F");
+		tree->Branch("UA_plane", &tick,"tick/F");
+		tree->Branch("VA_plane", &tick,"tick/F");
+		tree->Branch("YA_plane", &tick,"tick/F");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
 		for(int ki=0; ki<11264;ki++){
-			TString branch_name = "waveform"+to_string(ki); 
-		tree->Branch(branch_name, &tick,"tick/F");
+        	if (ki < 1984) {
+        		tree->SetBranchStatus("UB_plane", 1);
+        		tree->SetBranchStatus("VB_plane", 0);
+        		tree->SetBranchStatus("YB_plane", 0);
+        		tree->SetBranchStatus("UA_plane", 0);
+        		tree->SetBranchStatus("VA_plane", 0);
+        		tree->SetBranchStatus("YA_plane", 0);
+        	}
+        	else if (ki < 3968){
+        		tree->SetBranchStatus("UB_plane", 0);
+        		tree->SetBranchStatus("VB_plane", 1);
+        		tree->SetBranchStatus("YB_plane", 0);
+        		tree->SetBranchStatus("UA_plane", 0);
+        		tree->SetBranchStatus("VA_plane", 0);
+        		tree->SetBranchStatus("YA_plane", 0);
+        	}
+        	else if (ki < 5632){
+        		tree->SetBranchStatus("UB_plane", 0);
+        		tree->SetBranchStatus("VB_plane", 0);
+        		tree->SetBranchStatus("YB_plane", 1);
+        		tree->SetBranchStatus("UA_plane", 0);
+        		tree->SetBranchStatus("VA_plane", 0);
+        		tree->SetBranchStatus("YA_plane", 0);
+        	}
+        	else if (ki < 7616){
+        		tree->SetBranchStatus("UB_plane", 0);
+        		tree->SetBranchStatus("VB_plane", 0);
+        		tree->SetBranchStatus("YB_plane", 0);
+        		tree->SetBranchStatus("UA_plane", 1);
+        		tree->SetBranchStatus("VA_plane", 0);
+        		tree->SetBranchStatus("YA_plane", 0);
+        	}
+        	else if (ki < 9600){
+        		tree->SetBranchStatus("UB_plane", 0);
+        		tree->SetBranchStatus("VB_plane", 1);
+        		tree->SetBranchStatus("YB_plane", 0);
+        		tree->SetBranchStatus("UA_plane", 0);
+        		tree->SetBranchStatus("VA_plane", 1);
+        		tree->SetBranchStatus("YA_plane", 0);
+        	}
+        	else if (ki < 11264){
+        		tree->SetBranchStatus("UB_plane", 0);
+        		tree->SetBranchStatus("VB_plane", 0);
+        		tree->SetBranchStatus("YB_plane", 0);
+        		tree->SetBranchStatus("UA_plane", 0);
+        		tree->SetBranchStatus("VA_plane", 0);
+        		tree->SetBranchStatus("YA_plane", 1);
+        	}
 			vector<float> x;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
