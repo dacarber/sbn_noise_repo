@@ -80,7 +80,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			if (myADC[in].NADC() != 3415){
 				for (size_t itick=0; itick < 3415; ++itick){
 					tick = -1000;
-					x.push_back(myADC[in].ADC(itick));
+					cout<<"Dead Channel"<<endl;
+					x.push_back(-1000);
 					tree->Fill();
 				}
 				//continue;
