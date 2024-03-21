@@ -20,10 +20,11 @@ import sys
 files = []
 fig = make_subplots(rows=3,cols =1,subplot_titles = ('UB FFT Spectrum','VB FFT Spectrum','YB FFT Spectrum'))
 
-#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11888.root"))
 files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_11995.root"))
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_11541.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_12014.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_12049.root"))
 
+run_number = [11995,12014,12049]
 
 
 
@@ -55,7 +56,7 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UB_{f}'],1984),marker_color = color[f],opacity = 1/(f+1)),row = 1, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UB_{f}'],1984),marker_color = color[f],opacity = 1/(f+1),name = f'Run {run_number[f]}'),row = 1, col = 1)
 
     for i in tqdm(range(1708*1984,1708*3968,1)):
             if i%1708 == 0:
@@ -72,7 +73,7 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_VB_{f}'],1984),marker_color = color[f],opacity = 1/(f+1)),row = 2, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_VB_{f}'],1984),marker_color = color[f],opacity = 1/(f+1),showlegend=False),row = 2, col = 1)
 
     for i in tqdm(range(1708*3968,1708*5632,1)):
             if i%1708 == 0:
@@ -89,11 +90,11 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_YB_{f}'],1664),marker_color = color[f],opacity = 1/(f+1)),row = 3, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_YB_{f}'],1664),marker_color = color[f],opacity = 1/(f+1),showlegend=False),row = 3, col = 1)
 #fig.update_layout(xaxis = dict(range = [1*0,.996*1]))
 fig.update_xaxes(title_text = "Frequency [MHz]",row = 3, col = 1)
 fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = .01),xaxis2 = dict(tickmode = 'linear',dtick = .01),xaxis3 = dict(tickmode = 'linear',dtick = .01))
-fig.update_layout(height = 600, width = 1800,showlegend = False)
+fig.update_layout(height = 600, width = 1800,showlegend = True)
 fig.show()
 
 fig = make_subplots(rows=3,cols =1,subplot_titles = ('UA FFT Spectrum','VA FFT Spectrum','YA FFT Spectrum'))
@@ -122,7 +123,7 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UA_{f}'],1984),marker_color = color[f],opacity = 1/(f+1)),row = 1, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UA_{f}'],1984),marker_color = color[f],opacity = 1/(f+1),name = f'Run {run_number[f]}'),row = 1, col = 1)
 
     for i in tqdm(range(1708*7616,1708*9600,1)):
             if i%1708 == 0:
@@ -139,7 +140,7 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_VA_{f}'],1984),marker_color = color[f],opacity = 1/(f+1)),row = 2, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_VA_{f}'],1984),marker_color = color[f],opacity = 1/(f+1),showlegend=False),row = 2, col = 1)
 
     for i in tqdm(range(1708*9600,1708*11264,1)):
             if i%1708 == 0:
@@ -156,12 +157,12 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_YA_{f}'],1664),marker_color = color[f],opacity = 1/(f+1)),row = 3, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_YA_{f}'],1664),marker_color = color[f],opacity = 1/(f+1),showlegend=False),row = 3, col = 1)
 
 #fig.update_layout(xaxis = dict(range = [1*0,.996*1]))
 fig.update_xaxes(title_text = "Frequency [MHz]",row = 3, col = 1)
 fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = .01),xaxis2 = dict(tickmode = 'linear',dtick = .01),xaxis3 = dict(tickmode = 'linear',dtick = .01))
-fig.update_layout(height = 600, width = 1800,showlegend = False)
+fig.update_layout(height = 600, width = 1800,showlegend = True)
 fig.show()
 #mask = Noise_df['wire_plane'] == 'UB'
 #median = np.median(Noise_df['Raw_rms'][mask])
