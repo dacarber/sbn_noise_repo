@@ -210,7 +210,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
+void load_waveforms(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
