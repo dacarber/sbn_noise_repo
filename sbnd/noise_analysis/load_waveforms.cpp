@@ -70,7 +70,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
-		for(int ki=0; ki<myADC.GetSize();ki++){
+		for(int ki=0; ki<11264;ki++){
 			cout<<myADC[ki].Channel()<<endl;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
