@@ -120,13 +120,14 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 
 }
 
-void load_waveforms(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root",int sel_evt = 2)
+void load_waveforms(TString inputFile="/pnfs/sbnd/scratch/users/jaz8600/Decoded/decoded_data_evb01_run12007_11_20240319T153332.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
 	TFile *inFile = TFile::Open(inputFile.Data());
 	cout<<"Got File"<<endl;
-	LoadRawDigits(inFile);
+	int sel_evt = 2
+	LoadRawDigits(inFile,sel_evt);
 }
 /*void Hit_removal(auto channels)
 {
