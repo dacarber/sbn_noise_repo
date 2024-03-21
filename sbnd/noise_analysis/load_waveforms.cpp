@@ -65,12 +65,14 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		float tick;
+		
 		TString branch_name = "waveform"; 
 		tree->Branch(branch_name, &tick,"tick/F");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
 		for(int ki=0; ki<11264;ki++){
+			vector<float> x;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
@@ -78,6 +80,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			if (myADC[in].NADC() != 3415){
 				for (size_t itick=0; itick < 3415; ++itick){
 					tick = -1000;
+					x.push_back(myADC[in].ADC(itick));
 					tree->Fill();
 				}
 				//continue;
@@ -85,11 +88,14 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			else { 
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
 				tick = myADC[in].ADC(itick);
+				x.push_back(myADC[in].ADC(itick));
 				tree->Fill();
 
 			}
+			
+			//x.clear();
 			} 
-		
+			cout<<x.size()<<endl;
 			
 
 		}
