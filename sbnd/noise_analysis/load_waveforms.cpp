@@ -153,7 +153,7 @@ void LoadRawDigits(TFile *inFile)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		short tick; 
-		tree->Branch(f"waveform_"+evt, &tick);
+		tree->Branch("waveform_"+evt, &tick);
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
@@ -163,7 +163,7 @@ void LoadRawDigits(TFile *inFile)
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
-			if (myADC[index].NADC() != 3415){
+			if (myADC[in].NADC() != 3415){
 				continue;
 			}
 			vector<double> x(myADC[index].Samples(),0);
