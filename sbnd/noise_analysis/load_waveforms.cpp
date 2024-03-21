@@ -54,7 +54,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	{
 		if (evt != sel_evt) {
 			cout<<"Skip event: "<<evt<<endl;
-			evt +=1
+			evt +=1;
 			continue;
 		}
 		//for(int i = 0; i<myPedestal.GetSize();i++){
@@ -65,7 +65,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		float tick;
-		TString branch_name = "waveform_" + evt; 
+		TString branch_name = "waveform"; 
 		tree->Branch(branch_name, &tick,"tick/F");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
@@ -88,7 +88,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 				tree->Fill();
 
 			} 
-		file->Write();
+		
 			
 
 		}
@@ -98,7 +98,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	}
 	
 	
-	
+	file->Write();
 	file->Close();
 	
 	cout<<"Got ADC and Pedestal"<<endl;
