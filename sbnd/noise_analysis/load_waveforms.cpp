@@ -88,7 +88,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 				//continue;
 			}
 			else { 
-			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
+			for (size_t itick=0; itick < 3415; ++itick){
 				tick = myADC[in].ADC(itick);
 				x.push_back(myADC[in].ADC(itick));
 				tree->Fill();
