@@ -37,7 +37,7 @@ using namespace std;
 
 		
 
-void LoadRawDigits(TFile *inFile)
+void LoadRawDigits(TFile *inFile,int sel_evt)
 {	
 	//TTree *Events = (TTree*)inFile->Get("Events;1");
 	//TString rootfilename(filename.c_str());	
@@ -52,7 +52,9 @@ void LoadRawDigits(TFile *inFile)
 	int evt = 0;
 	while (Events.Next())
 	{
-		
+		if (evt != sel_evt) {
+			continue
+		}
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
@@ -118,7 +120,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void load_waveforms(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
+void load_waveforms(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root",int sel_evt = 2)
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
