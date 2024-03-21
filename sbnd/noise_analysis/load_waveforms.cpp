@@ -150,7 +150,6 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			
 			//x.clear();
 			} 
-			tree->SetBranchStatus(branch_name, 0);
 			cout<<x.size()<<endl;
 			
 
