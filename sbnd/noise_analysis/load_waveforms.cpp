@@ -154,7 +154,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<short> channels;
 		short tick;
 		string branch_name = "waveform_" + to_string(evt); 
-		tree->Branch(branch_name, &tick);
+		tree->Branch(branch_name, &tick,"tick/S");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
