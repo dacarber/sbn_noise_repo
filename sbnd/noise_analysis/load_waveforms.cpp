@@ -126,7 +126,7 @@ void load_waveforms(TString inputFile="/pnfs/sbnd/scratch/users/jaz8600/Decoded/
 	
 	TFile *inFile = TFile::Open(inputFile.Data());
 	cout<<"Got File"<<endl;
-	int sel_evt = 2
+	int sel_evt = 2;
 	LoadRawDigits(inFile,sel_evt);
 }
 /*void Hit_removal(auto channels)
