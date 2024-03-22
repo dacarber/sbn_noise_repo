@@ -111,7 +111,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
         	}
         	else if (ki < 9600){
         		tree->SetBranchStatus("UB_plane", 0);
-        		tree->SetBranchStatus("VB_plane", 1);
+        		tree->SetBranchStatus("VB_plane", 0);
         		tree->SetBranchStatus("YB_plane", 0);
         		tree->SetBranchStatus("UA_plane", 0);
         		tree->SetBranchStatus("VA_plane", 1);
