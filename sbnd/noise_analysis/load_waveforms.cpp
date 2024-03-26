@@ -129,7 +129,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
+			cout<<"Index:"<<index<<", Channel:"<<myADC[index].Channel()<<", Loop index:"<<ki<<endl;
 			if (myADC[in].NADC() != 3415){
 				cout<<"Dead Channel"<<endl;
 				for (size_t itick=0; itick < 3415; ++itick){
@@ -188,13 +188,13 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 
 }
 
-void load_waveforms(TString inputFile="/pnfs/sbnd/scratch/users/jaz8600/Decoded/decoded_data_evb01_run12007_11_20240319T153332.root")
+void load_waveforms(TString inputFile="/pnfs/sbnd/scratch/users/jaz8600/Decoded/decoded_data_evb02_run12007_14_20240319T153634.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
 	TFile *inFile = TFile::Open(inputFile.Data());
 	cout<<"Got File"<<endl;
-	int sel_evt = 2;
+	int sel_evt = 18;
 	LoadRawDigits(inFile,sel_evt);
 }
 /*void Hit_removal(auto channels)
