@@ -65,7 +65,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		
-		float tick;
+		short tick;
 		
 		tree->Branch("UB_plane", &tick,"tick/F");
 		tree->Branch("VB_plane", &tick,"tick/F");
@@ -146,7 +146,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			for (size_t itick=0; itick < 3415; ++itick){
 				tick = myADC[in].ADC(itick);
 				total_tick+=1;
-				x.push_back(myADC[in].ADC(itick));
+				x.push_back(tick);
 				tree->Fill();
 
 			}
