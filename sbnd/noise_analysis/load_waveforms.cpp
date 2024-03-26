@@ -130,7 +130,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
 			//int in = index;
-			cout<<"Index:"<<index<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
+			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
 			if (myADC[in].NADC() != 3415){
 				cout<<"Dead Channel"<<endl;
 				for (size_t itick=0; itick < 3415; ++itick){
