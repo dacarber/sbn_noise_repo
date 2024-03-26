@@ -144,7 +144,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			else { 
 			for (size_t itick=0; itick < 3415; ++itick){
 				tick = myADC[in].ADC(itick);
-				cout<<tick<<endl;
+				cout<<tick<<" : "<<itick<<endl;
 				x.push_back(myADC[in].ADC(itick));
 				tree->Fill();
 
