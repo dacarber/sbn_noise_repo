@@ -116,7 +116,7 @@ def load_wire_info():
     return wire_df
 
 def plot_wireplanes(event_number,metric):
-    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/"
+    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/{metric}"
     if not os.path.exists(directory):
         os.mkdir(directory)
     files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/waveform_output_{event_number}.root")
@@ -345,6 +345,49 @@ def plot_wireplanes(event_number,metric):
     print("Done")
     fig.show()
                     
+        
+    Waveform_df = {}
+    ch_id = 9600
+    raw_rms = files['tpc_noise;1']['YA_plane'].array().to_list()
+    for r,rms in tqdm(enumerate(raw_rms)):
+        if r%3415 == 0:
+            Waveform_df[f'Channel_{ch_id}'] = []
+            Waveform_df[f'Channel_{ch_id}'].append(rms)
+            ch_id +=1
+        else:
+            Waveform_df[f'Channel_{ch_id-1}'].append(rms)
+
+    Waveform_df = pd.DataFrame(Waveform_df)
+    calc = waveform_calc(Waveform_df,metric)
+    waveform = calc.Run_calc()
+    
+    print(max(waveform),min(waveform),np.mean(waveform))
+    print(ch_id)
+    #ch_id = 10
+    color = []
+    x = []
+    y=[]
+    c = []
+    #fig = make_subplots(rows=1,cols=1)
+    for ch in tqdm(range(9600,ch_id,1)):
+        #a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
+        #b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
+
+        color.append(ch)
+        for i in range(int(wire_df['y_0'][ch]),int(wire_df['y_1'][ch]),1):
+            x_i = wire_df['z_0'][ch]
+            x.append(wire_df['z_0'][ch])
+            #print(ch)
+            c.append(waveform[ch-9600])
+            y.append(i)
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    #df = pd.DataFrame(df)
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"West TPC Coll Wire {str(metric)} Signal")
+    fig.update_layout(height = 800, width = 1200,showlegend = False)
+
+    fig.write_image(directory+f'/YA_plane_diagram_{event_number}_{metric}.png')
+    print("Done")
+    fig.show()
 
 def main():
 

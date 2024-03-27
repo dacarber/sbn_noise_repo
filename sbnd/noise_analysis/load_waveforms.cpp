@@ -67,12 +67,12 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		
 		short tick;
 		
-		tree->Branch("UB_plane", &tick,"tick/F");
-		tree->Branch("VB_plane", &tick,"tick/F");
-		tree->Branch("YB_plane", &tick,"tick/F");
-		tree->Branch("UA_plane", &tick,"tick/F");
-		tree->Branch("VA_plane", &tick,"tick/F");
-		tree->Branch("YA_plane", &tick,"tick/F");
+		tree->Branch("UB_plane", &tick,"tick/S");
+		tree->Branch("VB_plane", &tick,"tick/S");
+		tree->Branch("YB_plane", &tick,"tick/S");
+		tree->Branch("UA_plane", &tick,"tick/S");
+		tree->Branch("VA_plane", &tick,"tick/S");
+		tree->Branch("YA_plane", &tick,"tick/S");
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
