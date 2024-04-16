@@ -85,20 +85,24 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
+				cout<<2<<endl;
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
+					cout<<3<<endl;
 					NhighBurst++;
 					burst_high = true;
 				}
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){
+					cout<<4<<endl;
 					NLowBurst++;
 					burst_low = true;
 				}
 				if (burst_low == true && burst_high == true){ 
+					cout<<5<<endl;
 					break;
 				}
 			}
 			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
-				cout<<2<<endl;
+				
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
 				cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
@@ -122,7 +126,6 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		tree->Branch("UA_plane", &tick,"tick/S");
 		tree->Branch("VA_plane", &tick,"tick/S");
 		tree->Branch("YA_plane", &tick,"tick/S");
-		cout<<4<<endl;
 		for(int ki=0; ki<11264;ki++){
 
         	if (ki < 1984) {
