@@ -28,7 +28,7 @@ class waveform_calc:
         bin_width = 10
         if self.calc == 'RMS':
             calculation = self.RMS_calc()
-            self.range = (0,10)
+            self.range = (0,2)
             bin_width = .001
         elif self.calc == 'Max':
             calculation = self.Max_calc()
@@ -46,7 +46,12 @@ class waveform_calc:
             #bin_width = .01
         elif self.calc == 'Rise':
             calculation = self.Rise_calc()
-            self.range = (-100,100)
+            self.range = (-500,500)
+        elif self.calc == 'Ledge':
+            calculation = self.Ledge_calc()
+            self.range = (0,300)
+            bin_width = 1
+            self.type = 'Tick'
         else:
             print("You didn't enter a correct calculation\n Please enter Max, Min, Range, or RMS")
         square = 0
@@ -54,15 +59,16 @@ class waveform_calc:
             square += (tick - np.mean(calculation))*(tick - np.mean(calculation))
             mean = square / len(calculation)
             RMSE =np.sqrt(mean)
-        
+        '''
         nbins = int((max(calculation)-min(calculation))/bin_width)
-        print(nbins)
         fig = px.histogram(x=calculation,nbins=nbins)
         fig.update_layout(xaxis_title=self.calc)
         fig.update_layout(height = 600, width = 1000,showlegend = False)
         fig.add_annotation(dict(font = dict(size = 20),xshift=350,yshift=400,text = f"RMSE:{RMSE:.2f}",showarrow = False))
         fig.update_layout(xaxis_range=self.range)
         fig.show()
+        
+        '''
         return calculation
       
     def RMS_calc(self):
@@ -75,8 +81,8 @@ class waveform_calc:
                 square += (tick)*(tick)
             mean = square / len(waveform)
             RMS.append(np.sqrt(mean))
-            #if np.sqrt(mean) < 1.35:
-            #    print(keys)
+            if np.sqrt(mean) < 1.35:
+                print(keys)
         return RMS
     def Max_calc(self):
         waveform_max = []
@@ -123,6 +129,51 @@ class waveform_calc:
                         break
             waveform_adc_lead.append(waveform[pulse_start]-median)
         return waveform_adc_lead
+    def Ledge_calc(self):
+        waveform_time_zero = []
+        long_ledge = 0
+        ledge_time_end = 0
+        ledge_time_beg = 0
+        ledge_time = []
+        for keys in self.waveform_df:
+            number_0 = len(self.waveform_df[keys][(self.waveform_df[keys] ==np.min(self.waveform_df[keys]))&(np.min(self.waveform_df[keys]) < 100)])
+            waveform = self.waveform_df[keys]
+            waveform = list(waveform - np.mean(waveform[0:50]))
+            beg_ped = np.mean(waveform[0:50])
+            waveform.reverse()
+            end_ped = np.mean(waveform[0:50])
+            if abs(end_ped -beg_ped) >= 150:
+                #print("Waveform ledge goes all the way to the end")
+                ledge_time.append(np.argmax(waveform))
+                long_ledge +=1
+                continue
+            for t,tick in enumerate(waveform):
+                if waveform[t] > 100 and waveform[t+1]-waveform[t] < 10 :
+                    ledge_time_beg = t
+                    break
+            if abs(np.argmax(waveform)-ledge_time_beg) < 60:
+                #print("No ledge")
+                ledge_time.append(-10)
+                continue
+            if number_0 >1:
+                #print("No ledge")
+                ledge_time.append(-10)
+                continue
+            for k in range(ledge_time_beg, len(waveform),1):
+                if waveform[k+1]-waveform[k] < -10:
+                    ledge_time_end=0
+                    ledge_time_bed = 10
+                    #print("No ledge")
+                    break
+                if waveform[k+1]-waveform[k] > 10:
+                    ledge_time_end = k
+                    break
+                if k == 3413:
+                    break
+            #print(ledge_time_end,ledge_time_beg)
+            ledge_time.append(ledge_time_end-ledge_time_beg)
+        print("Number of channels with ledges past event display: ",long_ledge)
+        return ledge_time
 def load_wire_info():
     wire_plane_list = ['UB','VB','YB','UA','VA','YA']
     wire_df = {'Channel_id':[],'cryo':[],'tpc':[],'tpc':[],'plane':[],'rel_wire':[],'x_0':[],'y_0':[],'z_0':[],'x_1':[],'y_1':[],'z_1':[],'r':[]}
@@ -152,7 +203,7 @@ def load_wire_info():
     ch_mask = wire_df['Channel_id'] == 1
     return wire_df
 
-def threshold_info(waveform,value, threshold = None,ch_id = 0):
+def threshold_info(waveform,value, threshold = None):
     channel_map = pd.read_csv("../datafiles/channel_mapping.txt", sep = " ")
     
     if threshold is None:
@@ -160,15 +211,15 @@ def threshold_info(waveform,value, threshold = None,ch_id = 0):
     elif threshold == "Greater":
         for w,wire in enumerate(waveform):
             if wire >= float(value):
-                print(channel_map[channel_map['LArSoft_ch'] == w+ch_id])
+                print(channel_map[channel_map['LArSoft_ch'] == w])
     elif threshold == "Less":
         for w,wire in enumerate(waveform):
             if wire <= float(value):
-                print(channel_map[channel_map['LArSoft_ch'] == w+ch_id])
+                print(channel_map[channel_map['LArSoft_ch'] == w])
     elif threshold == "Equal":
         for w,wire in enumerate(waveform):
             if wire == float(value):
-                print(channel_map[channel_map['LArSoft_ch'] == w+ch_id])
+                print(channel_map[channel_map['LArSoft_ch'] == w])
     
 
 def plot_wireplanes(event_number,metric,value,threshold):
@@ -179,12 +230,12 @@ def plot_wireplanes(event_number,metric,value,threshold):
         os.mkdir(directory)
     files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/waveform_output_{event_number}.root")
     print(files['tpc_noise;1'].keys())
-    
+    print(metric)
     wire_df = load_wire_info()
     Waveform_df = {}
     ch_id = 0
     raw_rms = files['tpc_noise;1']['UB_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -195,20 +246,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1984)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: UB First East Induction")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
-    #ch_id = 10
+
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(0,ch_id,1)):
+    for ch in range(0,ch_id,1):
         a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -218,14 +269,13 @@ def plot_wireplanes(event_number,metric,value,threshold):
             x.append(i*((wire_df['z_1'][ch]-wire_df['z_0'][ch])/int(wire_df['r'][ch]))+wire_df['z_0'][ch])
             c.append(waveform[ch])
             y.append(a*x_i+b)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
     #df = pd.DataFrame(df)
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"East TPC First Ind Wire {metric} Signal")
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = f"{calc.type}",range_color=calc.range,title=f"East TPC First Ind Wire {metric} Signal")
     fig.update_layout(height = 800, width = 1200,showlegend = False)
     
     fig.write_image(directory+f'UB_plane_diagram_{event_number}_{metric}.png')
-    print("Done")
-    fig.show()
+    #fig.show()
     
     
 # VB Plane
@@ -233,7 +283,7 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = {}
     ch_id = 1984
     raw_rms = files['tpc_noise;1']['VB_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -243,20 +293,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1984)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: VB Second East Induction")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
     #ch_id = 10
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(1984,ch_id,1)):
+    for ch in range(1984,ch_id,1):
         a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -267,13 +317,12 @@ def plot_wireplanes(event_number,metric,value,threshold):
             #print(ch)
             c.append(waveform[ch-1984])
             y.append(a*x_i+b)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color ="ADC",range_color=calc.range,title=f"East TPC Second Ind Wire {str(metric)} Signal")
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color =f"{calc.type}",range_color=calc.range,title=f"East TPC Second Ind Wire {str(metric)} Signal")
     fig.update_layout(height = 800, width = 1200,showlegend = False)
 
     fig.write_image(directory+f"VB_plane_diagram_{event_number}_{metric}.png")
-    print("Done")
-    fig.show()
+    #fig.show()
     
 
 #.      YB Plane    
@@ -281,7 +330,7 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = {}
     ch_id = 3968
     raw_rms = files['tpc_noise;1']['YB_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -292,20 +341,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1664)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: YB East Collection")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
     #ch_id = 10
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(3968,ch_id,1)):
+    for ch in range(3968,ch_id,1):
         #a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         #b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -316,20 +365,19 @@ def plot_wireplanes(event_number,metric,value,threshold):
             #print(ch)
             c.append(waveform[ch-3968])
             y.append(i)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
 
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"East TPC Coll Wire {str(metric)} Signal")
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = f"{calc.type}",range_color=calc.range,title=f"East TPC Coll Wire {str(metric)} Signal")
     fig.update_layout(height = 800, width = 1200,showlegend = False)
 
     fig.write_image(directory+f'YB_plane_diagram_{event_number}_{metric}.png')
-    print("Done")
-    fig.show()
+    #fig.show()
     
     
     Waveform_df = {}
     ch_id = 5632
     raw_rms = files['tpc_noise;1']['UA_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -339,20 +387,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1984)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: UA First West Induction")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
     #ch_id = 10
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(5632,ch_id,1)):
+    for ch in range(5632,ch_id,1):
         a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -363,22 +411,21 @@ def plot_wireplanes(event_number,metric,value,threshold):
             #print(ch)
             c.append(waveform[ch-5632])
             y.append(a*x_i+b)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
     #df = pd.DataFrame(df)
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"West TPC First Ind Wire {str(metric)} Signal")
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = f"{calc.type}",range_color=calc.range,title=f"West TPC First Ind Wire {str(metric)} Signal")
 
 
     fig.update_layout(height = 800, width = 1200,showlegend = False)
 
     fig.write_image(directory+f'UA_plane_diagram_{event_number}_{metric}.png')
-    print("Done")
-    fig.show()
+    #fig.show()
     
     
     Waveform_df = {}
     ch_id = 7616
     raw_rms = files['tpc_noise;1']['VA_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -389,20 +436,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1984)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: VA Second West Induction")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
     #ch_id = 10
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(7616,ch_id,1)):
+    for ch in range(7616,ch_id,1):
         a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -413,20 +460,19 @@ def plot_wireplanes(event_number,metric,value,threshold):
             #print(ch)
             c.append(waveform[ch-7616])
             y.append(a*x_i+b)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
     #df = pd.DataFrame(df)
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"West TPC Second Ind Wire {str(metric)} Signal")
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = f"{calc.type}",range_color=calc.range,title=f"West TPC Second Ind Wire {str(metric)} Signal")
     fig.update_layout(height = 800, width = 1200,showlegend = False)
 
     fig.write_image(directory+f'VA_plane_diagram_{event_number}_{metric}.png')
-    print("Done")
-    fig.show()
+    #fig.show()
                     
         
     Waveform_df = {}
     ch_id = 9600
     raw_rms = files['tpc_noise;1']['YA_plane'].array().to_list()
-    for r,rms in tqdm(enumerate(raw_rms)):
+    for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
             Waveform_df[f'Channel_{ch_id}'] = []
             Waveform_df[f'Channel_{ch_id}'].append(rms)
@@ -437,20 +483,20 @@ def plot_wireplanes(event_number,metric,value,threshold):
     Waveform_df = pd.DataFrame(Waveform_df)
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
-    threshold_info(waveform, value = value, threshold = threshold,ch_id=ch_id - 1664)
+    threshold_info(waveform, value = value, threshold = threshold)
+    print("\nWire plane: YA West Collection")
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
     if sum(mask) > 0:
         print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
-    print(ch_id)
     #ch_id = 10
     color = []
     x = []
     y=[]
     c = []
     #fig = make_subplots(rows=1,cols=1)
-    for ch in tqdm(range(9600,ch_id,1)):
+    for ch in range(9600,ch_id,1):
         #a = (wire_df['y_1'][ch]-wire_df['y_0'][ch])/(wire_df['z_1'][ch]-wire_df['z_0'][ch])
         #b = wire_df['y_1'][ch] -a*wire_df['z_1'][ch]
 
@@ -461,26 +507,26 @@ def plot_wireplanes(event_number,metric,value,threshold):
             #print(ch)
             c.append(waveform[ch-9600])
             y.append(i)
-    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),"ADC":np.array(c)}
+    df = {'Z [cm]':np.array(x),'Y [cm]':np.array(y),f"{calc.type}":np.array(c)}
     #df = pd.DataFrame(df)
-    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "ADC",range_color=calc.range,title=f"West TPC Coll Wire {str(metric)} Signal")
+    fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = f"{calc.type}",range_color=calc.range,title=f"West TPC Coll Wire {str(metric)} Signal")
     fig.update_layout(height = 800, width = 1200,showlegend = False)
 
     fig.write_image(directory+f'YA_plane_diagram_{event_number}_{metric}.png')
-    print("Done")
-    fig.show()
+    #fig.show()
 
 def main():
-
-    event_number = input("Please enter event number:")
-    metric = input("Please enter calculation type (RMS, Max, Min,Integral, Rise or Range):")
-    channel_map = pd.read_csv("../datafiles/channel_mapping.txt", sep = " ")
-    threshold = input(f"If you want to print threshold enter type of threshold (Greater, Less, or Equal): ")
-    print(threshold)
-    if (threshold != '' or threshold != None):
-        value = input("Please enter value for threshold: ")
     
-    plot_wireplanes(event_number,str(metric),value,threshold)
+    event_number = input("Please enter event number:")
+    #metric = input("Please enter calculation type (RMS, Max, Min,Integral, Rise or Range):")
+    metric_list = ['Rise','Integral','Ledge']
+    channel_map = pd.read_csv("../datafiles/channel_mapping.txt", sep = " ")
+    for metric in metric_list:
+        threshold = input(f"If you want to print threshold for {metric} enter type of threshold (Greater, Less, or Equal): ")
+        if (threshold != "" or threshold != None):
+            value = input("Please enter value for threshold: ")
+
+        plot_wireplanes(event_number,str(metric),value,threshold)
     
 if __name__=="__main__": 
     main() 

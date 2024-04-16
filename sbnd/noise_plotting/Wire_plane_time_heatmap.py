@@ -23,8 +23,10 @@ class waveform_calc:
         self.calc = calc
         self.range = (0,200)
         self.type = 'Tick'
+        
     def Run_calc(self):
         calculation = []
+        bin_width = 1
         if self.calc == 'RMS':
             calculation = self.RMS_calc()
             self.range = (0,1000)
@@ -38,6 +40,24 @@ class waveform_calc:
         elif self.calc == 'Rise':
             calculation = self.Rise_calc()
             self.range = (0,100)
+        elif self.calc == 'Slope':
+            calculation = self.Slope_calc()
+            self.range = (0,30)
+        elif self.calc == 'Zero':
+            calculation = self.Zero_calc()
+            self.range = (0,20)
+        elif self.calc == 'Start':
+            calculation = self.Start_calc()
+            self.range = (calculation[0]-10,calculation[0]+10)
+            bin_width = .5
+        elif self.calc == 'Lead_rise':
+            calculation = self.Lead_rise_calc()
+            self.range = (0,100)
+            bin_width = .5
+        elif self.calc == 'Ledge':
+            calculation = self.Ledge_calc()
+            self.range = (0,300)
+            bin_width = 1
         else:
             print("You didn't enter a correct calculation\n Please enter Max, Min, Rise, or Range")
         square = 0
@@ -45,7 +65,7 @@ class waveform_calc:
             square += (tick - np.mean(calculation))*(tick - np.mean(calculation))
             mean = square / len(calculation)
             RMSE =np.sqrt(mean)
-        bin_width = 1
+        #print(calculation)
         nbins = int((max(calculation)-min(calculation))/bin_width)
         print(nbins)
         fig = px.histogram(x=calculation,nbins=nbins)
@@ -80,7 +100,9 @@ class waveform_calc:
     def Range_calc(self):
         waveform_time_range = []
         for keys in self.waveform_df:
-            waveform_time_range.append(abs(np.argmax(self.waveform_df[keys])-np.argmin(self.waveform_df[keys])))
+            number_0 = len(self.waveform_df[keys][self.waveform_df[keys] == 0])
+            number_max = len(self.waveform_df[keys][self.waveform_df[keys] == np.max(self.waveform_df[keys])])
+            waveform_time_range.append(abs(np.argmax(self.waveform_df[keys])+int(number_max/2)-(np.argmin(self.waveform_df[keys])+(int(number_0/2)))))
         return waveform_time_range
     def Rise_calc(self):
         rise_time = []
@@ -100,6 +122,107 @@ class waveform_calc:
             rise_time.append(np.argmax(waveform)-i)
         return rise_time
 
+    def Slope_calc(self):
+        waveform_time_slope = []
+        for keys in self.waveform_df:
+            pulse = self.waveform_df[keys][np.argmax(self.waveform_df[keys]):np.argmax(self.waveform_df[keys])+50]
+            x=0
+            for tick in pulse:
+                x+=1
+                if tick == 0:
+                    break
+            y = np.min(self.waveform_df[keys]) - np.max(self.waveform_df[keys])
+            waveform_time_slope.append(y/x)
+        return waveform_time_slope
+    def Zero_calc(self):
+        waveform_time_zero = []
+        for keys in self.waveform_df:
+            number_0 = len(self.waveform_df[keys][self.waveform_df[keys] ==np.min(self.waveform_df[keys])])
+            waveform_time_zero.append(number_0)
+        return waveform_time_zero
+    def Start_calc(self):
+        waveform_time_start = []
+        for keys in self.waveform_df:
+            waveform = self.waveform_df[keys]
+            pulse_start = 0
+            for tick in range(1,len(waveform),1):
+                    if abs(waveform[tick]-waveform[tick-1]) > 20:
+                        pulse_start = tick-1
+                        break
+            waveform_time_start.append(pulse_start)
+        return waveform_time_start
+    def Lead_rise_calc(self):
+        waveform_time_lead = []
+        k=0
+        waveform = [0]*3415
+        for keys in self.waveform_df:
+            pulse = self.waveform_df[keys][:np.argmax(self.waveform_df[keys])-100]
+            number_min = len(pulse[pulse < 500])
+            number_max = len(pulse[pulse > 2500])
+            if (number_min > 1 or number_max>1):
+                continue
+            waveform += self.waveform_df[keys]
+            k+=1
+        waveform = waveform/k
+        rise_start = 0
+        for tick in range(0,len(waveform),1):
+                if abs(waveform[tick+20]-waveform[tick]) >=2:
+                    rise_start = tick
+                    break
+        for keys in self.waveform_df:
+            waveform = self.waveform_df[keys]
+            pulse_start = 0
+            for tick in range(1,len(waveform),1):
+                    if abs(waveform[tick]-waveform[tick-1]) > 20:
+                        pulse_start = tick-1
+                        break
+            waveform_time_lead.append(pulse_start-rise_start)
+        return waveform_time_lead
+    def Ledge_calc(self):
+        waveform_time_zero = []
+        long_ledge = 0
+        ledge_time_end = 0
+        ledge_time_beg = 0
+        ledge_time = []
+        for keys in self.waveform_df:
+            number_0 = len(self.waveform_df[keys][(self.waveform_df[keys] ==np.min(self.waveform_df[keys]))&(np.min(self.waveform_df[keys]) < 100)])
+            waveform = self.waveform_df[keys]
+            waveform = list(waveform - np.mean(waveform[0:50]))
+            beg_ped = np.mean(waveform[0:50])
+            waveform.reverse()
+            end_ped = np.mean(waveform[0:50])
+            if abs(end_ped -beg_ped) >= 150:
+                print("Waveform ledge goes all the way to the end")
+                ledge_time.append(np.argmax(waveform))
+                long_ledge +=1
+                continue
+            for t,tick in enumerate(waveform):
+                if waveform[t] > 100 and waveform[t+1]-waveform[t] < 10 :
+                    ledge_time_beg = t
+                    break
+            if abs(np.argmax(waveform)-ledge_time_beg) < 60:
+                #print("No ledge")
+                ledge_time.append(-10)
+                continue
+            if number_0 >1:
+                #print("No ledge")
+                ledge_time.append(-10)
+                continue
+            for k in range(ledge_time_beg, len(waveform),1):
+                if waveform[k+1]-waveform[k] < -10:
+                    ledge_time_end=0
+                    ledge_time_bed = 10
+                    #print("No ledge")
+                    break
+                if waveform[k+1]-waveform[k] > 10:
+                    ledge_time_end = k
+                    break
+                if k == 3413:
+                    break
+            #print(ledge_time_end,ledge_time_beg)
+            ledge_time.append(ledge_time_end-ledge_time_beg)
+        print("Number of channels with ledges past event display: ",long_ledge)
+        return ledge_time
         
 def load_wire_info():
     wire_plane_list = ['UB','VB','YB','UA','VA','YA']
@@ -131,7 +254,9 @@ def load_wire_info():
     return wire_df
 
 def plot_wireplanes(event_number,metric):
-    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/"
+    if not os.path.exists(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/"):
+        os.mkdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/")
+    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/time_{metric}/"
     if not os.path.exists(directory):
         os.mkdir(directory)
     files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/waveform_output_{event_number}.root")
@@ -153,7 +278,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
 
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     
     print(ch_id)
     #ch_id = 10
@@ -177,7 +306,7 @@ def plot_wireplanes(event_number,metric):
     fig=px.scatter(df,x="Z [cm]",y ="Y [cm]",color = "Tick",range_color=calc.range,title=f"East TPC First Ind Wire {metric} Signal",color_continuous_scale=px.colors.sequential.Viridis)
     fig.update_layout(height = 800, width = 1200,showlegend = False)
     
-    fig.write_image(directory+f'UB_plane_diagram_event_time_{event_number}_{metric}.png')
+    fig.write_image(directory+f'UB_plane_diagram_time_{event_number}_{metric}.png')
     print("Done")
     fig.show()
     
@@ -198,7 +327,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
 
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     print(ch_id)
     #ch_id = 10
     color = []
@@ -243,7 +376,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
 
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     print(ch_id)
     #ch_id = 10
     color = []
@@ -286,7 +423,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
 
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     print(ch_id)
     #ch_id = 10
     color = []
@@ -332,7 +473,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
     
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     print(ch_id)
     #ch_id = 10
     color = []
@@ -376,7 +521,11 @@ def plot_wireplanes(event_number,metric):
     calc = waveform_calc(Waveform_df,metric)
     waveform = calc.Run_calc()
     
-    print(max(waveform),min(waveform),np.mean(waveform))
+    print("Max: ",max(waveform)*.5,"Min: ",min(waveform)*.5,"Mean: ",np.mean(waveform)*.5)
+    waveform = np.array(waveform)
+    mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
+    if sum(mask) > 0:
+        print("Max within range: ",np.max(waveform[mask])*.5,"Min within range: ",np.min(waveform[mask])*.5,"Mean within range: ",np.mean(waveform[mask])*.5)
     print(ch_id)
     #ch_id = 10
     color = []
@@ -408,7 +557,7 @@ def plot_wireplanes(event_number,metric):
 def main():
 
     event_number = input("Please enter event number:")
-    metric = input("Please enter calculation type of time (Max, Min, Rise, or Range):")
+    metric = input("Please enter calculation type of time (Max, Min, Rise, Slope, Zero, Start, Lead_rise,Ledge or Range):")
     plot_wireplanes(event_number,str(metric))
     
 if __name__=="__main__": 
