@@ -86,6 +86,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
 				cout<<2<<endl;
+				cout<<myADC[in].ADC(itick)<<endl;
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
 					cout<<3<<endl;
 					NhighBurst++;
