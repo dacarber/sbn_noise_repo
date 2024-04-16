@@ -85,7 +85,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
 					NhighBurst++;
-					burst_high == true;
+					burst_high = true;
 				}
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){
 					NLowBurst++;
@@ -96,11 +96,11 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
-				cout<< "Event: "<< event_num<< "Local event: "<<evt<<end;
+				cout<< "Event: "<< event_num<< "Local event: "<<evt<<endl;
 			}
 		}
 		if (burst == false){
-			cout<<"Skip event: "<<event_info<<endl;
+			cout<<"Skip event: "<<event_num<<endl;
 			continue;
 		}
 		TFile* file = new TFile(filename, "RECREATE");
