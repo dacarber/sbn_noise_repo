@@ -57,7 +57,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	while (Events.Next())
 	{
 		unsigned int *event_num = event_info.Get();
-		cout<<"Event id"<<event_num<<endl;
+		cout<<"Event id: "<<*event_num<<endl;
 		evt +=1;
 
 		//for(int i = 0; i<myPedestal.GetSize();i++){
@@ -97,15 +97,15 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
-				cout<< "Event: "<< event_num<< "Local event: "<<evt<<endl;
+				cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
 			}
 		}
 		if (burst == false){
-			cout<<"Skip event: "<<event_num<<endl;
+			cout<<"Skip event: "<<*event_num<<endl;
 			continue;
 		}
 		TString filename = "waveform_";
-		filename += Form("%u", event_num);
+		filename += Form("%u", *event_num);
 		filename += ".root";
 		TFile* file = new TFile(filename, "RECREATE");
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
