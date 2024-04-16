@@ -30,6 +30,7 @@
 #include <TVirtualFFT.h>
 #include <fstream>
 #include <TChain.h>
+#include <string>
 
 //#include <bits/stdc++.h> 
 
