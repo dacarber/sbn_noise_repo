@@ -82,7 +82,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			cout<<2<<endl;
+			
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
@@ -93,15 +93,18 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 					NLowBurst++;
 					burst_low = true;
 				}
-				if (burst_low == true && burst_high == true) break;
+				if (burst_low == true && burst_high == true){ 
+					break;
+				}
 			}
 			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
+				cout<<2<<endl;
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
 				cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
 			}
 		}
-		cout<<3<<endl;
+		
 		if (burst == false){
 			cout<<"Skip event: "<<*event_num<<endl;
 			continue;
