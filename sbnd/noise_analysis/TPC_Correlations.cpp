@@ -128,6 +128,17 @@ vector<float> FFT(vector<short> noise_channel){
 	return fftMagnitude;
 		
 }
+float dot_product(vector<short> vector_a, vector<short> vector_b) {
+    int product = 0;
+    if (vector_a.size() != vector_b.size()){
+    	cerr<<"Error: Vectors not the same size."<<endl;
+    	return product = 0;
+    }
+    for (int i = 0; i < size; i++){
+    	product = product + vector_a[i] * vector_b[i];
+	}
+   return product;
+}
 
 void LoadRawDigits(TFile *inFile)
 {	
@@ -145,8 +156,8 @@ void LoadRawDigits(TFile *inFile)
 	//vector<uint32_t> Pedestal;
 	//cout<<myADC.GetSize()<<endl;
 	//size_t channel_size = 2000;
-	vector<float> RMS_total(11264,0.0f);
-	vector<vector<float>> FFT_total(11264);
+	//vector<float> RMS_total(11264,0.0f);
+	vector<vector<float>> Cor_total(11264,vector<float>(11264,0.0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
@@ -162,7 +173,31 @@ void LoadRawDigits(TFile *inFile)
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
-		for(int ki=0; ki<myADC.GetSize();ki++){
+		for(int ki=0; ki<11264;ki++){
+			int channel = myADC[ki].Channel();
+			auto in = find(channels.begin(),channels.end(), ki);
+			int index = in-channels.begin();
+			
+			if (myADC[index].NADC() != 3415){
+				continue;
+			}
+			vector<double> x(myADC[index].Samples(),0);
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
+			for (int ji=0; ji < 11264;ji++){
+				int channel = myADC[ji].Channel();
+				auto in = find(channels.begin(),channels.end(), ji);
+				int index = in-channels.begin();
+				vector<double> y(myADC[index].Samples(),0);
+				if (myADC[index].NADC() != 3415){
+					continue;
+				}
+				for (size_t itick=0; itick < myADC[index].Samples(); ++itick) y[itick] = myADC[index].ADC(itick);
+				cov = dot_product(x,y);
+				var_x = dot_product(x,x);
+				var_y = dot_product(y,y);
+				Cor_total[ki][ji] = cov/(var_x*var_y);
+
+			}
 			cout<<myADC[ki].Channel()<<endl;
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
@@ -232,7 +267,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
+void TPC_Correlations(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	

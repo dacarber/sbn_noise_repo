@@ -47,18 +47,16 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	//Events.Print();
 	TString filename = "waveform_"+TString(sel_evt)+".root";
 	TTreeReaderArray<int> event_info(Events, "EventAuxiliary.id_.event_");
+
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
-	TFile* file = new TFile(, "RECREATE");
-	TTree* tree = new TTree("tpc_noise", "tpc_noise");
+	
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
 	{
-		if (evt != sel_evt) {
-			cout<<"Skip event: "<<evt<<endl;
-			evt +=1;
-			continue;
-		}
+		cout<<"Event id",event_info<<endl;
+		evt +=1;
+
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
@@ -67,6 +65,44 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<short> channels;
 		
+		
+		for(int p=0; p<myADC.GetSize();p++){
+			channels.push_back(myADC[p].Channel());
+		}
+		int NhighBurst = 0;
+		int NLowBurst = 0;
+		bool burst = false;
+		for(int ki=0; ki<11264;ki++){
+			bool burst_high = false;
+			bool burst_low = false;
+			int channel = myADC[ki].Channel();
+			auto index = find(channels.begin(),channels.end(), ki);
+			int in = index-channels.begin();
+			
+			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){
+				if (myADC[index].ADC(itick) - myADC[index].GetPedestal() > 1000 && burst_high == false){
+					NhighBurst++;
+					burst_high == true;
+				}
+				if (myADC[index].ADC(itick) - myADC[index].GetPedestal() < -1000 && burst_low == false){
+					NLowBurst++;
+					burst_low = true
+				}
+				if (burst_low == true && burst_high == true) break;
+			}
+			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
+				burst = true;
+				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
+				cout<< "Event: "<< event_info<< "Local event: "<<evt<<end;
+			}
+		}
+		if (burst == false){
+			cout<<"Skip event: "<<event_info<<endl;
+			continue;
+		}
+		TFile* file = new TFile(filename, "RECREATE");
+		TTree* tree = new TTree("tpc_noise", "tpc_noise");
 		short tick;
 		
 		tree->Branch("UB_plane", &tick,"tick/S");
@@ -75,10 +111,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		tree->Branch("UA_plane", &tick,"tick/S");
 		tree->Branch("VA_plane", &tick,"tick/S");
 		tree->Branch("YA_plane", &tick,"tick/S");
-		for(int p=0; p<myADC.GetSize();p++){
-			channels.push_back(myADC[p].Channel());
-		}
 		for(int ki=0; ki<11264;ki++){
+
         	if (ki < 1984) {
         		tree->SetBranchStatus("UB_plane", 1);
         		tree->SetBranchStatus("VB_plane", 0);
@@ -128,9 +162,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
         		tree->SetBranchStatus("YA_plane", 1);
         	}
 			vector<float> x;
-			int channel = myADC[ki].Channel();
-			auto index = find(channels.begin(),channels.end(), ki);
-			int in = index-channels.begin();
+			
 			//int in = index;
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
 			int total_tick = 0;
