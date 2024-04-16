@@ -103,7 +103,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			cout<<"Skip event: "<<event_num<<endl;
 			continue;
 		}
-		TString filename = "waveform_"+to_string(event_num)+".root";
+		TString filename = "waveform_"+std::to_string(event_num)+".root";
 		TFile* file = new TFile(filename, "RECREATE");
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
 		short tick;
