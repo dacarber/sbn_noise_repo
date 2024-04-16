@@ -46,6 +46,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
 	TString filename = "waveform_"+TString(sel_evt)+".root";
+	TTreeReaderArray<int> event_info(Events, "EventAuxiliary.id_.event_");
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	TFile* file = new TFile(, "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
