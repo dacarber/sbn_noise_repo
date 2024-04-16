@@ -56,7 +56,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	int evt = 0;
 	while (Events.Next())
 	{
-		int *event_num = event_info.Get();
+		unsigned int *event_num = event_info.Get();
 		cout<<"Event id"<<event_num<<endl;
 		evt +=1;
 
@@ -105,7 +105,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			continue;
 		}
 		TString filename = "waveform_";
-		filename += Form("%i", event_num);
+		filename += Form("%u", event_num);
 		filename += ".root";
 		TFile* file = new TFile(filename, "RECREATE");
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
