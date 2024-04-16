@@ -46,7 +46,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
-	TString filename = "waveform_"+TString(sel_evt)+".root";
+	
 	TTreeReaderValue<int> event_info(Events, "EventAuxiliary.id_.event_");
 
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
@@ -103,6 +103,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			cout<<"Skip event: "<<event_num<<endl;
 			continue;
 		}
+		TString filename = "waveform_"+TString(event_num)+".root";
 		TFile* file = new TFile(filename, "RECREATE");
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
 		short tick;
@@ -164,7 +165,9 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
         		tree->SetBranchStatus("YA_plane", 1);
         	}
 			vector<float> x;
-			
+			int channel = myADC[ki].Channel();
+			auto index = find(channels.begin(),channels.end(), ki);
+			int in = index-channels.begin();
 			//int in = index;
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
 			int total_tick = 0;
@@ -194,14 +197,15 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			
 
 		}
-		evt+=1;
+		//evt+=1;
 		cout<<"Event:"<<evt<<endl;
 		//break;
+		file->Write();
+		file->Close();
 	}
 	
 	
-	file->Write();
-	file->Close();
+	
 	
 	cout<<"Got ADC and Pedestal"<<endl;
 
