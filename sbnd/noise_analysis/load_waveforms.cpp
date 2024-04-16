@@ -54,7 +54,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	int evt = 0;
 	while (Events.Next())
 	{
-		cout<<"Event id",event_info<<endl;
+		cout<<"Event id"<<event_info<<endl;
 		evt +=1;
 
 		//for(int i = 0; i<myPedestal.GetSize();i++){
