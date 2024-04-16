@@ -81,13 +81,13 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
 			
-			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){
-				if (myADC[index].ADC(itick) - myADC[index].GetPedestal() > 1000 && burst_high == false){
+			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
+			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
 					NhighBurst++;
 					burst_high == true;
 				}
-				if (myADC[index].ADC(itick) - myADC[index].GetPedestal() < -1000 && burst_low == false){
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){
 					NLowBurst++;
 					burst_low = true;
 				}
