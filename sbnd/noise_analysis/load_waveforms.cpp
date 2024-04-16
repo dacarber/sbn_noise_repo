@@ -20,6 +20,7 @@
 #include "TVectorT.h"
 #include "TTreeReader.h"
 #include "TTreeReaderArray.h"
+#include "TTreeReaderValue.h"
 #include <typeinfo>
 #include <cmath>
 #include <cstdlib>
@@ -46,7 +47,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	TTreeReader Events("Events;1", inFile);
 	//Events.Print();
 	TString filename = "waveform_"+TString(sel_evt)+".root";
-	TTreeReaderArray<int> event_info(Events, "EventAuxiliary.id_.event_");
+	TTreeReaderValue<int> event_info(Events, "EventAuxiliary.id_.event_");
 
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	
@@ -54,7 +55,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	int evt = 0;
 	while (Events.Next())
 	{
-		cout<<"Event id"<<event_info<<endl;
+		int *event_num = event_info.Get();
+		cout<<"Event id"<<event_num<<endl;
 		evt +=1;
 
 		//for(int i = 0; i<myPedestal.GetSize();i++){
@@ -87,14 +89,14 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 				}
 				if (myADC[index].ADC(itick) - myADC[index].GetPedestal() < -1000 && burst_low == false){
 					NLowBurst++;
-					burst_low = true
+					burst_low = true;
 				}
 				if (burst_low == true && burst_high == true) break;
 			}
 			if (NhighBurst > 2000 && NLowBurst > 100 && NhighBurst > NLowBurst){
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
-				cout<< "Event: "<< event_info<< "Local event: "<<evt<<end;
+				cout<< "Event: "<< event_num<< "Local event: "<<evt<<end;
 			}
 		}
 		if (burst == false){
