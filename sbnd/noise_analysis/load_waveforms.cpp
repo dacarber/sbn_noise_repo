@@ -82,23 +82,19 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			
+			if (myADC[in].Samples() != 3415){
+				continue;
+			} 
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
-				cout<<2<<endl;
-				cout<<myADC[in].ADC(itick)<<endl;
-				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){
-					cout<<3<<endl;
-					NhighBurst++;
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){					NhighBurst++;
 					burst_high = true;
 				}
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){
-					cout<<4<<endl;
 					NLowBurst++;
 					burst_low = true;
 				}
 				if (burst_low == true && burst_high == true){ 
-					cout<<5<<endl;
 					break;
 				}
 			}
