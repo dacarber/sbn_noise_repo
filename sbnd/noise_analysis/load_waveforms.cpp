@@ -98,7 +98,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 					break;
 				}
 			}
-			if (NhighBurst > 1500 || NLowBurst > 1500){ //&& NLowBurst > 100 && NhighBurst > NLowBurst
+			if (NhighBurst > 1500 && NLowBurst > 100 && NhighBurst > NLowBurst){ //|| NLowBurst > 1500
 				
 				burst = true;
 				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
