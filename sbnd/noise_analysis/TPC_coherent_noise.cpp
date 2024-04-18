@@ -130,7 +130,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<short> noise_channels(ADC.size(),0);
 		bool responsive_channel = true;
 		vector<short> channels;
-		short group_size = 32;
+		short group_size = 8;
 		for(int p=0; p<myADC.GetSize();p++){		//Puts all of the channel ids into a vector in the order the files have the events
             channels.push_back(myADC[p].Channel()); 
         }
@@ -159,7 +159,7 @@ void LoadRawDigits(TFile *inFile)
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
 				}
-				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
+				transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
 
 				continue;
 			}
@@ -177,7 +177,7 @@ void LoadRawDigits(TFile *inFile)
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
 				}
 				
-				transform(RMS_wave_total[channel/31].begin(),RMS_wave_total[channel/31].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
+				transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
 				cout<<"combine waveform"<<endl;
 			}
 			else{
