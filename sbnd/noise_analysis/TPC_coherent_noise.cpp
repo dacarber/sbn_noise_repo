@@ -55,7 +55,7 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 
 }
 
-double Noise_levels(vector<short> noise_channels){
+double Noise_levels(vector<float> noise_channels){
 	double RMS;
 	float square;
 	float sum;
@@ -152,7 +152,7 @@ void LoadRawDigits(TFile *inFile)
 					channel_group.clear();
 					continue;				
 				}
-				vector<short> coherent_waveform = Coherent_RMS(channel_group);
+				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;

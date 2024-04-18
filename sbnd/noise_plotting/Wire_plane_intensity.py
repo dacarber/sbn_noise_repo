@@ -228,7 +228,7 @@ def plot_wireplanes(event_number,metric,value,threshold):
     directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/{metric}/"
     if not os.path.exists(directory):
         os.mkdir(directory)
-    files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/waveform_output_{event_number}.root")
+    files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/run12622/waveform_{event_number}.root")
     print(files['tpc_noise;1'].keys())
     print(metric)
     wire_df = load_wire_info()
