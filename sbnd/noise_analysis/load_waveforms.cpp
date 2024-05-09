@@ -215,6 +215,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		//evt+=1;
 		cout<<"Event:"<<evt<<endl;
 		//break;
+		event_tree->Fill();
 		file->Write();
 		file->Close();
 	}
