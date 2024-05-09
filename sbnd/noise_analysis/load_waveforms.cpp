@@ -59,7 +59,9 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		unsigned int *event_num = event_info.Get();
 		cout<<"Event id: "<<*event_num<<endl;
 		evt +=1;
-
+		if (*event_num == 0 || *event_num >50){
+            continue;
+        }
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
@@ -87,7 +89,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			} 
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
-				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){					NhighBurst++;
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){					
+					NhighBurst++;
 					burst_high = true;
 				}
 				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){

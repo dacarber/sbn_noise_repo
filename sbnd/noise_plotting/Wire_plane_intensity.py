@@ -23,6 +23,7 @@ class waveform_calc:
         self.calc = calc
         self.range = (0,5000)
         self.type = 'ADC'
+        self.ledge = 0
     def Run_calc(self):
         calculation = []
         bin_width = 10
@@ -48,10 +49,15 @@ class waveform_calc:
             calculation = self.Rise_calc()
             self.range = (-500,500)
         elif self.calc == 'Ledge':
-            calculation = self.Ledge_calc()
-            self.range = (0,300)
+            ledge_info = self.Ledge_calc()
+            calculation = ledge_info[0]
+            self.ledge = ledge_info[1]
+            self.range = (0,2000)
             bin_width = 1
             self.type = 'Tick'
+        elif self.calc == 'Rise_time':
+            calculation = self.Rise_time_calc()
+            self.range = (0,500)
         else:
             print("You didn't enter a correct calculation\n Please enter Max, Min, Range, or RMS")
         square = 0
@@ -129,6 +135,23 @@ class waveform_calc:
                         break
             waveform_adc_lead.append(waveform[pulse_start]-median)
         return waveform_adc_lead
+    def Rise_time_calc(self):
+        rise_time = []
+        for keys in self.waveform_df:
+            waveform = self.waveform_df[keys]
+            median = np.median(waveform[0:50])
+            i = np.argmax(waveform)
+            if i == 0:
+                rise_time.append(-1)
+                continue
+            #print(waveform[i]," ",median, " ")
+            while waveform[i]>=median:
+                i-=1
+                if i == 0:
+                    break
+                #print(i)
+            rise_time.append(np.argmax(waveform)-i)
+        return rise_time
     def Ledge_calc(self):
         waveform_time_zero = []
         long_ledge = 0
@@ -153,27 +176,29 @@ class waveform_calc:
                     break
             if abs(np.argmax(waveform)-ledge_time_beg) < 60:
                 #print("No ledge")
-                ledge_time.append(-10)
+                ledge_time.append(0)
                 continue
             if number_0 >1:
                 #print("No ledge")
-                ledge_time.append(-10)
+                ledge_time.append(0)
                 continue
             for k in range(ledge_time_beg, len(waveform),1):
                 if waveform[k+1]-waveform[k] < -10:
                     ledge_time_end=0
-                    ledge_time_bed = 10
+                    ledge_time_beg = 0
                     #print("No ledge")
                     break
                 if waveform[k+1]-waveform[k] > 10:
                     ledge_time_end = k
                     break
                 if k == 3413:
+                    ledge_time_end=0
+                    ledge_time_beg = 0
                     break
             #print(ledge_time_end,ledge_time_beg)
             ledge_time.append(ledge_time_end-ledge_time_beg)
-        print("Number of channels with ledges past event display: ",long_ledge)
-        return ledge_time
+        
+        return ledge_time,long_ledge
 def load_wire_info():
     wire_plane_list = ['UB','VB','YB','UA','VA','YA']
     wire_df = {'Channel_id':[],'cryo':[],'tpc':[],'tpc':[],'plane':[],'rel_wire':[],'x_0':[],'y_0':[],'z_0':[],'x_1':[],'y_1':[],'z_1':[],'r':[]}
@@ -222,18 +247,27 @@ def threshold_info(waveform,value, threshold = None):
                 print(channel_map[channel_map['LArSoft_ch'] == w])
     
 
-def plot_wireplanes(event_number,metric,value,threshold):
-    if not os.path.exists(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/"):
-        os.mkdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/")
-    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/{event_number}/{metric}/"
+def plot_wireplanes(event_number,run_number,metric,):#value,threshold
+    value = None
+    threshold = None
+    #"Event":[],"UA Blob Max":[],"UA Blob Mean":[],"Long Ledge":[]
+    return_list = [0,0,0,0]
+    return_list[0] = event_number
+    print(f"Run {run_number}, Event: {event_number}")
+    if not os.path.exists(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/"):
+        os.mkdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/")
+    if not os.path.exists(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/{event_number}/"):
+        os.mkdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/{event_number}/")
+    directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/{event_number}/{metric}/"
     if not os.path.exists(directory):
         os.mkdir(directory)
-    files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/run12622/waveform_{event_number}.root")
-    print(files['tpc_noise;1'].keys())
+    files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/run{run_number}/waveform_{event_number}.root")
+    #print(files['tpc_noise;1'].keys())
     print(metric)
     wire_df = load_wire_info()
     Waveform_df = {}
     ch_id = 0
+    '''
     raw_rms = files['tpc_noise;1']['UB_plane'].array().to_list()
     for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
@@ -372,7 +406,7 @@ def plot_wireplanes(event_number,metric,value,threshold):
 
     fig.write_image(directory+f'YB_plane_diagram_{event_number}_{metric}.png')
     #fig.show()
-    
+    '''
     
     Waveform_df = {}
     ch_id = 5632
@@ -392,8 +426,24 @@ def plot_wireplanes(event_number,metric,value,threshold):
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
-    if sum(mask) > 0:
-        print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
+    if metric == 'Ledge':
+        print("Max within range: ",np.max(waveform[132:832]),"Min within range: ",np.min(waveform[132:832]),"Mean within range: ",np.mean(waveform[132:832]))
+
+        return_list[1] = np.max(waveform[132:832])
+        return_list[2] = np.mean(waveform[132:832])
+        return_list[3] = calc.ledge
+        print("Number of channels with ledges past event display: ",calc.ledge)
+    else:
+        print("Max within range: ",np.max(waveform),"Min within range: ",np.min(waveform),"Mean within range: ",np.mean(waveform))
+
+        return_list[1] = np.max(waveform)
+        return_list[2] = np.mean(waveform)
+        #return_list[3] = calc.ledge
+        #print("Number of channels with ledges past event display: ",calc.ledge)
+    #else:
+    #    return_list[1] = -10
+    #    return_list[2] = -10
+    #    return_list[3] = -10
     #ch_id = 10
     color = []
     x = []
@@ -420,7 +470,7 @@ def plot_wireplanes(event_number,metric,value,threshold):
 
     fig.write_image(directory+f'UA_plane_diagram_{event_number}_{metric}.png')
     #fig.show()
-    
+    '''
     
     Waveform_df = {}
     ch_id = 7616
@@ -441,8 +491,14 @@ def plot_wireplanes(event_number,metric,value,threshold):
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
-    if sum(mask) > 0:
-        print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
+    #if sum(mask) > 0:
+    if metric == 'Ledge':
+        print("Max within range: ",np.max(waveform[132:832]),"Min within range: ",np.min(waveform[132:832]),"Mean within range: ",np.mean(waveform[132:832]))
+
+        print("Number of channels with ledges past event display: ",calc.ledge)
+    else:
+        print("Max within range: ",np.max(waveform),"Min within range: ",np.min(waveform),"Mean within range: ",np.mean(waveform))
+
     #ch_id = 10
     color = []
     x = []
@@ -488,8 +544,13 @@ def plot_wireplanes(event_number,metric,value,threshold):
     print("Max: ",max(waveform),"Min: ",min(waveform),"Mean: ",np.mean(waveform))
     waveform = np.array(waveform)
     mask = (waveform > calc.range[0]) & (waveform < calc.range[1])
-    if sum(mask) > 0:
-        print("Max within range: ",np.max(waveform[mask]),"Min within range: ",np.min(waveform[mask]),"Mean within range: ",np.mean(waveform[mask]))
+    #if sum(mask) > 0:
+    if metric == 'Ledge':
+        print("Max within range: ",np.max(waveform[132:832]),"Min within range: ",np.min(waveform[132:832]),"Mean within range: ",np.mean(waveform[132:832]))
+
+        print("Number of channels with ledges past event display: ",calc.ledge)
+    else:
+        print("Max within range: ",np.max(waveform),"Min within range: ",np.min(waveform),"Mean within range:", np.mean(waveform))
     #ch_id = 10
     color = []
     x = []
@@ -514,19 +575,47 @@ def plot_wireplanes(event_number,metric,value,threshold):
 
     fig.write_image(directory+f'YA_plane_diagram_{event_number}_{metric}.png')
     #fig.show()
-
+    '''
+    
+    return return_list
 def main():
     
-    event_number = input("Please enter event number:")
+    #event_number = input("Please enter event number:")
+    run_number = input("Please enter run number:")
+    dir_list = os.listdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/run{run_number}/")
     #metric = input("Please enter calculation type (RMS, Max, Min,Integral, Rise or Range):")
-    metric_list = ['Rise','Integral','Ledge']
+    metric_list = ['Rise_time']#'Rise','Integral','Rise_time','Ledge'
     channel_map = pd.read_csv("../datafiles/channel_mapping.txt", sep = " ")
+    df_metric = {}
+    #print(dir_list)
     for metric in metric_list:
-        threshold = input(f"If you want to print threshold for {metric} enter type of threshold (Greater, Less, or Equal): ")
-        if (threshold != "" or threshold != None):
-            value = input("Please enter value for threshold: ")
+        df_metric = {}
+        df_metric[f'Event'] = []
+        df_metric[f'{metric}_max'] = []
+        df_metric[f'{metric}_mean'] = []
+        if metric == 'Ledge':
+            df_metric[f'Long Ledge'] = []
+        for event in tqdm(dir_list):
+            if event[:4] != "wave":
+                continue
+            event_number = event[9:]
+            print("Event:",event_number)
+            event_number = int(event_number[:-5])
+            
+            #print(event_number)
+        #threshold = input(f"If you want to print threshold for {metric} enter type of threshold (Greater, Less, or Equal): ")
+        #if (threshold != "" or threshold != None):
+        #    value = input("Please enter value for threshold: ")
 
-        plot_wireplanes(event_number,str(metric),value,threshold)
+            metric_list =plot_wireplanes(event_number,run_number,str(metric),)#value,threshold
+            df_metric['Event'].append(metric_list[0])
+            df_metric[f'{metric}_max'].append(metric_list[1])
+            df_metric[f'{metric}_mean'].append(metric_list[2])
+            if metric == 'Ledge':
+                df_metric[f'Long Ledge'].append(metric_list[3])
+        print(df_metric)
+        df_metric = pd.DataFrame(df_metric)
+        df_metric.to_csv(f'/Users/danielcarber/Documents/SBND/Noise Analysis/data/Run_{run_number}_{metric}.csv', index=False) 
     
 if __name__=="__main__": 
     main() 
