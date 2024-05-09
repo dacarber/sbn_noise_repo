@@ -121,8 +121,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
 		TTree* event_tree = new TTree("Event_info","Event_info");
 		short tick;
-		int time = *event_time
-		int event_n = *event_num
+		int time = *event_time;
+		int event_n = *event_num;
 		event_tree->Branch("Event",&event_n,"event_num/I");
 		event_tree->Branch("Time",&time,"event_time/I");
 		tree->Branch("UB_plane", &tick,"tick/S");
