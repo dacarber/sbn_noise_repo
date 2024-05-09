@@ -105,8 +105,8 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			if (NhighBurst > 1500 && NLowBurst > 100 && NhighBurst > NLowBurst){ //|| NLowBurst > 1500
 				
 				burst = true;
-				cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
-				cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
+				//cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
+				//cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
 			}
 		}
 		
@@ -119,10 +119,12 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 		filename += ".root";
 		TFile* file = new TFile(filename, "RECREATE");
 		TTree* tree = new TTree("tpc_noise", "tpc_noise");
-		TTree* event_tree = new TTree("Event_info","Event_info")
+		TTree* event_tree = new TTree("Event_info","Event_info");
 		short tick;
-		event_tree->Branch("Event",&event_num,"event_num/I")
-		event_tree->Branch("Time",&event_time,"event_time/I")
+		int time = *event_time
+		int event_n = *event_num
+		event_tree->Branch("Event",&event_n,"event_num/I");
+		event_tree->Branch("Time",&time,"event_time/I");
 		tree->Branch("UB_plane", &tick,"tick/S");
 		tree->Branch("VB_plane", &tick,"tick/S");
 		tree->Branch("YB_plane", &tick,"tick/S");
@@ -184,7 +186,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
 			//int in = index;
-			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
+			//cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
 			int total_tick = 0;
 			if (myADC[in].NADC() != 3415){
 				cout<<"Dead Channel"<<endl;
@@ -213,7 +215,7 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 
 		}
 		//evt+=1;
-		cout<<"Event:"<<evt<<endl;
+		//cout<<"Event:"<<evt<<endl;
 		//break;
 		event_tree->Fill();
 		file->Write();
@@ -223,11 +225,11 @@ void LoadRawDigits(TFile *inFile,int sel_evt)
 	
 	
 	
-	cout<<"Got ADC and Pedestal"<<endl;
+	cout<<"Finished"<<endl;
 
 }
 
-void load_waveforms(TString inputFile="/pnfs/sbnd/scratch/users/jaz8600/Decoded/decoded_data_evb02_run12007_14_20240319T153634.root")
+void load_waveforms(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run12802/run_12802.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
