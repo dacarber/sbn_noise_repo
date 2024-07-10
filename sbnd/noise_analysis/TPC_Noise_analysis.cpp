@@ -70,8 +70,8 @@ double Noise_levels(vector<short> noise_channels){
 	}
 	//cout<<sum<<endl;
 	//float mean = sum/noise_channels.size();
-	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
-	RMS =sqrt(sum/noise_channels.size());
+	float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
+	RMS =sqrt((sum/noise_channels.size()) - mean*mean);
 	//}
 	cout<<"Size:"<<sum<<endl;
 	return RMS;	

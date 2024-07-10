@@ -21,7 +21,7 @@ Run_num = int(input("Enter the Run Number: "))
 directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
 if not os.path.exists(directory):
     os.mkdir(directory)
-files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_run{Run_num}.root")
+files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_run{Run_num}.root")
 files['tpc_noise;1'].keys()
 
 raw_rms = files['tpc_noise;1']['raw_rms'].array().to_list()
@@ -39,7 +39,7 @@ for r,rms in enumerate(raw_rms):
         Noise_df['wire_plane'].append('UA')
     elif r<9600:
         Noise_df['wire_plane'].append('VA')
-    else:
+    elif r<11264:
         Noise_df['wire_plane'].append('YA')
 Noise_df = pd.DataFrame(Noise_df)
 
@@ -53,8 +53,8 @@ fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'red',xbin
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 1)
 fig.update_layout(xaxis2 = dict(range = [0,median+5]))
 fig.update_layout(margin = dict(r=200))
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=120,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=110,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=120,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=100,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 
 mask = Noise_df['wire_plane'] == 'VB'
@@ -64,8 +64,8 @@ fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'purple',x
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
 fig.update_layout(xaxis4 = dict(range = [0,median+5]))
 
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-120,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-130,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-120,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-150,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 mask = Noise_df['wire_plane'] == 'YB'
 median = np.median(Noise_df['Raw_rms'][mask])
@@ -74,8 +74,8 @@ fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'blue',xbi
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
 fig.update_layout(xaxis6 = dict(range = [0,median+5]))
 
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-370,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-380,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-370,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-400,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 fig.update_yaxes(title_text = "RMS [ADC]",row = 1, col = 1)
 fig.update_yaxes(title_text = "RMS [ADC]",row = 2, col = 1)
@@ -104,8 +104,8 @@ fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'red',xbin
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 1)
 fig.update_layout(xaxis2 = dict(range = [0,median+5]))
 fig.update_layout(margin = dict(r=200))
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=60,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=50,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=50,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=30,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 
 mask = Noise_df['wire_plane'] == 'VA'
@@ -115,18 +115,19 @@ fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'purple',x
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
 fig.update_layout(xaxis4 = dict(range = [0,median+5]))
 
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-180,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-190,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-190,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-210,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 mask = Noise_df['wire_plane'] == 'YA'
+print(Noise_df['Channel_id'][mask])
 median = np.median(Noise_df['Raw_rms'][mask])
 mean = np.mean(Noise_df['Raw_rms'][mask])
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask],marker_color = 'blue',xbins=dict(start = median - 5,end = median+5,size=.05)),row = 3, col =2)
 fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
 fig.update_layout(xaxis6 = dict(range = [0,median+5]))
 
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-420,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
-fig.add_annotation(dict(font = dict(size = 10),xshift= 180,yshift=-430,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-420,text = f"Mean RMS:{mean:.2f}",showarrow = False),row =1,col=2)
+fig.add_annotation(dict(font = dict(size = 17),xshift= 40,yshift=-440,text = f"Median RMS:{median:.2f}",showarrow = False),row =1,col=2)
 
 fig.update_yaxes(title_text = "RMS [ADC]",row = 1, col = 1)
 fig.update_yaxes(title_text = "RMS [ADC]",row = 2, col = 1)

@@ -9,7 +9,7 @@ import plotly.io as pio
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 import os
 from plotly.subplots import make_subplots
@@ -79,7 +79,7 @@ class waveform_calc:
       
     def RMS_calc(self):
         RMS = []
-        for keys in tqdm(self.waveform_df):
+        for keys in self.waveform_df:
             waveform  = self.waveform_df[keys]-np.median(self.waveform_df[keys])
             square = 0
             for tick in waveform:
@@ -87,8 +87,8 @@ class waveform_calc:
                 square += (tick)*(tick)
             mean = square / len(waveform)
             RMS.append(np.sqrt(mean))
-            if np.sqrt(mean) < 1.35:
-                print(keys)
+            #if np.sqrt(mean) < 1.35:
+            #    print(keys)
         return RMS
     def Max_calc(self):
         waveform_max = []
@@ -251,7 +251,7 @@ def plot_wireplanes(event_number,run_number,metric,):#value,threshold
     value = None
     threshold = None
     #"Event":[],"UA Blob Max":[],"UA Blob Mean":[],"Long Ledge":[]
-    return_list = [0,0,0,0]
+    return_list = [0,0,0,0,0]
     return_list[0] = event_number
     print(f"Run {run_number}, Event: {event_number}")
     if not os.path.exists(f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/Event_diagnostics/run_{run_number}/"):
@@ -265,9 +265,10 @@ def plot_wireplanes(event_number,run_number,metric,):#value,threshold
     #print(files['tpc_noise;1'].keys())
     print(metric)
     wire_df = load_wire_info()
+    '''
     Waveform_df = {}
     ch_id = 0
-    '''
+
     raw_rms = files['tpc_noise;1']['UB_plane'].array().to_list()
     for r,rms in enumerate(raw_rms):
         if r%3415 == 0:
@@ -438,6 +439,9 @@ def plot_wireplanes(event_number,run_number,metric,):#value,threshold
 
         return_list[1] = np.max(waveform)
         return_list[2] = np.mean(waveform)
+    event_info = files['Event_info;1']['Time'].array().to_list()
+    print(event_info[0])
+    return_list[4] = datetime.fromtimestamp(event_info[0], timezone(timedelta(hours=-7)))
         #return_list[3] = calc.ledge
         #print("Number of channels with ledges past event display: ",calc.ledge)
     #else:
@@ -470,7 +474,7 @@ def plot_wireplanes(event_number,run_number,metric,):#value,threshold
 
     fig.write_image(directory+f'UA_plane_diagram_{event_number}_{metric}.png')
     #fig.show()
-    '''
+
     
     Waveform_df = {}
     ch_id = 7616
@@ -575,7 +579,7 @@ def plot_wireplanes(event_number,run_number,metric,):#value,threshold
 
     fig.write_image(directory+f'YA_plane_diagram_{event_number}_{metric}.png')
     #fig.show()
-    '''
+
     
     return return_list
 def main():
@@ -584,7 +588,7 @@ def main():
     run_number = input("Please enter run number:")
     dir_list = os.listdir(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/run{run_number}/")
     #metric = input("Please enter calculation type (RMS, Max, Min,Integral, Rise or Range):")
-    metric_list = ['Rise_time']#'Rise','Integral','Rise_time','Ledge'
+    metric_list = ['Rise']#'Rise','Integral','Rise_time','Ledge'
     channel_map = pd.read_csv("../datafiles/channel_mapping.txt", sep = " ")
     df_metric = {}
     #print(dir_list)
@@ -593,12 +597,14 @@ def main():
         df_metric[f'Event'] = []
         df_metric[f'{metric}_max'] = []
         df_metric[f'{metric}_mean'] = []
+        df_metric[f'Event_time'] = []
         if metric == 'Ledge':
             df_metric[f'Long Ledge'] = []
         for event in tqdm(dir_list):
             if event[:4] != "wave":
                 continue
             event_number = event[9:]
+            
             print("Event:",event_number)
             event_number = int(event_number[:-5])
             
@@ -613,6 +619,7 @@ def main():
             df_metric[f'{metric}_mean'].append(metric_list[2])
             if metric == 'Ledge':
                 df_metric[f'Long Ledge'].append(metric_list[3])
+            df_metric['Event_time'].append(metric_list[4])
         print(df_metric)
         df_metric = pd.DataFrame(df_metric)
         df_metric.to_csv(f'/Users/danielcarber/Documents/SBND/Noise Analysis/data/Run_{run_number}_{metric}.csv', index=False) 
