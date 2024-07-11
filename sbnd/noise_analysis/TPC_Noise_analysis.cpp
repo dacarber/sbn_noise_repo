@@ -35,18 +35,18 @@
 
 using namespace std;
 
-vector<short> Hit_removal(vector<double> channel,float Pedestal){	
+vector<float> Hit_removal(vector<float> channel,float Pedestal){	
 	vector<short> noise_channels;
 	//for (int i = 0; i <=channels.GetSize();i++){
 	//cout<<"Start of Hit Removal"<<endl;
-		vector<double> ADCs = channel;
+		vector<float> ADCs = channel;
 
 		float pedestal = Pedestal;
-		vector<short> noise;
+		vector<float> noise;
 		noise.clear();
 		for (int j = 0; j < channel.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
-			short ADC = abs(ADCs.at(j)-pedestal);
+			float ADC = abs(ADCs.at(j)-pedestal);
 			if (ADC > 10){
 				//noise.push_back(ADC);
 				continue;
@@ -62,8 +62,8 @@ vector<short> Hit_removal(vector<double> channel,float Pedestal){
 
 }
 
-double Noise_levels(vector<short> noise_channels){
-	double RMS;
+float Noise_levels(vector<float> noise_channels){
+	float RMS;
 	float square;
 	float sum;
 	//for (int i = 0; i<noise_channels.size();i++){
@@ -178,13 +178,13 @@ void LoadRawDigits(TFile *inFile)
 			}
 
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
-			vector<double> x(myADC[in].Samples(),0);
+			vector<float> x(myADC[in].Samples(),0);
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick) x[itick] =myADC[in].ADC(itick);
 			
 			
-			vector<short> noise_channels = Hit_removal(x,myADC[in].GetPedestal());
+			vector<float> noise_channels = Hit_removal(x,myADC[in].GetPedestal());
 			
-			cout<<"Completed noise removal"<<endl;
+			cout<<"Completed hit removal"<<endl;
 			float RMS = Noise_levels(noise_channels);
 			
 			cout<<"RMS:"<<RMS<<endl;
