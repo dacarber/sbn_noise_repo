@@ -43,7 +43,6 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 
 		float pedestal = Pedestal;
 		vector<float> noise;
-		noise.clear();
 		for (int j = 0; j < channel.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
 			float ADC = abs(ADCs.at(j)-pedestal);
@@ -79,77 +78,14 @@ float Noise_levels(vector<float> noise_channels){
 	cout<<"Size:"<<sum<<endl;
 	return RMS;	
 }
-/*float Coherent_RMS(vector<short> noise_channels){
-	float coherent_RMS;
-	int channel_index = 128
-	for (int i = 0; i<noise_channels.size()/channel_index;i++){
-		vector<short> channel_group(noise_channels.begin()+(i*channel_index),noise_channels.end()+((i+1)*channel_index));
-		sort(channel_group.begin(),channel_group.end());
-		coherent_RMS = (channel_group[64] + channel_group[63])/2.0;
-	}
-}*/
-vector<float> FFT(vector<short> noise_channel){
-	//vector<float> FFT;
-	int vec_size = noise_channel.size();
-	Int_t size = vec_size;
-	//vector<double> noise_vector(noise_channel.begin(), noise_channel.end());
-	std::vector<Double_t> inputSignalDouble(vec_size);
-	cout<<"Turn vector into Double_t"<<endl;
-    	for (size_t i = 0; i < vec_size; ++i) {
-        	inputSignalDouble[i] = static_cast<Double_t>(noise_channel[i]);
-    	}
-	noise_channel.clear();
-	//size_t* vectorSize = &size;
-	//Int_t intVectorSize = static_cast<Int_t>(vectorSize);
-	cout<<"Transforming"<<endl;
-	TVirtualFFT::SetTransform(0);
-   	TVirtualFFT* fft = TVirtualFFT::FFT(1, &size, "R2C");
-	if (!fft) {
-        	std::cerr << "Error: Failed to initialize FFT." << std::endl;
-        	return vector<float>();
-    	}
-    	fft->SetPoints(inputSignalDouble.data());
-    	fft->Transform();
-	cout<<"Grabbing real and imag"<<endl;
-	std::vector<Double_t> fftReal(vec_size / 2 + 1);
-    	std::vector<Double_t> fftImag(vec_size / 2 + 1);
-	fft->GetPoints(fftReal.data(), fftImag.data());
-	delete fft;
-	std::vector<float> fftMagnitude(vec_size / 2 + 1);
-	cout<<"Getting magnitude"<<vec_size<<endl;
-   	for (auto i = 0; i <fftReal.size(); ++i) {
-		//cout<<"Find Mag"<<endl;
-		//int j = static_cast<int>(i);
-        	fftMagnitude[i] = static_cast<float>(sqrt(fftReal[0] * fftReal[0] + fftImag[0] * fftImag[0]));
-		cout<<"Mag:"<<fftMagnitude[i]<<endl;
-		fftReal.erase(fftReal.begin());
-		fftImag.erase(fftImag.begin());
-    	}
-	cout<<"Finished mad"<<endl;
-	//fftReal.clear();
-	//fftImag.clear();
-	return fftMagnitude;
-		
-}
+
 
 void LoadRawDigits(TFile *inFile)
 {	
-	//TTree *Events = (TTree*)inFile->Get("Events;1");
-	//TString rootfilename(filename.c_str());	
-	//TFile *inFile = TFile::Open(rootfilename.Data());	
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
-	//Events.Print();
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
-	//TTreeReaderArray<int> myADC(Events, "raw::RawDigits_daq__DetSim.obj.fADC");
-
-	//TTreeReaderArray<Float_t> myPedestal(Events, "raw::RawDigits_daq__DECODER.obj.fPedestal");
-	//vector<short> ADC;
-	//vector<uint32_t> Pedestal;
-	//cout<<myADC.GetSize()<<endl;
-	//size_t channel_size = 2000;
 	vector<float> RMS_total(11264,0.0f);
-	vector<vector<float>> FFT_total(11264);
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
@@ -161,7 +97,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<"Grabbed ADCs"<<endl;
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
-		vector<short> channels;
+		vector<float> channels;
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
