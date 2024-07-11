@@ -65,15 +65,16 @@ float Noise_levels(vector<float> noise_channels){
 	float RMS;
 	float square;
 	float sum;
-	//for (int i = 0; i<noise_channels.size();i++){
-	//	square = noise_channels[i] * noise_channels[i];
-	//	sum = sum+square;
-	//}
-	RMS = TMath::RMS(noise_channels.begin(),noise_channels.end());
+	float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
+	for (int i = 0; i<noise_channels.size();i++){
+		square = (noise_channels[i]-mean) * (noise_channels[i]-mean);
+		sum = sum+square;
+	}
+	//RMS = TMath::RMS(noise_channels.begin(),noise_channels.end());
 	//cout<<sum<<endl;
 	//float mean = sum/noise_channels.size();
-	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
-	//RMS =sqrt((sum/noise_channels.size()) - mean*mean);
+	
+	RMS =sqrt(sum/noise_channels.size());
 	//}
 	cout<<"Size:"<<noise_channels.size()<<endl;
 	return RMS;	
