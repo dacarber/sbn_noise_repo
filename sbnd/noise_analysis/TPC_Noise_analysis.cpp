@@ -168,9 +168,9 @@ void LoadRawDigits(TFile *inFile)
 		for(int ki=0; ki<myADC.GetSize();ki++){
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			cout<<myADC[in].Channel()<<endl;
+			cout<<"Channel: "<<myADC[in].Channel()<<endl;
 			int channel = myADC[in].Channel();
-
+			cout<<"Number of ticks: "<< myADC[in].NADC()<<endl;
 			if (myADC[in].NADC() != 3415){
 				RMS_total[channel] =  0;
 				continue;
