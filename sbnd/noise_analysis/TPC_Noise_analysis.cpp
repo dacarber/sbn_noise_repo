@@ -42,9 +42,9 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 	float pedestal = Pedestal;
 	vector<float> noise;
 	for (int j = 0; j < channel.size();j++){
-		cout<<"ADC with pedestal: "<<ADCs.at(j)<<endl;
+		//cout<<"ADC with pedestal: "<<ADCs.at(j)<<endl;
 		float ADC = (float) TMath::Abs(ADCs.at(j)-pedestal);
-		cout<<"ADC without pedestal: "<<ADC<<endl;
+		//cout<<"ADC without pedestal: "<<ADC<<endl;
 		if (ADC > 10.0){
 			//noise.push_back(ADC);
 			continue;
