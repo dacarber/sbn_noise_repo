@@ -30,6 +30,7 @@
 #include <TVirtualFFT.h>
 #include <fstream>
 #include <TChain.h>
+#include "lardataobj/RawData/RawDigit.h"
 
 //#include <bits/stdc++.h> 
 
