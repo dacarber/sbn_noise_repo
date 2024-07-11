@@ -69,7 +69,7 @@ double Noise_levels(vector<short> noise_channels){
 	//	square = noise_channels[i] * noise_channels[i];
 	//	sum = sum+square;
 	//}
-	RMS = TMath::RMS(noise_channels.begin(),noise_channels.end())
+	RMS = TMath::RMS(noise_channels.begin(),noise_channels.end());
 	//cout<<sum<<endl;
 	//float mean = sum/noise_channels.size();
 	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
