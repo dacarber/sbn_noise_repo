@@ -171,17 +171,17 @@ void LoadRawDigits(TFile *inFile)
 			cout<<myADC[in].Channel()<<endl;
 			int channel = myADC[in].Channel();
 
-			if (myADC[index].NADC() != 3415){
+			if (myADC[in].NADC() != 3415){
 				RMS_total[channel] =  0;
 				continue;
 			}
 
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
-			vector<double> x(myADC[index].Samples(),0);
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] =myADC[index].ADC(itick);
+			vector<double> x(myADC[in].Samples(),0);
+			for (size_t itick=0; itick < myADC[in].Samples(); ++itick) x[itick] =myADC[in].ADC(itick);
 			
 			
-			vector<short> noise_channels = Hit_removal(x,myADC[index].GetPedestal());
+			vector<short> noise_channels = Hit_removal(x,myADC[in].GetPedestal());
 			
 			cout<<"Completed noise removal"<<endl;
 			float RMS = Noise_levels(noise_channels);
