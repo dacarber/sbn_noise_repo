@@ -75,7 +75,7 @@ float Noise_levels(vector<float> noise_channels){
 	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
 	//RMS =sqrt((sum/noise_channels.size()) - mean*mean);
 	//}
-	cout<<"Size:"<<sum<<endl;
+	cout<<"Size:"<<noise_channels.size()<<endl;
 	return RMS;	
 }
 
@@ -101,7 +101,7 @@ void LoadRawDigits(TFile *inFile)
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
 		}
-		for(int ki=0; ki<myADC.GetSize();ki++){
+		for(int ki=0; ki<11264;ki++){
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
 			cout<<"Channel: "<<myADC[in].Channel()<<endl;
