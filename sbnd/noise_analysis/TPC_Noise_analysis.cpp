@@ -46,7 +46,7 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 		for (int j = 0; j < channel.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
 			float ADC = abs(ADCs.at(j)-pedestal);
-			if (ADC > 10){
+			if (ADC > 10.0){
 				//noise.push_back(ADC);
 				continue;
 			}
@@ -108,13 +108,13 @@ void LoadRawDigits(TFile *inFile)
 			int channel = myADC[in].Channel();
 			cout<<"Number of ticks: "<< myADC[in].NADC()<<endl;
 			if (myADC[in].NADC() != 3415){
-				RMS_total[ki] =  0;
+				RMS_total[ki] =  0.0;
 				continue;
 
 			}
 
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
-			vector<float> x(myADC[in].Samples(),0);
+			vector<float> x(myADC[in].Samples(),0.0f);
 			for (size_t itick=0; itick < myADC[in].Samples(); ++itick) x[itick] =myADC[in].ADC(itick);
 			
 			
