@@ -41,7 +41,7 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 	float pedestal = Pedestal;
 	vector<float> noise;
 	for (int j = 0; j < channel.size();j++){
-		float ADC = (float) abs(ADCs.at(j)-pedestal);
+		float ADC = (float) TMath::Abs(ADCs.at(j)-pedestal);
 		if (ADC > 10.0){
 			//noise.push_back(ADC);
 			continue;
@@ -71,7 +71,7 @@ float Noise_levels(vector<float> noise_channels){
 	
 	RMS =sqrt(sum/noise_channels.size());
 	//}
-	cout<<"Size:"<<sum<<endl;
+	cout<<"Size:"<<mean<<endl;
 	return RMS;	
 }
 
