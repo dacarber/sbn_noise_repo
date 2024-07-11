@@ -76,7 +76,7 @@ float Noise_levels(vector<float> noise_channels){
 	
 	RMS =sqrt(sum/noise_channels.size());
 	//}
-	cout<<"Size:"<<noise_channels.size()<<endl;
+	cout<<"Size:"<<sum<<endl;
 	return RMS;	
 }
 
