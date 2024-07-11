@@ -172,8 +172,9 @@ void LoadRawDigits(TFile *inFile)
 			int channel = myADC[in].Channel();
 			cout<<"Number of ticks: "<< myADC[in].NADC()<<endl;
 			if (myADC[in].NADC() != 3415){
-				RMS_total[channel] =  0;
+				RMS_total[ki] =  0;
 				continue;
+
 			}
 
 			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
@@ -187,7 +188,7 @@ void LoadRawDigits(TFile *inFile)
 			float RMS = Noise_levels(noise_channels);
 			
 			cout<<"RMS:"<<RMS<<endl;
-			RMS_total[channel] =  RMS_total.at(channel)+RMS;
+			RMS_total[ki] =  RMS_total.at(ki)+RMS;
 		}
 		evt+=1;
 		cout<<"Event:"<<evt<<endl;
