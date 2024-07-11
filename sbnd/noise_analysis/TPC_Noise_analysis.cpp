@@ -11,6 +11,7 @@
 //#include "THStack.h"
 //#include "TAxis.h"
 //#include "TGraphErrors.h"
+#include "TMath.h"
 #include <sstream>
 #include <vector>
 #include "TString.h"
@@ -64,14 +65,15 @@ double Noise_levels(vector<short> noise_channels){
 	double RMS;
 	float square;
 	float sum;
-	for (int i = 0; i<noise_channels.size();i++){
-		square = noise_channels[i] * noise_channels[i];
-		sum = sum+square;
-	}
+	//for (int i = 0; i<noise_channels.size();i++){
+	//	square = noise_channels[i] * noise_channels[i];
+	//	sum = sum+square;
+	//}
+	RMS = TMath::RMS(noise_channels.begin(),noise_channels.end())
 	//cout<<sum<<endl;
 	//float mean = sum/noise_channels.size();
-	float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
-	RMS =sqrt((sum/noise_channels.size()) - mean*mean);
+	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
+	//RMS =sqrt((sum/noise_channels.size()) - mean*mean);
 	//}
 	cout<<"Size:"<<sum<<endl;
 	return RMS;	
@@ -232,7 +234,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11665/run_11665.root")
+void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/trj/run11505/tpcdecode_data_evb03_run11505_24_20240304T182922.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
