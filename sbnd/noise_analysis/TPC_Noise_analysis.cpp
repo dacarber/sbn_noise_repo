@@ -35,11 +35,12 @@
 
 using namespace std;
 
-vector<short> Hit_removal(vector<short> channels,float Pedestal){	
+vector<short> Hit_removal(vector<double> channel,float Pedestal){	
 	vector<short> noise_channels;
 	//for (int i = 0; i <=channels.GetSize();i++){
 	//cout<<"Start of Hit Removal"<<endl;
-		vector<short> ADCs = channels;
+		vector<double> ADCs = channel;
+
 		float pedestal = Pedestal;
 		vector<short> noise;
 		noise.clear();
@@ -165,27 +166,27 @@ void LoadRawDigits(TFile *inFile)
 			channels.push_back(myADC[p].Channel());
 		}
 		for(int ki=0; ki<myADC.GetSize();ki++){
-			cout<<myADC[ki].Channel()<<endl;
-			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			cout<<"Index:"<<in<<", Channel:"<<myADC[in].Channel()<<", Loop index:"<<ki<<endl;
-			vector<short> noise_channels = Hit_removal(myADC[ki].ADCs(),myADC[ki].GetPedestal());
+			cout<<myADC[index].Channel()<<endl;
+			int channel = myADC[index].Channel();
+
+			if (myADC[index].NADC() != 3415){
+				RMS_total[channel] =  0;
+				continue;
+			}
+
+			vector<double> x(myADC[index].Samples(),0);
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] =myADC[index].ADC(itick);
+			
+			cout<<"Index:"<<index<<", Channel:"<<myADC[index].Channel()<<", Loop index:"<<ki<<endl;
+			vector<short> noise_channels = Hit_removal(x,myADC[index].GetPedestal());
+			
 			cout<<"Completed noise removal"<<endl;
 			float RMS = Noise_levels(noise_channels);
+			
 			cout<<"RMS:"<<RMS<<endl;
 			RMS_total[channel] =  RMS_total.at(channel)+RMS;
-			//RMS_vec.push_back(RMS);
-			//delete RMS;
-			//cout<<"Start FFT"<<endl;
-			//vector<float> FFT_mag = FFT(noise_channels);
-			//cout<<"Done with FFT"<<endl;			
-			//for (size_t ji = 0; ji < FFT_mag.size(); ++ji) {
-        		//	FFT_total[channel][ji] = FFT_total[channel][ji] + FFT_mag[ji];
-    			//}
-			//FFT_mag.clear();
-			//cout<<"FFT Done"<<endl;
-
 		}
 		evt+=1;
 		cout<<"Event:"<<evt<<endl;

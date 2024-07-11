@@ -197,7 +197,7 @@ void LoadRawDigits(TFile *inFile)
 			//cout<<myADC[ki].Channel()<<endl;
 
 			auto in = find(channels.begin(),channels.end(), ki);
-            		int index = find(channels.begin(),channels.end(), ki)-channels.begin();
+            int index = find(channels.begin(),channels.end(), ki)-channels.begin();
 			//vector<double> x(myADC[index].Samples(),0);
 			cout<<myADC[index].NADC()<<endl;
 			//cout<<"Starting noise removal"<<index<<endl;
