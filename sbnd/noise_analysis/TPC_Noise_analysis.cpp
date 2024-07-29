@@ -84,15 +84,22 @@ void LoadRawDigits(TFile *inFile)
 {	
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
+	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__DECODE.obj"); //New files with full decode
+	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	vector<float> RMS_total(11264,0.0f);
 	cout<<"Running Events"<<endl;
 	float evt = 0.0;
+	int true_evt = 0;
 	while (Events.Next())
 	{
-		
+		if evt == 0.0:
+			evt+=1;
+			true_evt+=1;
+			continue;
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
+		unsigned int *event_num = event_info.Get();
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<"Grabbed ADCs"<<endl;
@@ -100,6 +107,45 @@ void LoadRawDigits(TFile *inFile)
 		vector<float> channels;
 		for(int p=0; p<myADC.GetSize();p++){
 			channels.push_back(myADC[p].Channel());
+		}
+		int NhighBurst = 0;
+		int NLowBurst = 0;
+		bool burst = false;
+		for(int ki=0; ki<11264;ki++){
+			bool burst_high = false;
+			bool burst_low = false;
+			int channel = myADC[ki].Channel();
+			auto index = find(channels.begin(),channels.end(), ki);
+			int in = index-channels.begin();
+			if (myADC[in].Samples() != 3415){//5995 for long readout windows, 3415 for standard readout windows
+				continue;
+			} 
+			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
+			for (size_t itick=0; itick < myADC[in].Samples(); ++itick){
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() > 1000 && burst_high == false){					
+					NhighBurst++;
+					burst_high = true;
+				}
+				if (myADC[in].ADC(itick) - myADC[in].GetPedestal() < -1000 && burst_low == false){
+					NLowBurst++;
+					burst_low = true;
+				}
+				if (burst_low == true && burst_high == true){ 
+					break;
+				}
+			}
+			if (NhighBurst > 1500 && NLowBurst > 100 && NhighBurst > NLowBurst){ //|| NLowBurst > 1500
+				
+				burst = true;
+				//cout<< "Burst: "<< NhighBurst<<" "<<NLowBurst<<endl;
+				//cout<< "Event: "<< *event_num<< "Local event: "<<evt<<endl;
+			}
+		}
+		
+		if (burst == true){
+			true_evt+=1;
+			cout<<"Skip event: "<<*event_num<<endl;
+			continue;
 		}
 		for(int ki=0; ki<11264;ki++){
 			auto index = find(channels.begin(),channels.end(), ki);
@@ -127,6 +173,7 @@ void LoadRawDigits(TFile *inFile)
 			RMS_total[ki] =  RMS_total.at(ki)+RMS;
 		}
 		evt+=1.0;
+		true_evt+=1;
 		cout<<"Event:"<<evt<<endl;
 	}
 	
@@ -135,7 +182,7 @@ void LoadRawDigits(TFile *inFile)
 	float avg_rms;
 	tree->Branch("raw_rms", &avg_rms, "avg_rms/F");
 	for(int ch = 0; ch<RMS_total.size(); ch++){
-		avg_rms = RMS_total.at(ch)/evt;
+		avg_rms = RMS_total.at(ch)/(evt-1);
 		tree->Fill();	
 	}
 	
@@ -146,7 +193,9 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/trj/run11505/tpcdecode_data_evb03_run11505_24_20240304T182922.root")
+void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run10772/run_10772.root")
+//void TPC_Noise_analysis(TString inputFile="/pnfs/sbn/data_add/sbnd/commissioning/run14401_decoded/decode_data_evb03_EventBuilder3_art4_run14401_14_20240704T014829-d07546f2-c49c-47f0-bc39-17d3d2f4226a.root")
+
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	

@@ -44,7 +44,8 @@ for r,rms in enumerate(raw_rms):
 Noise_df = pd.DataFrame(Noise_df)
 
 filename = f"RMS_plots_planeB_{Run_num}.png"
-
+Non_zero_mask = Noise_df['Raw_rms'] > 0
+print("Average noise of SBND: ",np.mean(Noise_df['Raw_rms'][Non_zero_mask]),"Median noise of SBND: ",np.median(Noise_df['Raw_rms'][Non_zero_mask]))
 fig = make_subplots(rows=3,cols=2,column_widths = [0.7,0.3],subplot_titles = (f'UB Channel RMS Run {Run_num}','UB RMS',f'VB Channel RMS Run {Run_num}','VB RMS',f'YB Channel RMS Run {Run_num}','YB RMS',))
 mask = Noise_df['wire_plane'] == 'UB'
 median = np.median(Noise_df['Raw_rms'][mask])

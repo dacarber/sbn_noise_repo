@@ -39,10 +39,10 @@ vector<short> Hit_removal(vector<short> channels,float Pedestal){
 		noise.clear();
 		for (int j = 0; j < channels.size();j++){
 			//cout<<"Start of searching for hits"<<endl;
-			short ADC = abs(ADCs.at(j)-pedestal);
-			if (ADC > 10){
+			short ADC = ADCs.at(j)-pedestal;
+			if (abs(ADC)> 10){
 				noise.push_back(ADC);
-				//continue;
+				continue;
 			}
 			else{
 				noise.push_back(ADC);
@@ -163,8 +163,20 @@ void LoadRawDigits(TFile *inFile)
 
 				continue;
 			}
-			vector<short> x(myADC[index].Samples(),0); //Makes a vector the size of the uncompressed channel
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
+			bool skip_channel = false;
+			vector<double> x(myADC[index].Samples(),0);
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
+				if (abs(myADC[index].ADC(itick)-myADC[in].GetPedestal()) >  10){
+					skip_channel = true;
+					break;
+				}
+				x[itick] =myADC[index].ADC(itick);
+
+			}
+			if (skip_channel == true){
+				channel_group.clear();
+				continue;
+			}
 			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
 			cout<<"Completed noise  "<<ki<<endl;
 
