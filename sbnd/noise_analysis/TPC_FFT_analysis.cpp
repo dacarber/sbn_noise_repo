@@ -187,7 +187,7 @@ void LoadRawDigits(TFile *inFile)
 	cout<<"Got ADC and Pedestal"<<endl;
 }
 
-void TPC_FFT_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11527/run_11527.root")
+void TPC_FFT_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14784/run_14784.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
