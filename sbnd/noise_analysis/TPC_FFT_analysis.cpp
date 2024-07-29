@@ -141,7 +141,7 @@ void LoadRawDigits(TFile *inFile)
 			bool skip_channel = false;
 			vector<double> x(myADC[index].Samples(),0);
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
-				if (abs(myADC[index].ADC(itick)-myADC[in].GetPedestal()) >  10){
+				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  10){
 					skip_channel = true;
 					break;
 				}
