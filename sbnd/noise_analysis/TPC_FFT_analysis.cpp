@@ -69,16 +69,15 @@ vector<double> FFT(vector<double> noise_channel){
 	int vec_size = noise_channel.size();
 	Int_t size = vec_size;
 	double* inputSignalDouble = new double[vec_size];
-	cout<<"Turn vector into Double_t"<<endl;
     	for (size_t i = 0; i < vec_size; ++i) {
         	inputSignalDouble[i] = noise_channel[i];
     	}
 	noise_channel.clear();
 	//size_t* vectorSize = &size;
 	//Int_t intVectorSize = static_cast<Int_t>(vectorSize);
-	cout<<"Transforming"<<endl;
+	//cout<<"Transforming"<<endl;
 	//TVirtualFFT::SetTransform(0);
-	cout<<"Size of waveform: "<<size<<endl;
+	//cout<<"Size of waveform: "<<size<<endl;
    	TVirtualFFT* fft = TVirtualFFT::FFT(1, &size, "R2C ES K");
 	if (!fft) {
         std::cerr << "Error: Failed to initialize FFT." << std::endl;
@@ -87,7 +86,7 @@ vector<double> FFT(vector<double> noise_channel){
     
     fft->SetPoints(inputSignalDouble);
     fft->Transform();
-	cout<<"Grabbing real and imag"<<endl;
+
 	double fftReal=0;
         double fftImag=0;
 	vector<double> fftMag(vec_size / 2 + 2);
@@ -101,10 +100,10 @@ vector<double> FFT(vector<double> noise_channel){
 		fftMag[k] = TMath::Sqrt(fftReal*fftReal + fftImag*fftImag);
 	}
 
-	cout<<"Getting magnitude"<<vec_size<<endl;
+
 	delete[] inputSignalDouble;
 	delete fft;
-	cout<<"Finished"<<fftMag[100]<<endl;
+	//cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
 		
 }
@@ -158,7 +157,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"FFT is calculated "<<FFT_total[ki][100]<<" "<<FFT_total[ki].capacity()<<" "<<x.capacity()<<endl;
 			cout<<getValue()<<endl;
 
-			cout<<"Channel "<<ki<<endl;
+			//cout<<"Channel "<<ki<<endl;
 
 		}
 
