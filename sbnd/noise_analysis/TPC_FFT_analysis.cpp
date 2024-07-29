@@ -119,9 +119,10 @@ void LoadRawDigits(TFile *inFile)
 	int evt = 0;
 	while (Events.Next())
 	{
-		if evt == 0:
+		if evt == 0{
 			evt+=1;
 			continue;
+		}
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
