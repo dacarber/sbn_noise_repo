@@ -94,9 +94,10 @@ vector<double> FFT(vector<double> noise_channel){
 	for(size_t k=1;k<vec_size / 2 + 2;k++){
 		fft->GetPointComplex(k,fftReal, fftImag);
 	//delete fft;
-		if (k == vec_size / 2 + 1):
+		if (k == vec_size / 2 + 1){
 			fftMag[k] = 1;
 			continue;
+		}
 		fftMag[k] = TMath::Sqrt(fftReal*fftReal + fftImag*fftImag);
 	}
 
