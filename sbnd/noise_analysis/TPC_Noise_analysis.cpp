@@ -93,7 +93,7 @@ void LoadRawDigits(TFile *inFile)
 	int true_evt = 0;
 	while (Events.Next())
 	{
-		if evt == 0.0{
+		if (evt == 0.0){
 			evt+=1;
 			true_evt+=1;
 			continue;
