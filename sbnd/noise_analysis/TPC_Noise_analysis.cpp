@@ -93,10 +93,11 @@ void LoadRawDigits(TFile *inFile)
 	int true_evt = 0;
 	while (Events.Next())
 	{
-		if evt == 0.0:
+		if evt == 0.0{
 			evt+=1;
 			true_evt+=1;
 			continue;
+		}
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		unsigned int *event_num = event_info.Get();
@@ -174,7 +175,7 @@ void LoadRawDigits(TFile *inFile)
 		}
 		evt+=1.0;
 		true_evt+=1;
-		cout<<"Event:"<<evt<<endl;
+		cout<<"Event:"<<evt<<"True Event num"<<true_evt<<endl;
 	}
 	
 	TFile* file = new TFile("noise_output.root", "RECREATE");
@@ -193,7 +194,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run10772/run_10772.root")
+void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14275/run_14275.root")
 //void TPC_Noise_analysis(TString inputFile="/pnfs/sbn/data_add/sbnd/commissioning/run14401_decoded/decode_data_evb03_EventBuilder3_art4_run14401_14_20240704T014829-d07546f2-c49c-47f0-bc39-17d3d2f4226a.root")
 
 {	
