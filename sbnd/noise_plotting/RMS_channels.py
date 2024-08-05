@@ -28,7 +28,10 @@ raw_rms = files['tpc_noise;1']['raw_rms'].array().to_list()
 Noise_df = {'Channel_id':[],'Raw_rms':[],'wire_plane':[]}
 for r,rms in enumerate(raw_rms):
     Noise_df['Channel_id'].append(r)
-    Noise_df['Raw_rms'].append(rms)
+    if rms ==0:
+        Noise_df['Raw_rms'].append(None)
+    else:
+        Noise_df['Raw_rms'].append(rms)
     if r <1984:
         Noise_df['wire_plane'].append('UB')
     elif r<3968:
@@ -46,43 +49,93 @@ Noise_df = pd.DataFrame(Noise_df)
 filename = f"RMS_channels_{Run_num}.png"
 Non_zero_mask = Noise_df['Raw_rms'] > 0
 print("Average noise of SBND: ",np.mean(Noise_df['Raw_rms'][Non_zero_mask]),"Median noise of SBND: ",np.median(Noise_df['Raw_rms'][Non_zero_mask]))
-fig = make_subplots(rows=3,cols=2,column_widths = [0.5,0.5],subplot_titles = (r'West 1st Induction',f'East 1st Induction',f'West 2nd Induction',f'East 2nd Induction',f'West Collection',f'East Collection',),shared_yaxes=True,
-                    horizontal_spacing=0.01)
+fig = make_subplots(rows=3,cols=2,column_widths = [0.5,0.5],subplot_titles = (r'West 1<sup>st</sup> Induction',f'East 1<sup>st</sup> Induction',f'West 2<sup>nd</sup> Induction',f'East 2<sup>nd</sup> Induction',f'West Collection',f'East Collection',),shared_yaxes=False,horizontal_spacing = 0.01)
 mask = Noise_df['wire_plane'] == 'UB'
 #median = np.median(Noise_df['Raw_rms'][mask])
 #mean = np.mean(Noise_df['Raw_rms'][mask])
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 2)
+fig.add_trace(go.Scatter(x=list(range(0,1984)),y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 2)
 mask = Noise_df['wire_plane'] == 'UA'
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 1)
-#fig.update_layout(xaxis2 = dict(range = [0,median+5]))
-#fig.update_layout(margin = dict(r=200))
+#Noise_df['Channel_id'][mask] for LArSoft Channels, list(range(0,1984)) for local channel number
+fig.add_trace(go.Scatter(x=list(range(0,1984)),y = Noise_df['Raw_rms'][mask],marker_color = 'red'),row = 1, col = 1)
+#Noise_df['Channel_id'][mask] for LArSoft Channels, list(range(0,1984)) for local channel number
 
 mask = Noise_df['wire_plane'] == 'VB'
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 2)
-
+fig.add_trace(go.Scatter(x=list(range(0,1984)),y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 2)
+#Noise_df['Channel_id'][mask] for LArSoft Channels, list(range(0,1984)) for local channel number
 mask = Noise_df['wire_plane'] == 'VA'
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
+fig.add_trace(go.Scatter(x=list(range(0,1984)),y = Noise_df['Raw_rms'][mask],marker_color = 'purple'),row = 2, col = 1)
 
-
+#Noise_df['Channel_id'][mask] for LArSoft Channels, list(range(0,1984)) for local channel number
 mask = Noise_df['wire_plane'] == 'YB'
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 2)
-
+fig.add_trace(go.Scatter(x=list(range(0,1664)),y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 2)
+#Noise_df['Channel_id'][mask] for LArSoft Channels, list(range(0,1664)) for local channel number
 mask = Noise_df['wire_plane'] == 'YA'
-fig.add_trace(go.Scatter(x=Noise_df['Channel_id'][mask],y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
+fig.add_trace(go.Scatter(x=list(range(0,1664)),y = Noise_df['Raw_rms'][mask],marker_color = 'blue'),row = 3, col = 1)
+fig.add_vrect(
+    x0="1248", x1="1280",
+    fillcolor="Grey", opacity=0.5,
+    layer="below", line_width=0,row=2,col = 2
+)
+fig.add_vrect(
+    x0="191", x1="224",
+    fillcolor="Grey", opacity=0.5,
+    layer="below", line_width=0,row=3,col = 2
+)
+
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 1, col = 1)
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 2, col = 1)
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 3, col = 1)
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 1, col = 2)
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 2, col = 2)
+#fig.update_yaxes(title_text = "RMS [ADC]",row = 3, col = 2)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 1, col = 1)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 2, col = 1)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 3, col = 1)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 1, col = 2)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 2, col = 2)
+fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 3, col = 2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 1, col =1)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 1, col =2)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 2, col =2)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 2, col =1)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 3, col =2)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"SBND<br>Preliminary Data",showarrow = False),row = 3, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1528,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 1, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 751,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 952,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 200,y=3,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="left",ax=30,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1260,y=4,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="right",ay=0,ax=-20,arrowwidth=2,arrowcolor="Black"),row = 2, col =2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 546,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 606,y=3.2,text = f"Soldered Wires",showarrow = True,arrowhead=1,xanchor="right",ay=-10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
 
 
-fig.update_yaxes(title_text = "RMS [ADC]",row = 1, col = 1)
-fig.update_yaxes(title_text = "RMS [ADC]",row = 2, col = 1)
-fig.update_yaxes(title_text = "RMS [ADC]",row = 3, col = 1)
-fig.update_xaxes(title_text = "Channel #",row = 1, col = 1)
-fig.update_xaxes(title_text = "Channel #",row = 2, col = 1)
-fig.update_xaxes(title_text = "Channel #",row = 3, col = 1)
-fig.update_xaxes(title_text = "Channel #",row = 1, col = 2)
-fig.update_xaxes(title_text = "Channel #",row = 2, col = 2)
-fig.update_xaxes(title_text = "Channel #",row = 3, col = 2)
+
+
 #fig.update_layout(xaxis2 = dict(range = [0,5]),xaxis4 = dict(range = [0,5]),xaxis6 = dict(range = [0,5]))
-fig.update_layout(yaxis = dict(range = [0,5]),yaxis2 = dict(range = [0,5]),yaxis3 = dict(range = [0,5]),yaxis4 = dict(range = [0,5]),yaxis5 = dict(range = [0,5]),yaxis6 = dict(range = [0,5]))
-fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = 64),xaxis2 = dict(tickmode = 'linear',dtick = 64),xaxis3 = dict(tickmode = 'linear',dtick = 64),xaxis4 = dict(tickmode = 'linear',dtick = 64),xaxis5 = dict(tickmode = 'linear',dtick = 64),xaxis6 = dict(tickmode = 'linear',dtick = 64))
+fig.update_layout(yaxis = dict(range = [0,5],title="RMS [ADC]",side="left",),
+                  yaxis2 = dict(range = [0,5],title="RMS [ADC]",side="right",),
+                  yaxis3 = dict(range = [0,5],title="RMS [ADC]",side="left",),
+                  yaxis4 = dict(range = [0,5],title="RMS [ADC]",side="right",),
+                  yaxis5 = dict(range = [0,5],title="RMS [ADC]",side="left",),
+                  yaxis6 = dict(range = [0,5],title="RMS [ADC]",side="right",))
+tick_size = 128 #128 64
+fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = tick_size),xaxis2 = dict(tickmode = 'linear',dtick = tick_size),xaxis3 = dict(tickmode = 'linear',dtick = tick_size),xaxis4 = dict(tickmode = 'linear',dtick = tick_size),xaxis5 = dict(tickmode = 'linear',dtick = tick_size),xaxis6 = dict(tickmode = 'linear',dtick = tick_size))
 fig.update_layout(height = 800, width = 1800,showlegend = False,title_text=f"Channel RMS Run {Run_num}",title_x=0.5)
 
 fig.write_image(directory+filename)

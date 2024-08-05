@@ -1,0 +1,121 @@
+import uproot
+import matplotlib.pyplot as plt
+import seaborn
+import numpy as np
+import math
+from scipy.fft import fft, fftfreq
+import plotly.express as px
+import plotly.io as pio
+import plotly.graph_objects as go
+import numpy as np
+import pandas as pd
+
+import os
+from plotly.subplots import make_subplots
+from plotly import tools
+import plotly.offline as pyo
+import sys
+
+
+Run_num = input("Enter the Run Number: ")
+directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
+if not os.path.exists(directory):
+    os.mkdir(directory)
+files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_run{Run_num}.root")
+files['tpc_noise;1'].keys()
+
+raw_rms = files['tpc_noise;1']['raw_rms'].array().to_list()
+Noise_df = {'Channel_id':[],'Raw_rms':[],'wire_plane':[]}
+for r,rms in enumerate(raw_rms):
+    Noise_df['Channel_id'].append(r)
+    Noise_df['Raw_rms'].append(rms)
+    if r <1984:
+        Noise_df['wire_plane'].append('UB')
+    elif r<3968:
+        Noise_df['wire_plane'].append('VB')
+    elif r<5632:
+        Noise_df['wire_plane'].append('YB')
+    elif r<7616:
+        Noise_df['wire_plane'].append('UA')
+    elif r<9600:
+        Noise_df['wire_plane'].append('VA')
+    elif r<11264:
+        Noise_df['wire_plane'].append('YA')
+Noise_df = pd.DataFrame(Noise_df)
+
+filename = f"RMS_histograms_{Run_num}.png"
+Non_zero_mask = Noise_df['Raw_rms'] > 0
+print("Average noise of SBND: ",np.mean(Noise_df['Raw_rms'][Non_zero_mask]),"Median noise of SBND: ",np.median(Noise_df['Raw_rms'][Non_zero_mask]))
+
+
+mask_UB = Noise_df['wire_plane'] == 'UB'
+mean_UB = np.mean(Noise_df['Raw_rms'][mask_UB])
+
+mask_VB = Noise_df['wire_plane'] == 'VB'
+mean_VB = np.mean(Noise_df['Raw_rms'][mask_VB])
+
+mask_YB = Noise_df['wire_plane'] == 'YB'
+mean_YB = np.mean(Noise_df['Raw_rms'][mask_YB])
+
+mask_UA = Noise_df['wire_plane'] == 'UA'
+mean_UA = np.mean(Noise_df['Raw_rms'][mask_UA])
+
+mask_VA = Noise_df['wire_plane'] == 'VA'
+mean_VA = np.mean(Noise_df['Raw_rms'][mask_VA])
+
+mask_YA = Noise_df['wire_plane'] == 'YA'
+mean_YA = np.mean(Noise_df['Raw_rms'][mask_YA])
+
+
+fig = make_subplots(rows=3,cols=2,column_widths = [0.5,0.5],subplot_titles = (f'<b><span style="font-size: 20px;">West TPC Run {Run_num}</span><br> 1<sup>st</sup> Induction RMS</b> <br> Mean RMS:{mean_UB:.2f} ',f'<b><span style="font-size: 20px;">East TPC Run {Run_num}</span><br> 1<sup>st</sup> Induction RMS </b> <br> Mean RMS:{mean_UA:.2f}',f'<b> 2<sup>nd</sup> Induction RMS </b> <br> Mean RMS:{mean_VB:.2f}',f'<b> 2<sup>nd</sup> Induction RMS </b> <br> Mean RMS:{mean_VA:.2f}',f'<b> Collection RMS </b> <br> Mean RMS:{mean_YB:.2f}',f'<b> Collection RMS</b> <br> Mean RMS:{mean_YA:.2f}',))
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_UB],marker_color = 'red',xbins=dict(start = mean_UB - 5,end = mean_UB+5,size=.05)),row = 1, col =2)
+fig.update_layout(xaxis = dict(range = [0,4]))
+
+
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_VB],marker_color = 'purple',xbins=dict(start = mean_VB - 5,end = mean_VB+5,size=.05)),row = 2, col =2)
+fig.update_layout(xaxis3 = dict(range = [0,4]))
+
+
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_YB],marker_color = 'blue',xbins=dict(start = mean_YB - 5,end = mean_YB + 5,size=.05)),row = 3, col =2)
+fig.update_layout(xaxis5 = dict(range = [0,4]))
+
+
+
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_UA],marker_color = 'red',xbins=dict(start = mean_UA-5,end = mean_UA+5,size=.05)),row = 1, col =1)
+fig.update_layout(xaxis2 = dict(range = [0,4]))
+
+
+
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_VA],marker_color = 'purple',xbins=dict(start = mean_VA-5,end = mean_VA+5,size=.05)),row = 2, col =1)
+fig.update_layout(xaxis4 = dict(range = [0,4]))
+
+
+
+
+fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_YA],marker_color = 'blue',xbins=dict(start = mean_YA-5,end = mean_YA+5,size=.05)),row = 3, col =1)
+fig.update_layout(xaxis6 = dict(range = [0,4]))
+
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 120,yshift=157,text = f"SBND Preliminary<br>TPC Data",showarrow = False),row = 1, col =1)
+fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 120,yshift=157,text = f"SBND Preliminary<br>TPC Data",showarrow = False),row = 1, col =2)
+
+
+
+fig.update_xaxes(title_text = "RMS [ADC]",row = 1, col = 1)
+fig.update_xaxes(title_text = "RMS [ADC]",row = 2, col = 1)
+fig.update_xaxes(title_text = "RMS [ADC]",row = 3, col = 1)
+fig.update_xaxes(title_text = "RMS [ADC]",row = 1, col = 2)
+fig.update_xaxes(title_text = "RMS [ADC]",row = 2, col = 2)
+fig.update_xaxes(title_text = "RMS [ADC]",row = 3, col = 2)
+#fig.update_layout(xaxis2 = dict(range = [0,5]),xaxis4 = dict(range = [0,5]),xaxis6 = dict(range = [0,5]))
+#fig.update_layout(yaxis = dict(range = [0,5]),yaxis3 = dict(range = [0,5]),yaxis5 = dict(range = [0,5]))
+#fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = 64),xaxis3 = dict(tickmode = 'linear',dtick = 64),xaxis5 = dict(tickmode = 'linear',dtick = 64))
+fig.update_layout(height = 1000, width = 1000,showlegend = False)
+
+fig.write_image(directory+filename)
+fig.show()
+

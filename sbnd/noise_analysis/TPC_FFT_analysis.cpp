@@ -148,6 +148,7 @@ void LoadRawDigits(TFile *inFile)
 
 			}
 			if (skip_channel == true){
+				cout<<"Skipped channel"<<endl;
 				continue;
 			}
 			vector<double> channel_fft = FFT(x);
@@ -172,10 +173,10 @@ void LoadRawDigits(TFile *inFile)
 	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
 	for(int ch = 0; ch<FFT_total.size(); ch++){
 		//transform(FFT_total[ch].begin(),FFT_total[ch].end(),FFT_total[ch].begin(),[evt](double &c){ return c/evt; });
-		cout<<FFT_total[ch][100]<<endl;
+		//cout<<FFT_total[ch][100]<<endl;
 
 		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
-			cout<<c<<" "<<FFT_total[ch][c]<<endl;
+			//cout<<c<<" "<<FFT_total[ch][c]<<endl;
 			avg_FFT = FFT_total[ch][c];
 			tree->Fill();
                 }

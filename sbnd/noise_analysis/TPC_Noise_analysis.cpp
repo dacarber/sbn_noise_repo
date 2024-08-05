@@ -154,7 +154,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"Channel: "<<myADC[in].Channel()<<endl;
 			int channel = myADC[in].Channel();
 			cout<<"Number of ticks: "<< myADC[in].NADC()<<endl;
-			if (myADC[in].NADC() != 3415){
+			if (myADC[in].NADC() != 3415){ //5995 Long readout windows, 3415 for normal readout windows 
 				RMS_total[ki] =  0.0;
 				continue;
 
