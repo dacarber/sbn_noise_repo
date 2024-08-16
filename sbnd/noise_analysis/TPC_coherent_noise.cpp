@@ -146,24 +146,35 @@ void LoadRawDigits(TFile *inFile)
 				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
 
 			}
-			if (skip_channel == true){
-				continue;
-			}
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
-				channel_group.push_back(x);
-				vector<float> coherent_waveform = Coherent_RMS(channel_group);
-				float Coh_RMS = Noise_levels(coherent_waveform);
-				channel_group.clear();
-				cout<<"Coh RMS:"<<Coh_RMS<<endl;
-				for (int kh=0; kh < group_size; kh++){
+				if skip_channel == true{
+					vector<float> coherent_waveform = Coherent_RMS(channel_group);
+					float Coh_RMS = Noise_levels(coherent_waveform);
+					channel_group.clear();
+					cout<<"Coh RMS:"<<Coh_RMS<<endl;
+					for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+					}
+				}
+				else{
+					channel_group.push_back(x);
+					vector<float> coherent_waveform = Coherent_RMS(channel_group);
+					float Coh_RMS = Noise_levels(coherent_waveform);
+					channel_group.clear();
+					cout<<"Coh RMS:"<<Coh_RMS<<endl;
+					for (int kh=0; kh < group_size; kh++){
+						RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+					}
 				}
 				
 				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
 				//cout<<"combine waveform"<<endl;
 			}
 			else{
+				if skip_channel == true{ 
+					continue;
+				}
 				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
 				channel_group.push_back(x);
 			}
