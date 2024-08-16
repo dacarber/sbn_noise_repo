@@ -149,6 +149,10 @@ void LoadRawDigits(TFile *inFile)
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				if (skip_channel == true){
+					if (channel_group.size() == 0){
+					channel_group.clear();
+					continue;				
+				}
 					vector<float> coherent_waveform = Coherent_RMS(channel_group);
 					float Coh_RMS = Noise_levels(coherent_waveform);
 					channel_group.clear();
@@ -158,6 +162,10 @@ void LoadRawDigits(TFile *inFile)
 					}
 				}
 				else{
+					if (channel_group.size() == 0){
+					channel_group.clear();
+					continue;				
+				}
 					channel_group.push_back(x);
 					vector<float> coherent_waveform = Coherent_RMS(channel_group);
 					float Coh_RMS = Noise_levels(coherent_waveform);
