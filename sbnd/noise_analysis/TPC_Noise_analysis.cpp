@@ -1,16 +1,6 @@
-//#include "TCanvas.h"
-//#include "TStyle.h"
-//#include "TH1.h"
-//#include "TH2.h"
-//#include "TGaxis.h"
 #include "TRandom.h"
 #include "TFile.h"
-//#include "TLegend.h"
-//#include "TCollection.h"
 #include <iostream>
-//#include "THStack.h"
-//#include "TAxis.h"
-//#include "TGraphErrors.h"
 #include "TMath.h"
 #include <sstream>
 #include <vector>
@@ -46,8 +36,17 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 		float ADC = (float) ADCs.at(j)-pedestal;
 		//float ADC = (float) TMath::Abs(ADCs.at(j)-TMath::Median(channel.size(),channel.data()));
 		//cout<<"ADC without pedestal: "<<ADC<<endl;
-		if (TMath::Abs(ADC) > 10.0){
+		if (TMath::Abs(ADC) > 10.0 || skips > 0){
 			//noise.push_back(ADC);
+			if (skips > 0){
+				skip-=1;
+				continue;
+			}
+			skips = 50;
+			for (int i=0; i<50;i++){
+				if (noise.size() == 0) continue;
+				noise.pop_back();
+			}
 			continue;
 		}
 		else{

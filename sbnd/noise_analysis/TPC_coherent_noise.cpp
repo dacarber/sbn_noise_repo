@@ -201,7 +201,7 @@ void LoadRawDigits(TFile *inFile)
 	TFile* file = new TFile("noise_output_coh.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
-	int entries
+	int entries;
 	//vector<float> avg_FFT;
 	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
 	tree->Branch("entries", &entries, "entries/I");
