@@ -29,31 +29,6 @@
 
 using namespace std;
 
-vector<short> Hit_removal(vector<short> channels,float Pedestal){	
-	vector<short> noise_channels;
-	//for (int i = 0; i <=channels.GetSize();i++){
-	//cout<<"Start of Hit Removal"<<endl;
-		vector<short> ADCs = channels;
-		float pedestal = Pedestal;
-		vector<short> noise;
-		noise.clear();
-		for (int j = 0; j < channels.size();j++){
-			//cout<<"Start of searching for hits"<<endl;
-			short ADC = ADCs.at(j)-pedestal;
-			if (abs(ADC)> 10){
-				noise.push_back(ADC);
-				continue;
-			}
-			else{
-				noise.push_back(ADC);
-			}
-		
-		}
-		//noise_channels.push_back(noise);
-	//}
-	return noise;
-
-}
 
 double Noise_levels(vector<float> noise_channels){
 	double RMS;
@@ -99,29 +74,20 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 
 void LoadRawDigits(TFile *inFile)
 {	
-	//TTree *Events = (TTree*)inFile->Get("Events;1");
-	//TString rootfilename(filename.c_str());	
-	//TFile *inFile = TFile::Open(rootfilename.Data());	
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
-	//Events.Print();
+
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
 	//TTreeReaderArray<int> myADC(Events, "raw::RawDigits_daq__DetSim.obj.fADC");
 
-	//TTreeReaderArray<Float_t> myPedestal(Events, "raw::RawDigits_daq__DECODER.obj.fPedestal");
-	//vector<short> ADC;
-	//vector<uint32_t> Pedestal;
-	//cout<<myADC.GetSize()<<endl;
-	//size_t channel_size = 2000;
-	vector<float> RMS_total(11264,0.0f);
-	vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
+	vector<float> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
+	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
 	while (Events.Next())
 	{
 		
-		//for(int i = 0; i<myPedestal.GetSize();i++){
-	//	cout<<myPedestal.GetSize()<<endl;
+
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<"Grabbed ADCs"<<endl;
@@ -131,17 +97,22 @@ void LoadRawDigits(TFile *inFile)
 		bool responsive_channel = true;
 		vector<short> channels;
 		short group_size = 8;
-		for(int p=0; p<myADC.GetSize();p++){		//Puts all of the channel ids into a vector in the order the files have the events
+
+		//Puts all of the channel ids into a vector in the order the files have the events
+		for(int p=0; p<myADC.GetSize();p++){		
             channels.push_back(myADC[p].Channel()); 
         }
+
+        //Goes over all of the channels and does the analysis
 		for(int ki=0; ki<11264;ki++){
-			//cout<<ki<<endl;
 			auto in = find(channels.begin(),channels.end(), ki); //finds the the location of the channel corresponding to ki
             int index = in-channels.begin();
 			responsive_channel = true;
 			short channel = myADC[index].Channel();
 			cout<<"Channel index: "<<index<<" Channel: "<< myADC[index].Channel()<<endl;
 			cout<<"Channel size: "<<myADC[index].NADC()<<endl;
+
+
 			//Checks if the channel is dead
 			if (myADC[index].Samples() != 3415 && (ki+1)%group_size != 0){
 				responsive_channel = false;
@@ -159,28 +130,28 @@ void LoadRawDigits(TFile *inFile)
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
 				}
-				transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
+				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
 
 				continue;
 			}
+
+			//If channel is responsive the channel will grab the noise 
 			bool skip_channel = false;
 			vector<double> x(myADC[index].Samples(),0);
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
-				if (abs(myADC[index].ADC(itick)-myADC[in].GetPedestal()) >  10){
+				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  10){
 					skip_channel = true;
 					break;
 				}
-				x[itick] =myADC[index].ADC(itick);
+				x[itick] =myADC[index].ADC(itick)-myADC[index].GetPedestal();
 
 			}
 			if (skip_channel == true){
-				channel_group.clear();
 				continue;
 			}
-			noise_channels = Hit_removal(x,myADC[index].GetPedestal());
-			cout<<"Completed noise  "<<ki<<endl;
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
+				channel_group.push_back(x);
 				vector<float> coherent_waveform = Coherent_RMS(channel_group);
 				float Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
@@ -189,12 +160,12 @@ void LoadRawDigits(TFile *inFile)
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
 				}
 				
-				transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
-				cout<<"combine waveform"<<endl;
+				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
+				//cout<<"combine waveform"<<endl;
 			}
 			else{
 				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
-				channel_group.push_back(noise_channels);
+				channel_group.push_back(x);
 			}
 
 		}
@@ -208,7 +179,7 @@ void LoadRawDigits(TFile *inFile)
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
 	//vector<float> avg_FFT;
-	tree->Branch("raw_rms", &avg_rms, "avg_rms/F");
+	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
 	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
 	for(int ch = 0; ch<RMS_total.size(); ch++){
 		avg_rms = RMS_total.at(ch)/evt;
@@ -217,15 +188,15 @@ void LoadRawDigits(TFile *inFile)
                 //}
 		tree->Fill();	
 	}
-	short coh_wave;
-	tree->Branch("coh_wave", &coh_wave, "coh_wave/F");
-	for(int ch = 0; ch<RMS_wave_total.size(); ch++){
-		transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](float &c){ return c/evt; });
+	//short coh_wave;
+	//tree->Branch("coh_wave", &coh_wave, "coh_wave/F");
+	//for(int ch = 0; ch<RMS_wave_total.size(); ch++){
+	//	transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](float &c){ return c/evt; });
 		//coh_wave = RMS_wave_total[ch];
-		for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
-                	coh_wave = RMS_wave_total[ch][c];
-			tree->Fill();
-                }
+	//	for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
+    //           	coh_wave = RMS_wave_total[ch][c];
+	//		tree->Fill();
+    //            }
 	}
 	file->Write();
 	file->Close();
