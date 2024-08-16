@@ -86,7 +86,9 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReader Events("Events;1", inFile);
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__DECODE.obj"); //New files with full decode
 	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
-	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj");
+	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
+	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
+
 	vector<float> RMS_total(11264,0.0f);
 	cout<<"Running Events"<<endl;
 	float evt = 0.0;

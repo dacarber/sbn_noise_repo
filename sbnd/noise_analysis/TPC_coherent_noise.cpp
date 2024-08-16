@@ -143,7 +143,7 @@ void LoadRawDigits(TFile *inFile)
 					skip_channel = true;
 					break;
 				}
-				x[itick] =myADC[index].ADC(itick)-myADC[index].GetPedestal();
+				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
 
 			}
 			if (skip_channel == true){
@@ -197,7 +197,7 @@ void LoadRawDigits(TFile *inFile)
     //           	coh_wave = RMS_wave_total[ch][c];
 	//		tree->Fill();
     //            }
-	}
+	//}
 	file->Write();
 	file->Close();
 	
