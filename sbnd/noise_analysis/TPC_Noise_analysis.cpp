@@ -31,6 +31,7 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 
 	float pedestal = Pedestal;
 	vector<float> noise;
+	int skips =0;
 	for (int j = 0; j < channel.size();j++){
 		//cout<<"ADC with pedestal: "<<ADCs.at(j)<<endl;
 		float ADC = (float) ADCs.at(j)-pedestal;
