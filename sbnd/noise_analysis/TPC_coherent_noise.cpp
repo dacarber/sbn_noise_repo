@@ -81,6 +81,7 @@ void LoadRawDigits(TFile *inFile)
 	//TTreeReaderArray<int> myADC(Events, "raw::RawDigits_daq__DetSim.obj.fADC");
 
 	vector<float> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<int> Entries(11264,0.0f);
 	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
@@ -129,6 +130,7 @@ void LoadRawDigits(TFile *inFile)
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+					Entries[channel-kh] = Entries.at(channel-kh)+1;
 				}
 				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
 
@@ -159,6 +161,7 @@ void LoadRawDigits(TFile *inFile)
 					cout<<"Coh RMS:"<<Coh_RMS<<endl;
 					for (int kh=0; kh < group_size; kh++){
 					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+					Entries[channel-kh] = Entries.at(channel-kh)+1;
 					}
 				}
 				else{
@@ -173,6 +176,7 @@ void LoadRawDigits(TFile *inFile)
 					cout<<"Coh RMS:"<<Coh_RMS<<endl;
 					for (int kh=0; kh < group_size; kh++){
 						RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
+						Entries[channel-kh] = Entries.at(channel-kh)+1;
 					}
 				}
 				
@@ -197,11 +201,24 @@ void LoadRawDigits(TFile *inFile)
 	TFile* file = new TFile("noise_output_coh.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float avg_rms;
+	int entries
 	//vector<float> avg_FFT;
 	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
+	tree->Branch("entries", &entries, "entries/I");
 	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	tree->SetBranchStatus("coh_rms", 1);
+    tree->SetBranchStatus("entries", 0);
 	for(int ch = 0; ch<RMS_total.size(); ch++){
-		avg_rms = RMS_total.at(ch)/evt;
+		avg_rms = RMS_total.at(ch)/Entries.at(ch);
+		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
+                //	avg_FFT[c] = FFT_total[ch][c]/evt;
+                //}
+		tree->Fill();	
+	}
+	tree->SetBranchStatus("coh_rms", 0);
+    tree->SetBranchStatus("entries", 1);
+	for(int ch = 0; ch<Entries.size(); ch++){
+		entries = Entries.at(ch);
 		//for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
                 //	avg_FFT[c] = FFT_total[ch][c]/evt;
                 //}
