@@ -148,7 +148,7 @@ void LoadRawDigits(TFile *inFile)
 			}
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
-				if skip_channel == true{
+				if (skip_channel == true){
 					vector<float> coherent_waveform = Coherent_RMS(channel_group);
 					float Coh_RMS = Noise_levels(coherent_waveform);
 					channel_group.clear();
@@ -172,7 +172,7 @@ void LoadRawDigits(TFile *inFile)
 				//cout<<"combine waveform"<<endl;
 			}
 			else{
-				if skip_channel == true{ 
+				if (skip_channel == true){ 
 					continue;
 				}
 				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
