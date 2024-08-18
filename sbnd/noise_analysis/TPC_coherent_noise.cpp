@@ -77,10 +77,10 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x};);
-	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x};);
+	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
+	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
-	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x)};);
+	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	cout<<"Returning vector"<<endl;
 	return int_waveform;
@@ -92,7 +92,7 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReader Events("Events;1", inFile);
 
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
-	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
+	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
 
 
 	vector<float> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
@@ -331,7 +331,7 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run11799/run_11799.root")
+void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14784/run_14784.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
