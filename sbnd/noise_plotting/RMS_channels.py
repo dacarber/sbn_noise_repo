@@ -18,6 +18,7 @@ import sys
 
 
 Run_num = input("Enter the Run Number: ")
+anno = input("Do you want annotations? ")
 directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
 if not os.path.exists(directory):
     os.mkdir(directory)
@@ -101,28 +102,28 @@ fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift
 fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =1)
 fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =2)
 fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =1)
+if anno == "Yes" or anno == "yes":
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1528,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 1, col =1)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1528,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 1, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 751,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 751,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 952,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 952,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 2, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 406,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1257,y=1.25,text = f"No Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 200,y=3,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="left",ax=30,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 200,y=3,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="left",ax=30,arrowwidth=2,arrowcolor="Black"),row = 3, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1260,y=4,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="right",ay=0,ax=-20,arrowwidth=2,arrowcolor="Black"),row = 2, col =2)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1260,y=4,text = f"Non-responisve channels",showarrow = True,arrowhead=1,xanchor="right",ay=0,ax=-20,arrowwidth=2,arrowcolor="Black"),row = 2, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 546,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
 
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 546,y=1.5,text = f"Disconnected Wire",showarrow = True,arrowhead=1,xanchor="right",yanchor="top",ay=10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
-
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 606,y=3.2,text = f"Interconnected Wires",showarrow = True,arrowhead=1,xanchor="right",ay=-10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 606,y=3.2,text = f"Interconnected Wires",showarrow = True,arrowhead=1,xanchor="right",ay=-10,arrowwidth=2,arrowcolor="Black"),row = 1, col =2)
 
 
 

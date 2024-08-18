@@ -40,7 +40,7 @@ vector<float> Hit_removal(vector<float> channel,float Pedestal){
 		if (TMath::Abs(ADC) > 10.0 || skips > 0){
 			//noise.push_back(ADC);
 			if (skips > 0){
-				skip-=1;
+				skips-=1;
 				continue;
 			}
 			skips = 50;

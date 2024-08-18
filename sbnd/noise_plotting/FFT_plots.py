@@ -24,9 +24,9 @@ fig = make_subplots(rows=3,cols =1,subplot_titles = ('East First Induction FFT S
 files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_30.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11995.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_signal.root"))
-#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11653_30.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
 
-run_number = ["14784"]
+run_number = ["14784, 30","14784, 20"]
 
 
 
