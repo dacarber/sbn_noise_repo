@@ -31,20 +31,23 @@ using namespace std;
 
 
 double Noise_levels(vector<float> noise_channels){
-	double RMS;
+	float RMS;
 	float square;
 	float sum;
+	float mean =TMath::Mean(noise_channels.begin(),noise_channels.end());
+	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
 	for (int i = 0; i<noise_channels.size();i++){
-		square = noise_channels[i] * noise_channels[i];
+		square = (noise_channels[i]-mean) * (noise_channels[i]-mean);
 		sum = sum+square;
 	}
+	//RMS = TMath::RMS(noise_channels.begin(),noise_channels.end());
 	//cout<<sum<<endl;
 	//float mean = sum/noise_channels.size();
-	//float mean = accumulate(noise_channels.begin(),noise_channels.end(),0.0f)/noise_channels.size();
+	
 	RMS =sqrt(sum/noise_channels.size());
 	//}
-	cout<<"Size:"<<sum<<endl;
-	return RMS;	
+	cout<<"Size:"<<mean<<endl;
+	return RMS;		
 }
 vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	vector<float> waveform;
@@ -78,11 +81,14 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 		return int_waveform;
 	}
 	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
+	cout<<"1Returning vector"<<noise[100]<<endl;
 	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
+	cout<<"2Returning vector"<<coh_noise[100]<<endl;
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
+	cout<<"3Returning vector"<<int_waveform[100]<<endl;
 	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
-	cout<<"Returning vector"<<int_waveform[100]<<endl;
+	cout<<"4Returning vector"<<int_waveform[100]<<endl;
 	return int_waveform;
 }
 
@@ -238,7 +244,7 @@ void LoadRawDigits(TFile *inFile)
 				if (skip_channel == true){ 
 					continue;
 				}
-				cout<<"Adding another channel "<<noise_channels[0]<<endl; 
+				cout<<"Adding another channel "<<x[100]<<endl; 
 				channel_group.push_back(x);
 				int_channel_group.push_back(x);
 			}
