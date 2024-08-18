@@ -73,20 +73,20 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
-vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
+vector<float> Coh_removal(vector<float> noise, vector<float> coh_noise){
 	vector<float> int_waveform(noise.size(),0);
 	int sum = accumulate(noise.begin(),noise.end(),0);
 	cout<<"Check size"<<noise.size()<<endl;
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
+	//transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
 	cout<<"1Returning vector"<<noise[100]<<endl;
-	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
+	//transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
 	cout<<"2Returning vector"<<coh_noise[100]<<endl;
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	cout<<"3Returning vector"<<int_waveform[100]<<endl;
-	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
+	//transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	cout<<"4Returning vector"<<int_waveform[100]<<endl;
 	return int_waveform;
@@ -117,7 +117,7 @@ void LoadRawDigits(TFile *inFile)
 		cout<<"Grabbed ADCs"<<endl;
 		cout<<ADC.size()<<endl; //Grabs the number of time ticks
 		vector<vector<short>> channel_group;
-		vector<vector<short>> int_channel_group;
+		vector<vector<float>> int_channel_group;
 		vector<short> noise_channels(ADC.size(),0);
 		bool responsive_channel = true;
 		vector<short> channels;
@@ -178,7 +178,7 @@ void LoadRawDigits(TFile *inFile)
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
 				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  20){
 					skip_channel = true;
-					int_channel_group.push_back(vector<short>(3415,0));
+					int_channel_group.push_back(vector<float>(3415,0));
 					break;
 				}
 				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
