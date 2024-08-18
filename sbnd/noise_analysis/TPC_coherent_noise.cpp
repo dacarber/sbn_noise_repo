@@ -77,10 +77,10 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x});
-	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x});
+	transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x};);
+	transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x};);
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
-	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x)});
+	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x)};);
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	cout<<"Returning vector"<<endl;
 	return int_waveform;
