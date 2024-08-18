@@ -82,7 +82,7 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
-	cout<<"Returning vector"<<endl;
+	cout<<"Returning vector"<<int_waveform[100]<<endl;
 	return int_waveform;
 }
 
@@ -238,7 +238,7 @@ void LoadRawDigits(TFile *inFile)
 				if (skip_channel == true){ 
 					continue;
 				}
-				//cout<<"Adding another channel "<<noise_channels[0]<<endl; 
+				cout<<"Adding another channel "<<noise_channels[0]<<endl; 
 				channel_group.push_back(x);
 				int_channel_group.push_back(x);
 			}
