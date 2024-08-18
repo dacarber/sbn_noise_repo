@@ -135,7 +135,7 @@ void LoadRawDigits(TFile *inFile)
 			//Checks if the channel is dead
 			if (myADC[index].Samples() != 3415 && (ki+1)%group_size != 0){
 				responsive_channel = false;
-				int_channel_group.push_back(vector<short>(3415,0))
+				int_channel_group.push_back(vector<short>(3415,0));
 				continue;
 			}
 			else if(myADC[index].Samples() != 3415 && (ki+1)%group_size == 0){
@@ -171,7 +171,7 @@ void LoadRawDigits(TFile *inFile)
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
 				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  20){
 					skip_channel = true;
-					int_channel_group.push_back(vector<short>(3415,0))
+					int_channel_group.push_back(vector<short>(3415,0));
 					break;
 				}
 				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
