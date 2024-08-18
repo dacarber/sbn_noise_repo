@@ -73,7 +73,7 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	vector<float> int_waveform(noise.size(),0);
 	int sum = accumulate(noise.begin(),noise.end(),0);
-	cout<<"Check size"<<endl;
+	cout<<"Check size"<<noise.size()<<endl;
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
@@ -156,6 +156,7 @@ void LoadRawDigits(TFile *inFile)
 					}
 					vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
 					float Int_RMS = Noise_levels(intrinsic_waveform);
+					cout<<"Int RMS:"<<Int_RMS<<endl;
 					INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 					Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
 				}
@@ -197,6 +198,7 @@ void LoadRawDigits(TFile *inFile)
 						}
 						vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
 						float Int_RMS = Noise_levels(intrinsic_waveform);
+						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
 					}
@@ -222,6 +224,7 @@ void LoadRawDigits(TFile *inFile)
 						}
 						vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
 						float Int_RMS = Noise_levels(intrinsic_waveform);
+						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
 					}
