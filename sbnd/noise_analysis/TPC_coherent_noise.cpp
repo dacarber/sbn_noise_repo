@@ -30,8 +30,8 @@
 using namespace std;
 
 
-double Noise_levels(vector<float> noise_channels){
-	float RMS;
+double Noise_levels(vector<double> noise_channels){
+	double RMS;
 	float square;
 	float sum;
 	float mean =TMath::Mean(noise_channels.begin(),noise_channels.end());
@@ -49,8 +49,8 @@ double Noise_levels(vector<float> noise_channels){
 	cout<<"Size:"<<mean<<endl;
 	return RMS;		
 }
-vector<float> Coherent_RMS(vector<vector<short>> noise_group){
-	vector<float> waveform;
+vector<double> Coherent_RMS(vector<vector<short>> noise_group){
+	vector<double> waveform;
 	short tick;
 	cout<<noise_group.size()<<endl;
 	for (int i = 0; i<noise_group[0].size();i++){
@@ -73,8 +73,8 @@ vector<float> Coherent_RMS(vector<vector<short>> noise_group){
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
 	return waveform;
 }
-vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
-	vector<float> int_waveform(noise.size(),0);
+vector<double> Coh_removal(vector<short> noise, vector<double> coh_noise){
+	vector<double> int_waveform(noise.size(),0);
 	float coh;
 	float raw;
 	int sum = accumulate(noise.begin(),noise.end(),0);
@@ -82,31 +82,50 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	/*for (int tick =0; tick < noise.size();tick++){
-		if (noise[tick] <0){
-			raw = -(noise[tick]*noise[tick]);
-		}
-		else{
-			raw = (noise[tick]*noise[tick]);
-		}
-		if (coh_noise[tick] < 0){
-			coh = -(coh_noise[tick]*coh_noise[tick]);
-		}
-		else{
-			coh = (coh_noise[tick]*coh_noise[tick]);
-		}
-		int_waveform[tick] = sqrt(raw-coh);
-	}*/
-	//transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
-	cout<<"1Returning vector"<<noise[100]<<endl;
-	//transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
-	cout<<"2Returning vector"<<coh_noise[100]<<endl;
+
 	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
-	cout<<"3Returning vector"<<int_waveform[100]<<endl;
-	//transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
-	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
-	cout<<"4Returning vector"<<int_waveform[100]<<endl;
+	cout<<"Returning vector"<<int_waveform[100]<<endl;
+
 	return int_waveform;
+}
+
+vector<double> FFT(vector<double> noise_channel){
+	int vec_size = noise_channel.size();
+	Int_t size = vec_size;
+	double* inputSignalDouble = new double[vec_size];
+    	for (size_t i = 0; i < vec_size; ++i) {
+        	inputSignalDouble[i] = noise_channel[i];
+    	}
+	noise_channel.clear();
+
+   	TVirtualFFT* fft = TVirtualFFT::FFT(1, &size, "R2C ES K");
+	if (!fft) {
+        std::cerr << "Error: Failed to initialize FFT." << std::endl;
+        return vector<double>();
+    }
+    
+    fft->SetPoints(inputSignalDouble);
+    fft->Transform();
+
+	double fftReal=0;
+        double fftImag=0;
+	vector<double> fftMag(vec_size / 2 + 2);
+	for(size_t k=1;k<vec_size / 2 + 2;k++){
+		fft->GetPointComplex(k,fftReal, fftImag);
+	//delete fft;
+		if (k == vec_size / 2 + 1){
+			fftMag[k] = 1;
+			continue;
+		}
+		fftMag[k] = TMath::Sqrt(fftReal*fftReal + fftImag*fftImag);
+	}
+
+
+	delete[] inputSignalDouble;
+	delete fft;
+	//cout<<"Finished"<<fftMag[100]<<endl;
+	return fftMag;
+		
 }
 
 void LoadRawDigits(TFile *inFile)
@@ -118,10 +137,11 @@ void LoadRawDigits(TFile *inFile)
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
 
 
-	vector<float> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
-	vector<float> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
+	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<double> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
 	vector<int> Int_Entries(11264,0.0f);
+	vector<vector<double>> FFT_total(11264,vector<double>(3415/2+2,0));
 	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
@@ -168,8 +188,8 @@ void LoadRawDigits(TFile *inFile)
 					channel_group.clear();
 					continue;				
 				}
-				vector<float> coherent_waveform = Coherent_RMS(channel_group);
-				float Coh_RMS = Noise_levels(coherent_waveform);
+				vector<double> coherent_waveform = Coherent_RMS(channel_group);
+				double Coh_RMS = Noise_levels(coherent_waveform);
 				channel_group.clear();
 				cout<<"Coh RMS:"<<Coh_RMS<<endl;
 				for (int kh=0; kh < group_size; kh++){
@@ -179,8 +199,10 @@ void LoadRawDigits(TFile *inFile)
 					if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
 						continue;
 					}
-					vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-					float Int_RMS = Noise_levels(intrinsic_waveform);
+					vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
+					vector<double> channel_fft = FFT(intrinsic_waveform);
+					transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
+					double Int_RMS = Noise_levels(intrinsic_waveform);
 					cout<<"Int RMS:"<<Int_RMS<<endl;
 					INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 					Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
@@ -200,9 +222,12 @@ void LoadRawDigits(TFile *inFile)
 					int_channel_group.push_back(vector<short>(3415,0));
 					break;
 				}
-				x[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal()
-
+				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();//
+				
+;//
 			}
+
+			
 
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				if (skip_channel == true){
@@ -211,8 +236,8 @@ void LoadRawDigits(TFile *inFile)
 					int_channel_group.clear();
 					continue;				
 				}
-					vector<float> coherent_waveform = Coherent_RMS(channel_group);
-					float Coh_RMS = Noise_levels(coherent_waveform);
+					vector<double> coherent_waveform = Coherent_RMS(channel_group);
+					double Coh_RMS = Noise_levels(coherent_waveform);
 					channel_group.clear();
 					cout<<"Coh RMS:"<<Coh_RMS<<endl;
 					for (int kh=0; kh < group_size; kh++){
@@ -221,8 +246,10 @@ void LoadRawDigits(TFile *inFile)
 						if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
 							continue;
 						}
-						vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						float Int_RMS = Noise_levels(intrinsic_waveform);
+						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
+						vector<double> channel_fft = FFT(intrinsic_waveform);
+						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
+						double Int_RMS = Noise_levels(intrinsic_waveform);
 						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
@@ -237,8 +264,8 @@ void LoadRawDigits(TFile *inFile)
 				}
 					channel_group.push_back(x);
 					int_channel_group.push_back(x);
-					vector<float> coherent_waveform = Coherent_RMS(channel_group);
-					float Coh_RMS = Noise_levels(coherent_waveform);
+					vector<double> coherent_waveform = Coherent_RMS(channel_group);
+					double Coh_RMS = Noise_levels(coherent_waveform);
 					channel_group.clear();
 					cout<<"Coh RMS:"<<Coh_RMS<<endl;
 					for (int kh=0; kh < group_size; kh++){
@@ -247,8 +274,10 @@ void LoadRawDigits(TFile *inFile)
 						if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
 							continue;
 						}
-						vector<float> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						float Int_RMS = Noise_levels(intrinsic_waveform);
+						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
+						vector<double> channel_fft = FFT(intrinsic_waveform);
+						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
+						double Int_RMS = Noise_levels(intrinsic_waveform);
 						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
@@ -281,12 +310,16 @@ void LoadRawDigits(TFile *inFile)
 	int entries;
 	float int_rms;
 	int int_entries;
+	float avg_FFT;
+
 	//vector<float> avg_FFT;
 	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
 	tree->Branch("entries", &entries, "entries/I");
 	tree->Branch("int_rms", &int_rms, "int_rms/F");
 	tree->Branch("int_entries", &int_entries, "int_entries/I");
-	//tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	tree->SetBranchStatus("avg_FFT", 0);
+
 	tree->SetBranchStatus("coh_rms", 1);
     tree->SetBranchStatus("entries", 0);
     tree->SetBranchStatus("int_rms", 0);
@@ -320,42 +353,24 @@ void LoadRawDigits(TFile *inFile)
 
 		tree->Fill();	
 	}
+	tree->SetBranchStatus("coh_rms", 0);
+    tree->SetBranchStatus("entries", 0);
+    tree->SetBranchStatus("int_rms", 0);
+    tree->SetBranchStatus("int_entries", 0);
+	float avg_FFT;
+	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	for(int ch = 0; ch<FFT_total.size(); ch++){
+		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
 
-	//short coh_wave;
-	//tree->Branch("coh_wave", &coh_wave, "coh_wave/F");
-	//for(int ch = 0; ch<RMS_wave_total.size(); ch++){
-	//	transform(RMS_wave_total[ch].begin(),RMS_wave_total[ch].end(),RMS_wave_total[ch].begin(),[evt](float &c){ return c/evt; });
-		//coh_wave = RMS_wave_total[ch];
-	//	for (size_t c = 0; c < RMS_wave_total[ch].size(); ++c) {
-    //           	coh_wave = RMS_wave_total[ch][c];
-	//		tree->Fill();
-    //            }
-	//}
+			avg_FFT = FFT_total[ch][c];
+			tree->Fill();
+        }
+    }
 	file->Write();
 	file->Close();
 	
 	cout<<"Got ADC and Pedestal"<<endl;
 
-	/*TBranch* RawDigits = Events->GetBranch("raw::RawDigits_daq__DetSim.obj");
-	cout<<"Got Branch"<<endl;
-	TLeaf* ADC = RawDigits->GetLeaf("fADC");
-	int entries = Events->GetEntries("EventAuxiliary.id_.event_");
-
-	cout<<entries<<endl;
-	for (int i=0;i<entries;i++){
-		cout<<RawDigits->GetRow(i)<<endl;
-		cout<<ADC->GetValue(i)<<endl;
-	}*/
-	//TBranch* RawDigits = RawDigits_branch->GetSubBranch('raw::RawDigits_daq__DetSim.obj');
-
-
-	//Double_t ADC = RawDigits->GetLeaf("fADC")->GetValue(1);
-	
-
-	//cout<<ADC<<endl;
-
-	//TH1F* hist = new TH1F('fADC');
-	//Events->Draw('raw::RawDigits_daq__DetSim.obj.fADC');
 
 }
 
@@ -367,27 +382,4 @@ void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise
 	cout<<"Got File"<<endl;
 	LoadRawDigits(inFile);
 }
-/*void Hit_removal(auto channels)
-{
-	for (int i = 0; i <=channels.GetSize();i++){
-		vector<short> noise_channels;
-		int sum = accumulate(channels[i].begin(), channels[i].end(), 0);
-  		double mean = double(sum) / channels[i].size();
-		cout<<"Length of channel and mean before:"+channels[i].size()+mean<<endl;
-		for (int j = 0; j =< 34;j++){
-			double max_sig = *max_element(channels[i][j*100:(j+1)*100]);
-			double min_sig = *min_element(channels[i][j*100:(j+1)*100]);
-			double sig_diff = max_sig-min_sig;
-			if sig_diff > 30{
-				noise_channels.insert(i*100,vector<short> zeros(100,0.0));
-			noise_channels.insert(i*100,channels[i][j*100:(j+1)*100]);
-			}
-		}
-		int sum = accumulate(noise_channels.begin(), noise_channels.end(), 0);
-  		mean = double(sum) / noise_channels.size();
-		channels[i] = noise_channels;
-		cout<<"Length of channel and mean after:"+noise_channels[i].size()+mean<<endl;
-	}
-	cout<<"Number of channels"+noise_channels[i].size()<<endl;
 
-}*/
