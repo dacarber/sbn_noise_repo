@@ -127,7 +127,7 @@ void LoadRawDigits(TFile *inFile)
 	int evt = 0;
 	while (Events.Next())
 	{
-		if (evt > 100);{
+		if (evt > 100){
 			continue;
 		}
 
