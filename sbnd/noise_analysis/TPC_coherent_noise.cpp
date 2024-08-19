@@ -82,7 +82,7 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	for (tick =0; tick < noise.size();tick++){
+	for (int tick =0; tick < noise.size();tick++){
 		if (noise[tick] <0){
 			raw = -(noise[tick]*noise[tick]);
 		}
