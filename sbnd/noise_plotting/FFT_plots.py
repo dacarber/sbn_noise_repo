@@ -21,12 +21,12 @@ from operator import add
 files = []
 fig = make_subplots(rows=3,cols =1,subplot_titles = ('East First Induction FFT Spectrum','East Second Induction FFT Spectrum','East Collection FFT Spectrum'))
 
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_30.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_runsim.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11995.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_signal.root"))
 files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
 
-run_number = ["14784, 30","14784, 20"]
+run_number = ["Simulated","14784, 20"]
 
 
 

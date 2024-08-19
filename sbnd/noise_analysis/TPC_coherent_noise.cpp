@@ -200,7 +200,7 @@ void LoadRawDigits(TFile *inFile)
 					int_channel_group.push_back(vector<short>(3415,0));
 					break;
 				}
-				x[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal()
+				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();//
 
 			}
 
