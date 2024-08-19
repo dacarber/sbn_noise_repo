@@ -357,7 +357,6 @@ void LoadRawDigits(TFile *inFile)
     tree->SetBranchStatus("entries", 0);
     tree->SetBranchStatus("int_rms", 0);
     tree->SetBranchStatus("int_entries", 0);
-	float avg_FFT;
 	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
 	for(int ch = 0; ch<FFT_total.size(); ch++){
 		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
