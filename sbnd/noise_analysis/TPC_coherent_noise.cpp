@@ -90,6 +90,7 @@ vector<double> Coh_removal(vector<short> noise, vector<double> coh_noise){
 }
 
 vector<double> FFT(vector<double> noise_channel){
+	cout<<"Starting FFT"<<endl;
 	int vec_size = noise_channel.size();
 	Int_t size = vec_size;
 	double* inputSignalDouble = new double[vec_size];
@@ -123,7 +124,7 @@ vector<double> FFT(vector<double> noise_channel){
 
 	delete[] inputSignalDouble;
 	delete fft;
-	//cout<<"Finished"<<fftMag[100]<<endl;
+	cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
 		
 }
