@@ -23,7 +23,7 @@ noise = input("What Noise do you want (raw, coh, or int): ")
 directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
 if not os.path.exists(directory):
     os.mkdir(directory)
-files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_run{Run_num}.root")
+files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_run{Run_num}.root")
 files['tpc_noise;1'].keys()
 
 raw_rms = files['tpc_noise;1'][f'{noise}_rms'].array().to_list()
@@ -96,13 +96,13 @@ fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 3, col = 1)
 fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 1, col = 2)
 fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 2, col = 2)
 fig.update_xaxes(title_text = "TPC Plane Channel Number",row = 3, col = 2)
-
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =1)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =1)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =1)
+if Run_num != 'sim':
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 730,yshift=40,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =1)
 if anno == "Yes" or anno == "yes":
     fig.add_annotation(dict(font = dict(size = 15,color="Black",),x= 1528,y=3,text = f"Shorted Wire",showarrow = True,arrowhead=1,xanchor="right",arrowwidth=2,arrowcolor="Black"),row = 1, col =1)
 

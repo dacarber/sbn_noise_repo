@@ -44,26 +44,26 @@ for r,rms in enumerate(raw_rms):
 Noise_df = pd.DataFrame(Noise_df)
 
 filename = f"RMS_histograms_{Run_num}"
-Non_zero_mask = Noise_df['Raw_rms'] > 0
+Non_zero_mask = (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000);
 print("Average noise of SBND: ",np.mean(Noise_df['Raw_rms'][Non_zero_mask]),"Median noise of SBND: ",np.median(Noise_df['Raw_rms'][Non_zero_mask]))
 
 
-mask_UB = (Noise_df['wire_plane'] == 'UB') & (Noise_df['Raw_rms'] > 0)
+mask_UB = (Noise_df['wire_plane'] == 'UB') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_UB = np.mean(Noise_df['Raw_rms'][mask_UB])
 
-mask_VB = (Noise_df['wire_plane'] == 'VB') & (Noise_df['Raw_rms'] > 0)
+mask_VB = (Noise_df['wire_plane'] == 'VB') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_VB = np.mean(Noise_df['Raw_rms'][mask_VB])
 
-mask_YB = (Noise_df['wire_plane'] == 'YB') & (Noise_df['Raw_rms'] > 0)
+mask_YB = (Noise_df['wire_plane'] == 'YB') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_YB = np.mean(Noise_df['Raw_rms'][mask_YB])
 
-mask_UA = (Noise_df['wire_plane'] == 'UA') & (Noise_df['Raw_rms'] > 0)
+mask_UA = (Noise_df['wire_plane'] == 'UA') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_UA = np.mean(Noise_df['Raw_rms'][mask_UA])
 
-mask_VA = (Noise_df['wire_plane'] == 'VA') & (Noise_df['Raw_rms'] > 0)
+mask_VA = (Noise_df['wire_plane'] == 'VA') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_VA = np.mean(Noise_df['Raw_rms'][mask_VA])
 
-mask_YA = (Noise_df['wire_plane'] == 'YA') & (Noise_df['Raw_rms'] > 0)
+mask_YA = (Noise_df['wire_plane'] == 'YA') & (Noise_df['Raw_rms'] > 0) & (Noise_df['Raw_rms'] <10000)
 mean_YA = np.mean(Noise_df['Raw_rms'][mask_YA])
 
 
@@ -99,14 +99,14 @@ fig.update_layout(xaxis4 = dict(range = [0,4.3]))
 
 fig.add_trace(go.Histogram(x=Noise_df['Raw_rms'][mask_YA],marker_color = 'purple',xbins=dict(start = mean_YA-5,end = mean_YA+5,size=.05)),row = 3, col =1)
 fig.update_layout(xaxis6 = dict(range = [0,4.3]))
-
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =1)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =1)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =2)
-fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =1)
-#200,250
+if Run_num != 'sim':
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 1, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 2, col =1)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =2)
+    fig.add_annotation(dict(font = dict(size = 15,color="Black",),xshift= 115,yshift=157,text = f"<b>SBND<br>Preliminary Data</b>",showarrow = False),row = 3, col =1)
+    #200,250
 
 
 fig.update_xaxes(title_text = "RMS [ADC]",row = 1, col = 1)

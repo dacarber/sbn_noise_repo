@@ -26,7 +26,7 @@ files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/dat
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_signal.root"))
 files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
 
-run_number = ["Simulated","14784, 20"]
+run_number = ["Simulated","Run 14784"]
 
 
 
@@ -63,7 +63,7 @@ for f in range(len(files)):
     freq = list(range(len(df['0'])))
     freq = (np.add(freq,.5))*2/3415
     color = ['red','green','blue']
-    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UB_{f}'],1984-skipped),marker_color = color[f],opacity = 1/(f+1),name = f'Run {run_number[f]}'),row = 1, col = 1)
+    fig.add_trace(go.Scatter(x=freq,y = np.divide(df[f'total_UB_{f}'],1984-skipped),marker_color = color[f],opacity = 1/(f+1),name = f'{run_number[f]}'),row = 1, col = 1)
     
     skipped = 0
     for channel in tqdm(range(1984,3968,1)):
