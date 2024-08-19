@@ -82,7 +82,7 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 	if (noise.size() != 3415 || sum == 0 ){
 		return int_waveform;
 	}
-	for (int tick =0; tick < noise.size();tick++){
+	/*for (int tick =0; tick < noise.size();tick++){
 		if (noise[tick] <0){
 			raw = -(noise[tick]*noise[tick]);
 		}
@@ -96,12 +96,12 @@ vector<float> Coh_removal(vector<short> noise, vector<float> coh_noise){
 			coh = (coh_noise[tick]*coh_noise[tick]);
 		}
 		int_waveform[tick] = sqrt(raw-coh);
-	}
+	}*/
 	//transform(noise.begin(),noise.end(),noise.begin(),[](float x) {return x * x;});
 	cout<<"1Returning vector"<<noise[100]<<endl;
 	//transform(coh_noise.begin(),coh_noise.end(),coh_noise.begin(),[](float x) {return x * x;});
 	cout<<"2Returning vector"<<coh_noise[100]<<endl;
-	//transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
+	transform(noise.begin(),noise.end(),coh_noise.begin(),int_waveform.begin(),minus<float>());
 	cout<<"3Returning vector"<<int_waveform[100]<<endl;
 	//transform(int_waveform.begin(),int_waveform.end(),int_waveform.begin(),[](float x) {return sqrt(x);});
 	//cout<<"Coh ADC "<<noise_group[0][0]<<endl;
