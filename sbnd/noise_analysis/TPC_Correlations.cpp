@@ -181,8 +181,19 @@ void LoadRawDigits(TFile *inFile)
 			if (myADC[index].NADC() != 3415){
 				continue;
 			}
+			bool skip_channel = false;
 			vector<double> x(myADC[index].Samples(),0);
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick) x[itick] = myADC[index].ADC(itick);
+			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
+				if (abs(myADC[index].ADC(itick)-myADC[in].GetPedestal()) >  10){
+					skip_channel = true;
+					break;
+				}
+				x[itick] =myADC[index].ADC(itick);
+
+			}
+			if (skip_channel == true){
+				continue;
+			}
 			for (int ji=0; ji < 11264;ji++){
 				int channel = myADC[ji].Channel();
 				auto in = find(channels.begin(),channels.end(), ji);
@@ -208,16 +219,6 @@ void LoadRawDigits(TFile *inFile)
 			float RMS = Noise_levels(noise_channels);
 			cout<<"RMS:"<<RMS<<endl;
 			RMS_total[channel] =  RMS_total.at(channel)+RMS;
-			//RMS_vec.push_back(RMS);
-			//delete RMS;
-			//cout<<"Start FFT"<<endl;
-			//vector<float> FFT_mag = FFT(noise_channels);
-			//cout<<"Done with FFT"<<endl;			
-			//for (size_t ji = 0; ji < FFT_mag.size(); ++ji) {
-        		//	FFT_total[channel][ji] = FFT_total[channel][ji] + FFT_mag[ji];
-    			//}
-			//FFT_mag.clear();
-			//cout<<"FFT Done"<<endl;
 
 		}
 		evt+=1;
