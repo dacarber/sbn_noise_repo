@@ -162,7 +162,7 @@ void LoadRawDigits(TFile *inFile)
 		vector<short> noise_channels(ADC.size(),0);
 		bool responsive_channel = true;
 		vector<short> channels;
-		short group_size = 8;
+		short group_size = 32;
 
 		//Puts all of the channel ids into a vector in the order the files have the events
 		for(int p=0; p<myADC.GetSize();p++){		

@@ -32,8 +32,8 @@ Run_num = input("Enter the Run Number: ")
 fig = make_subplots(rows=1,cols =1,subplot_titles = (f'FFT Spectrum {Run_num}',))
 
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_runsim.root"))
-#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_run14784_int_fft.root"))
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_runsim_int_fft.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_run14784_fft.root"))
+#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_runsim_fft.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
 
 
@@ -45,7 +45,7 @@ files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/dat
 #df = {'total_0':[0]*1708,'total_1':[0]*1708,'total_2':[0]*1708}
 df= {}
 for f in range(len(files)):
-    raw_rms = files[f][f'{files[f].keys()[0]}']['avg_FFT'].array()
+    raw_rms = files[f][f'{files[f].keys()[0]}']['coh_FFT'].array()
     df[f'total_U_{f}'] = [0]*1709
     df[f'total_V_{f}'] = [0]*1709
     df[f'total_Y_{f}'] = [0]*1709
