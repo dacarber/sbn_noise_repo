@@ -143,6 +143,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<int> Entries(11264,0.0f);
 	vector<int> Int_Entries(11264,0.0f);
 	vector<vector<double>> FFT_total(11264,vector<double>(3415/2+2,0));
+	vector<vector<double>> Coh_FFT_total(11264,vector<double>(3415/2+2,0));
 	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
@@ -201,12 +202,18 @@ void LoadRawDigits(TFile *inFile)
 						continue;
 					}
 					vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-					vector<double> channel_fft = FFT(intrinsic_waveform);
-					transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
+					
 					double Int_RMS = Noise_levels(intrinsic_waveform);
 					cout<<"Int RMS:"<<Int_RMS<<endl;
 					INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 					Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
+
+					//FFT calc
+
+					vector<double> channel_fft = FFT(coherent_waveform);
+					transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+					vector<double> channel_fft = FFT(intrinsic_waveform);
+					transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 				}
 				int_channel_group.clear();
 				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
@@ -248,12 +255,17 @@ void LoadRawDigits(TFile *inFile)
 							continue;
 						}
 						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						vector<double> channel_fft = FFT(intrinsic_waveform);
-						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 						double Int_RMS = Noise_levels(intrinsic_waveform);
 						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
+
+						//FFT calc
+
+						vector<double> channel_fft = FFT(coherent_waveform);
+						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+						vector<double> channel_fft = FFT(intrinsic_waveform);
+						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 					}
 					int_channel_group.clear();
 				}
@@ -276,12 +288,17 @@ void LoadRawDigits(TFile *inFile)
 							continue;
 						}
 						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						vector<double> channel_fft = FFT(intrinsic_waveform);
-						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 						double Int_RMS = Noise_levels(intrinsic_waveform);
 						cout<<"Int RMS:"<<Int_RMS<<endl;
 						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
 						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
+
+						//FFT calc
+
+						vector<double> channel_fft = FFT(coherent_waveform);
+						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+						vector<double> channel_fft = FFT(intrinsic_waveform);
+						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 					}
 					int_channel_group.clear();
 				}
@@ -312,6 +329,7 @@ void LoadRawDigits(TFile *inFile)
 	float int_rms;
 	int int_entries;
 	float avg_FFT;
+	float coh_FFT;
 
 	//vector<float> avg_FFT;
 	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
@@ -319,8 +337,9 @@ void LoadRawDigits(TFile *inFile)
 	tree->Branch("int_rms", &int_rms, "int_rms/F");
 	tree->Branch("int_entries", &int_entries, "int_entries/I");
 	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	tree->Branch("coh_FFT", &coh_FFT, "coh_FFT/F");
 	tree->SetBranchStatus("avg_FFT", 0);
-
+	tree->SetBranchStatus("coh_FFT", 0);
 	tree->SetBranchStatus("coh_rms", 1);
     tree->SetBranchStatus("entries", 0);
     tree->SetBranchStatus("int_rms", 0);
@@ -331,38 +350,38 @@ void LoadRawDigits(TFile *inFile)
 	}
 	tree->SetBranchStatus("coh_rms", 0);
     tree->SetBranchStatus("entries", 1);
-    tree->SetBranchStatus("int_rms", 0);
-    tree->SetBranchStatus("int_entries", 0);
 	for(int ch = 0; ch<Entries.size(); ch++){
 		entries = Entries.at(ch);
 		tree->Fill();	
 	}
 	tree->SetBranchStatus("int_rms", 1);
-    tree->SetBranchStatus("int_entries", 0);
-    tree->SetBranchStatus("coh_rms", 0);
     tree->SetBranchStatus("entries", 0);
 	for(int ch = 0; ch<INT_RMS_total.size(); ch++){
 		int_rms = INT_RMS_total.at(ch)/Int_Entries.at(ch);
 		tree->Fill();	
 	}
-	tree->SetBranchStatus("coh_rms", 0);
     tree->SetBranchStatus("entries", 1);
     tree->SetBranchStatus("int_rms", 0);
-    tree->SetBranchStatus("int_entries", 0);
 	for(int ch = 0; ch<Int_Entries.size(); ch++){
 		int_entries = Int_Entries.at(ch);
 
 		tree->Fill();	
 	}
-	tree->SetBranchStatus("coh_rms", 0);
     tree->SetBranchStatus("entries", 0);
-    tree->SetBranchStatus("int_rms", 0);
-    tree->SetBranchStatus("int_entries", 0);
     tree->SetBranchStatus("avg_FFT", 1);
 	for(int ch = 0; ch<FFT_total.size(); ch++){
 		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
 
 			avg_FFT = FFT_total[ch][c];
+			tree->Fill();
+        }
+    }
+    tree->SetBranchStatus("avg_FFT", 0);
+    tree->SetBranchStatus("coh_FFT", 1);
+	for(int ch = 0; ch<Coh_FFT_total.size(); ch++){
+		for (size_t c = 0; c < Coh_FFT_total[ch].size(); ++c) {
+
+			coh_FFT = Coh_FFT_total[ch][c];
 			tree->Fill();
         }
     }
