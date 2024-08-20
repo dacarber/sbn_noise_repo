@@ -210,8 +210,8 @@ void LoadRawDigits(TFile *inFile)
 
 					//FFT calc
 
-					vector<double> channel_fft = FFT(coherent_waveform);
-					transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+					vector<double> coh_channel_fft = FFT(coherent_waveform);
+					transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
 					vector<double> channel_fft = FFT(intrinsic_waveform);
 					transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 				}
@@ -262,8 +262,8 @@ void LoadRawDigits(TFile *inFile)
 
 						//FFT calc
 
-						vector<double> channel_fft = FFT(coherent_waveform);
-						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+						vector<double> coh_channel_fft = FFT(coherent_waveform);
+						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
 						vector<double> channel_fft = FFT(intrinsic_waveform);
 						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 					}
@@ -295,8 +295,8 @@ void LoadRawDigits(TFile *inFile)
 
 						//FFT calc
 
-						vector<double> channel_fft = FFT(coherent_waveform);
-						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
+						vector<double> coh_channel_fft = FFT(coherent_waveform);
+						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
 						vector<double> channel_fft = FFT(intrinsic_waveform);
 						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
 					}
