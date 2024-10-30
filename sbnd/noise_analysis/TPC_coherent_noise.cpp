@@ -226,6 +226,7 @@ void LoadRawDigits(TFile *inFile)
 			//If channel is responsive the channel will grab the noise 
 			bool skip_channel = false;
 			vector<short> x(myADC[index].Samples(),0);
+			vector<double> y(myADC[index].Samples(),0);
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
 				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  20){
 					skip_channel = true;
@@ -233,12 +234,12 @@ void LoadRawDigits(TFile *inFile)
 					break;
 				}
 				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();//
-				
+				y[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
 ;//
 			}
 
 			if (skip_channel == false){
-				vector<double> raw_channel_fft = FFT(x);
+				vector<double> raw_channel_fft = FFT(y);
 				transform(Raw_FFT_total[ki].begin(),Raw_FFT_total[ki].end(),raw_channel_fft.begin(),Raw_FFT_total[ki].begin(),plus<double>());
 			}
 
