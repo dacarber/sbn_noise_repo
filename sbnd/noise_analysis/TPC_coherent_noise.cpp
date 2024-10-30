@@ -336,7 +336,7 @@ void LoadRawDigits(TFile *inFile)
 	int entries;
 	float int_rms;
 	int int_entries;
-	float avg_FFT;
+	float int_FFT;
 	float coh_FFT;
 	float raw_FFT;
 
@@ -383,7 +383,7 @@ void LoadRawDigits(TFile *inFile)
 	for(int ch = 0; ch<FFT_total.size(); ch++){
 		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
 
-			avg_FFT = FFT_total[ch][c];
+			int_FFT = FFT_total[ch][c];
 			tree->Fill();
         }
     }
