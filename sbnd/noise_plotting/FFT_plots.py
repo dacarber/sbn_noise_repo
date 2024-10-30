@@ -21,12 +21,13 @@ from operator import add
 files = []
 fig = make_subplots(rows=3,cols =1,subplot_titles = ('East First Induction FFT Spectrum','East Second Induction FFT Spectrum','East Collection FFT Spectrum'))
 
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_runsim.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise_Analysis/data/fft_output_runsim.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run11995.root"))
 #files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_signal.root"))
-files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
-
-run_number = ["Simulated","Run 14784"]
+#files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/fft_output_run14784_20.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise_Analysis/data/noise_output_sim_test.root"))
+files.append(uproot.open(f"/Users/danielcarber/Documents/SBND/Noise_Analysis/data/noise_output_full_14784.root"))
+run_number = ["Old Sim","New Simulated","Run 14784"]
 
 
 
@@ -91,7 +92,7 @@ for f in range(len(files)):
 #fig.update_layout(xaxis = dict(range = [1*0,.996*1]))
 fig.update_xaxes(title_text = "Frequency [MHz]",row = 3, col = 1)
 fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = .01),xaxis2 = dict(tickmode = 'linear',dtick = .01),xaxis3 = dict(tickmode = 'linear',dtick = .01))
-fig.update_layout(height = 600, width = 1800,showlegend = True)
+fig.update_layout(height = 900, width = 1500,showlegend = True)
 fig.show()
 
 
@@ -155,7 +156,7 @@ for f in range(len(files)):
 #fig.update_layout(xaxis = dict(range = [1*0,.996*1]))
 fig.update_xaxes(title_text = "Frequency [MHz]",row = 3, col = 1)
 fig.update_layout(xaxis = dict(tickmode = 'linear',dtick = .01),xaxis2 = dict(tickmode = 'linear',dtick = .01),xaxis3 = dict(tickmode = 'linear',dtick = .01))
-fig.update_layout(height = 600, width = 1800,showlegend = True)
+fig.update_layout(height = 900, width = 1500,showlegend = True)
 fig.show()
 #mask = Noise_df['wire_plane'] == 'UB'
 #median = np.median(Noise_df['Raw_rms'][mask])

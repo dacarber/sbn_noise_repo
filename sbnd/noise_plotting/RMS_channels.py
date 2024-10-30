@@ -9,7 +9,7 @@ import plotly.io as pio
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
-
+import time
 import os
 from plotly.subplots import make_subplots
 from plotly import tools
@@ -23,7 +23,7 @@ noise = input("What Noise do you want (raw, coh, or int): ")
 directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
 if not os.path.exists(directory):
     os.mkdir(directory)
-files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_coh_run{Run_num}.root")
+files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_run{Run_num}.root")
 files['tpc_noise;1'].keys()
 
 raw_rms = files['tpc_noise;1'][f'{noise}_rms'].array().to_list()
@@ -152,8 +152,10 @@ fig.update_layout(
         'xanchor': 'center',
         'yanchor': 'top',
         })
-
+print(directory+filename)
 fig.write_image(directory+filename+".png")
+fig.write_image(directory+filename+".pdf")
+time.sleep(0.1)
 fig.write_image(directory+filename+".pdf")
 fig.show()
 

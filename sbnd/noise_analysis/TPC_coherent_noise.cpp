@@ -140,10 +140,12 @@ void LoadRawDigits(TFile *inFile)
 
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<double> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
+	vector<double> Raw_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
 	vector<int> Int_Entries(11264,0.0f);
 	vector<vector<double>> FFT_total(11264,vector<double>(3415/2+2,0));
 	vector<vector<double>> Coh_FFT_total(11264,vector<double>(3415/2+2,0));
+	vector<vector<double>> Raw_FFT_total(11264,vector<double>(3415/2+2,0));
 	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
@@ -235,8 +237,13 @@ void LoadRawDigits(TFile *inFile)
 ;//
 			}
 
-			
+			if (skip_channel == false){
+				vector<double> raw_channel_fft = FFT(x);
+				transform(Raw_FFT_total[ki].begin(),Raw_FFT_total[ki].end(),raw_channel_fft.begin(),Raw_FFT_total[ki].begin(),plus<double>());
+			}
 
+			
+			//Finds the Coherent and Intrinsic components (FFT, rms)
 			if ((ki+1)%group_size == 0 && responsive_channel == true){
 				if (skip_channel == true){
 					if (channel_group.size() == 0){
@@ -330,15 +337,18 @@ void LoadRawDigits(TFile *inFile)
 	int int_entries;
 	float avg_FFT;
 	float coh_FFT;
+	float raw_FFT;
 
 	//vector<float> avg_FFT;
 	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
 	tree->Branch("entries", &entries, "entries/I");
 	tree->Branch("int_rms", &int_rms, "int_rms/F");
 	tree->Branch("int_entries", &int_entries, "int_entries/I");
-	tree->Branch("avg_FFT", &avg_FFT, "avg_FFT/F");
+	tree->Branch("int_FFT", &int_FFT, "int_FFT/F");
 	tree->Branch("coh_FFT", &coh_FFT, "coh_FFT/F");
-	tree->SetBranchStatus("avg_FFT", 0);
+	tree->Branch("raw_FFT", &raw_FFT, "raw_FFT/F");
+	tree->SetBranchStatus("int_FFT", 0);
+	tree->SetBranchStatus("raw_FFT", 0);
 	tree->SetBranchStatus("coh_FFT", 0);
 	tree->SetBranchStatus("coh_rms", 1);
     tree->SetBranchStatus("entries", 0);
@@ -368,7 +378,7 @@ void LoadRawDigits(TFile *inFile)
 		tree->Fill();	
 	}
     tree->SetBranchStatus("entries", 0);
-    tree->SetBranchStatus("avg_FFT", 1);
+    tree->SetBranchStatus("int_FFT", 1);
 	for(int ch = 0; ch<FFT_total.size(); ch++){
 		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
 
@@ -376,12 +386,21 @@ void LoadRawDigits(TFile *inFile)
 			tree->Fill();
         }
     }
-    tree->SetBranchStatus("avg_FFT", 0);
+    tree->SetBranchStatus("int_FFT", 0);
     tree->SetBranchStatus("coh_FFT", 1);
 	for(int ch = 0; ch<Coh_FFT_total.size(); ch++){
 		for (size_t c = 0; c < Coh_FFT_total[ch].size(); ++c) {
 
 			coh_FFT = Coh_FFT_total[ch][c];
+			tree->Fill();
+        }
+    }
+    tree->SetBranchStatus("coh_FFT", 0);
+    tree->SetBranchStatus("raw_FFT", 1);
+	for(int ch = 0; ch<Raw_FFT_total.size(); ch++){
+		for (size_t c = 0; c < Raw_FFT_total[ch].size(); ++c) {
+
+			raw_FFT = Raw_FFT_total[ch][c];
 			tree->Fill();
         }
     }
