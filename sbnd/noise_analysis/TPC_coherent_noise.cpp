@@ -134,10 +134,8 @@ void LoadRawDigits(TFile *inFile)
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
 	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
-	unsigned int *event_num = event_info.Get();
-	if (*event_num != 479){
-            continue;
-        }
+	
+	
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
 
@@ -158,7 +156,10 @@ void LoadRawDigits(TFile *inFile)
 		//if (evt > 100){
 		//	continue;
 		//}
-
+		unsigned int *event_num = event_info.Get();
+		if (*event_num != 479){
+            continue;
+        }
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<"Grabbed ADCs"<<endl;
