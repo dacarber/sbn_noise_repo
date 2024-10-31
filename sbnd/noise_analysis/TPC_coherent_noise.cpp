@@ -133,7 +133,11 @@ void LoadRawDigits(TFile *inFile)
 {	
 	cout<<"Got Events"<<endl;
 	TTreeReader Events("Events;1", inFile);
-
+	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
+	unsigned int *event_num = event_info.Get();
+	if (*event_num != 479){
+            continue;
+        }
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
 
@@ -233,8 +237,8 @@ void LoadRawDigits(TFile *inFile)
 					int_channel_group.push_back(vector<short>(3415,0));
 					break;
 				}
-				x[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();//
-				y[itick] = myADC[index].ADC(itick)-myADC[index].GetPedestal();
+				x[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal();//
+				y[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal();
 ;//
 			}
 
@@ -413,8 +417,8 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/prodgenie_cosmic_rockbox_sbnd_GenieGen-20241015T135353_G4-20241015T140624_DetSim-20241017T143903.root")
-//void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14784/run_14784.root")
+//void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/prodgenie_cosmic_rockbox_sbnd_GenieGen-20241015T135353_G4-20241015T140624_DetSim-20241017T143903.root")
+void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14784/run_14784.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
