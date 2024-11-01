@@ -79,7 +79,7 @@ vector<double> Coh_removal(vector<short> noise, vector<double> coh_noise){
 	float raw;
 	int sum = accumulate(noise.begin(),noise.end(),0);
 	cout<<"Check size"<<noise.size()<<endl;
-	if (noise.size() != 3415 || sum == 0 ){
+	if (noise.size() != 3427 || sum == 0 ){
 		return int_waveform;
 	}
 
@@ -139,15 +139,15 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
 
-
+	int event_len = 3427
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<double> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<double> Raw_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
 	vector<int> Int_Entries(11264,0.0f);
-	vector<vector<double>> FFT_total(11264,vector<double>(3415/2+2,0));
-	vector<vector<double>> Coh_FFT_total(11264,vector<double>(3415/2+2,0));
-	vector<vector<double>> Raw_FFT_total(11264,vector<double>(3415/2+2,0));
+	vector<vector<double>> FFT_total(11264,vector<double>(event_len/2+2,0));
+	vector<vector<double>> Coh_FFT_total(11264,vector<double>(event_len/2+2,0));
+	vector<vector<double>> Raw_FFT_total(11264,vector<double>(event_len/2+2,0));
 	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
 	cout<<"Running Events"<<endl;
 	int evt = 0;
@@ -156,10 +156,10 @@ void LoadRawDigits(TFile *inFile)
 		//if (evt > 100){
 		//	continue;
 		//}
-		unsigned int *event_num = event_info.Get();
-		if (*event_num != 479){
-            continue;
-        }
+		//unsigned int *event_num = event_info.Get();
+		//if (*event_num != 479){
+        //    continue;
+        //}
 		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
 		vector<short> ADC = myADC[1].ADCs();
 		cout<<"Grabbed ADCs"<<endl;
@@ -187,12 +187,12 @@ void LoadRawDigits(TFile *inFile)
 
 
 			//Checks if the channel is dead
-			if (myADC[index].Samples() != 3415 && (ki+1)%group_size != 0){
+			if (myADC[index].Samples() != event_len && (ki+1)%group_size != 0){
 				responsive_channel = false;
-				int_channel_group.push_back(vector<short>(3415,0));
+				int_channel_group.push_back(vector<short>(event_len,0));
 				continue;
 			}
-			else if(myADC[index].Samples() != 3415 && (ki+1)%group_size == 0){
+			else if(myADC[index].Samples() != event_len && (ki+1)%group_size == 0){
 				if (channel_group.size() == 0){
 					channel_group.clear();
 					continue;				
@@ -235,7 +235,7 @@ void LoadRawDigits(TFile *inFile)
 			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
 				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  20){
 					skip_channel = true;
-					int_channel_group.push_back(vector<short>(3415,0));
+					int_channel_group.push_back(vector<short>(event_len,0));
 					break;
 				}
 				x[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal();//
