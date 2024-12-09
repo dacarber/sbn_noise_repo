@@ -136,10 +136,11 @@ void LoadRawDigits(TFile *inFile)
 	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
 	
 	
-	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
+	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
+	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_sptpc2d_raw_WCLSNF.obj"); //For Data Noise filter
 
-	int event_len = 3427
+	int event_len = 3427;
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<double> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<double> Raw_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC

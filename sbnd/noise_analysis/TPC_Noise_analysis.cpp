@@ -87,19 +87,21 @@ void LoadRawDigits(TFile *inFile)
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__DECODE.obj"); //New files with full decode
 	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
 	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
-	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
+	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
+	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_sptpc2d_raw_WCLSNF.obj"); //For Data Noise filter
 
 	vector<float> RMS_total(11264,0.0f);
+	int event_len = 3427;
 	cout<<"Running Events"<<endl;
 	float evt = 0.0;
 	int true_evt = 0;
 	while (Events.Next())
 	{
-		if (evt == 0.0){
-			evt+=1;
-			true_evt+=1;
-			continue;
-		}
+		//if (evt == 0.0){
+		//	evt+=1;
+		//	true_evt+=1;
+		//	continue;
+		//}
 		//for(int i = 0; i<myPedestal.GetSize();i++){
 	//	cout<<myPedestal.GetSize()<<endl;
 		unsigned int *event_num = event_info.Get();
@@ -120,7 +122,7 @@ void LoadRawDigits(TFile *inFile)
 			int channel = myADC[ki].Channel();
 			auto index = find(channels.begin(),channels.end(), ki);
 			int in = index-channels.begin();
-			if (myADC[in].Samples() != 3415){//5995 for long readout windows, 3415 for standard readout windows
+			if (myADC[in].Samples() != event_len){//5995 for long readout windows, 3415 for standard readout windows
 				continue;
 			} 
 			vector<short> x(myADC[in].Samples(),0); //Makes a vector the size of the uncompressed channel
@@ -156,7 +158,7 @@ void LoadRawDigits(TFile *inFile)
 			cout<<"Channel: "<<myADC[in].Channel()<<endl;
 			int channel = myADC[in].Channel();
 			cout<<"Number of ticks: "<< myADC[in].NADC()<<endl;
-			if (myADC[in].NADC() != 3415){ //5995 Long readout windows, 3415 for normal readout windows 
+			if (myADC[in].NADC() != event_len){ //5995 Long readout windows, 3415 for normal readout windows 
 				RMS_total[ki] =  0.0;
 				continue;
 
@@ -196,7 +198,8 @@ void LoadRawDigits(TFile *inFile)
 
 }
 
-void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14275/run_14275.root")
+//void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14275/run_14275.root")
+void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/data_evb01_EventBuilder1_art1_run17470_112_20241027T005545_tpcdecode_WCLSNF-20241206T030417.root")
 //void TPC_Noise_analysis(TString inputFile="/pnfs/sbn/data_add/sbnd/commissioning/run14401_decoded/decode_data_evb03_EventBuilder3_art4_run14401_14_20240704T014829-d07546f2-c49c-47f0-bc39-17d3d2f4226a.root")
 
 {	
