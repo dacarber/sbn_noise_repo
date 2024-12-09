@@ -199,7 +199,7 @@ void LoadRawDigits(TFile *inFile)
 }
 
 //void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14275/run_14275.root")
-void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/data_evb01_EventBuilder1_art1_run17470_112_20241027T005545_tpcdecode_WCLSNF-20241206T030417.root")
+void TPC_Noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/data_evb01_EventBuilder1_art1_run17470_112_20241027T005545_tpcdecode_WCLSNF-20241206T030417.root")
 //void TPC_Noise_analysis(TString inputFile="/pnfs/sbn/data_add/sbnd/commissioning/run14401_decoded/decode_data_evb03_EventBuilder3_art4_run14401_14_20240704T014829-d07546f2-c49c-47f0-bc39-17d3d2f4226a.root")
 
 {	
