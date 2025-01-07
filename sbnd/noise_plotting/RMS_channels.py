@@ -20,10 +20,10 @@ import sys
 Run_num = input("Enter the Run Number: ")
 anno = input("Do you want annotations? ")
 noise = input("What Noise do you want (raw, coh, or int): ")
-directory = f"/Users/danielcarber/Documents/SBND/Noise Analysis/Plots/run{Run_num}/"
+directory = f"/Users/danielcarber/Documents/SBND/Noise_Analysis/Plots/run{Run_num}/"
 if not os.path.exists(directory):
     os.mkdir(directory)
-files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise Analysis/data/noise_output_run{Run_num}.root")
+files =uproot.open(f"/Users/danielcarber/Documents/SBND/Noise_Analysis/data/noise_output_run{Run_num}.root")
 files['tpc_noise;1'].keys()
 
 raw_rms = files['tpc_noise;1'][f'{noise}_rms'].array().to_list()
@@ -38,13 +38,13 @@ for r,rms in enumerate(raw_rms):
         Noise_df['wire_plane'].append('UB')
     elif r<3968:
         Noise_df['wire_plane'].append('VB')
-    elif r<5632:
+    elif r<5638:#5632
         Noise_df['wire_plane'].append('YB')
     elif r<7616:
         Noise_df['wire_plane'].append('UA')
-    elif r<9600:
+    elif r<9606:#9600
         Noise_df['wire_plane'].append('VA')
-    elif r<11264:
+    elif r<11270:#11264
         Noise_df['wire_plane'].append('YA')
 Noise_df = pd.DataFrame(Noise_df)
 
