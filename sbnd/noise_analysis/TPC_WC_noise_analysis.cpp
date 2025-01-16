@@ -167,16 +167,16 @@ void LoadRawDigits(TFile *inFile)
 	            int nBinsX = hist2D->GetNbinsX();
 	            int nBinsY = hist2D->GetNbinsY();
 
-	            vector<vector<double>> u0_wires();
-	            vector<vector<double>> v0_wires();
-	            vector<vector<double>> w0_wires();
-	            vector<vector<double>> u1_wires();
-	            vector<vector<double>> v1_wires();
-	            vector<vector<double>> w1_wires();
+	            vector<vector<double>> u0_wires;
+	            vector<vector<double>> v0_wires;
+	            vector<vector<double>> w0_wires;
+	            vector<vector<double>> u1_wires;
+	            vector<vector<double>> v1_wires;
+	            vector<vector<double>> w1_wires;
 
 	            if (hist_name[1] == 'u' && hist_name[7] == '0'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire();
+	            		vector<float> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
