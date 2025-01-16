@@ -159,8 +159,8 @@ void LoadRawDigits(TFile *inFile)
 	        // Check if the object is a 2D histogram
 	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
 	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
-	        `	string hist_name =hist2D->GetName();
-	        	event = stoi(hist_name.substr(9));
+	        	string hist_name =hist2D->GetName();
+	        	int event = stoi(hist_name.substr(9));
 	        	if (e != event) continue;
 	            if (hist_name[3] != 'r') continue;
 	            // Access 2D histogram data (e.g., print bin contents)
@@ -278,8 +278,6 @@ void LoadRawDigits(TFile *inFile)
 			double RMS = Noise_levels(x);
 			Raw_RMS_total[ki] = Raw_RMS_total.at(ki)+RMS;
 			entries[ki] = entries.at(ki)+1;
-
-
 		}
 
 		cout<<"Event:"<<e<<endl;
