@@ -331,7 +331,7 @@ void LoadRawDigits(TFile *inFile)
 }
 
 //void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/prodgenie_cosmic_rockbox_sbnd_GenieGen-20241015T135353_G4-20241015T140624_DetSim-20241017T143903.root")
-void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run14784/run_14784.root")
+void TPC_WC_noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/sbnd-data-check.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
