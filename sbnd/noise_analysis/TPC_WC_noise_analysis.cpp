@@ -151,7 +151,7 @@ void LoadRawDigits(TFile *inFile)
 
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
-	TIter next(file->GetListOfKeys());
+	TIter next(infile->GetListOfKeys());
     TKey* key;
     for (int e = 1; e <= TOTAL_EVT; ++e){
 	    vector<vector<double>> TPC_wires(11264,vector<double>(event_len,0));
@@ -159,7 +159,7 @@ void LoadRawDigits(TFile *inFile)
 	        // Check if the object is a 2D histogram
 	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
 	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
-	        `	string hist_name =hist2D->GetName()
+	        `	string hist_name =hist2D->GetName();
 	        	event = stoi(hist_name.substr(9));
 	        	if (e != event) continue;
 	            if (hist_name[3] != 'r') continue;
