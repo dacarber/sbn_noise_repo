@@ -126,7 +126,7 @@ vector<double> FFT(vector<double> noise_channel){
 	cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
 }
-float Median(vector<float> &vec) {
+float Median(vector<double> &vec) {
     int n = vec.size();
 
     // Sort the vector
