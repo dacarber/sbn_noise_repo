@@ -151,7 +151,7 @@ void LoadRawDigits(TFile *inFile)
 
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
-	TIter next(infile->GetListOfKeys());
+	TIter next(inFile->GetListOfKeys());
     TKey* key;
     for (int e = 1; e <= TOTAL_EVT; ++e){
 	    vector<vector<double>> TPC_wires(11264,vector<double>(event_len,0));
