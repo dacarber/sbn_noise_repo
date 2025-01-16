@@ -148,7 +148,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
 	vector<vector<double>> FFT_total(11264,vector<double>(event_len/2+2,0));
-	int entries = 0;
+
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
 	TIter next(inFile->GetListOfKeys());
@@ -284,7 +284,7 @@ void LoadRawDigits(TFile *inFile)
 			transform(FFT_total[ki].begin(),FFT_total[ki].end(),raw_channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
 			double RMS = Noise_levels(x);
 			RMS_total[ki] = RMS_total.at(ki)+RMS;
-			entries[ki] = entries.at(ki)+1;
+			Entries[ki] = Entries.at(ki)+1;
 		}
 
 		cout<<"Event:"<<e<<endl;
@@ -322,7 +322,7 @@ void LoadRawDigits(TFile *inFile)
 	tree->SetBranchStatus("raw_FFT", 1);
     tree->SetBranchStatus("entries", 0);
 	for(int ch = 0; ch<FFT_total.size(); ch++){
-		for (size_t c = 0; c < Raw_FFT_total[ch].size(); ++c) {
+		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
 			raw_FFT = FFT_total[ch][c];
 			tree->Fill();
         }
