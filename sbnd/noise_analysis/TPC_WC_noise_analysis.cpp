@@ -155,6 +155,13 @@ void LoadRawDigits(TFile *inFile)
     TKey* key;
     for (int e = 1; e <= TOTAL_EVT; ++e){
 	    vector<vector<double>> TPC_wires(11264,vector<double>(event_len,0));
+	    vector<vector<double>> u0_wires;
+        vector<vector<double>> v0_wires;
+        vector<vector<double>> w0_wires;
+        vector<vector<double>> u1_wires;
+        vector<vector<double>> v1_wires;
+        vector<vector<double>> w1_wires;
+
 	    while ((key = (TKey*)next())) {
 	        // Check if the object is a 2D histogram
 	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
@@ -167,12 +174,12 @@ void LoadRawDigits(TFile *inFile)
 	            int nBinsX = hist2D->GetNbinsX();
 	            int nBinsY = hist2D->GetNbinsY();
 
-	            vector<vector<double>> u0_wires;
-	            vector<vector<double>> v0_wires;
-	            vector<vector<double>> w0_wires;
-	            vector<vector<double>> u1_wires;
-	            vector<vector<double>> v1_wires;
-	            vector<vector<double>> w1_wires;
+	            u0_wires.clear();
+	            v0_wires.clear();
+	            w0_wires.clear();
+	            u1_wires.clear();
+	            v1_wires.clear();
+	            w1_wires.clear();
 
 	            if (hist_name[1] == 'u' && hist_name[7] == '0'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
