@@ -176,7 +176,7 @@ void LoadRawDigits(TFile *inFile)
 
 	            if (hist_name[1] == 'u' && hist_name[7] == '0'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
@@ -187,7 +187,7 @@ void LoadRawDigits(TFile *inFile)
 	            }
 	            else if (hist_name[1] == 'v' && hist_name[7] == '0'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
@@ -198,7 +198,7 @@ void LoadRawDigits(TFile *inFile)
 	            }
 	            else if (hist_name[1] == 'w' && hist_name[7] == '0'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
@@ -209,7 +209,7 @@ void LoadRawDigits(TFile *inFile)
 	            }
 	            else if (hist_name[1] == 'u' && hist_name[7] == '1'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
@@ -220,7 +220,7 @@ void LoadRawDigits(TFile *inFile)
 	            }
 	            else if (hist_name[1] == 'v' && hist_name[7] == '1'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
@@ -231,7 +231,7 @@ void LoadRawDigits(TFile *inFile)
 	            }
 	            else if (hist_name[1] == 'w' && hist_name[7] == '1'){
 	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<float> wire;
+	            		vector<double> wire;
 	                	for (int j = 1; j <= nBinsY; ++j) {
 	                    	double binContent = hist2D->GetBinContent(i, j);
 	                    	wire.push_back(j);
