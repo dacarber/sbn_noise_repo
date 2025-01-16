@@ -126,7 +126,7 @@ vector<double> FFT(vector<double> noise_channel){
 	cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
 }
-float median(vector<float> &vec) {
+float Median(vector<float> &vec) {
     int n = vec.size();
 
     // Sort the vector
@@ -271,13 +271,13 @@ void LoadRawDigits(TFile *inFile)
 			vector<short> x(TPC_wires[ki].size(),0);
 			vector<double> y(TPC_wires[ki].size(),0);
 			for (size_t itick=0; itick < TPC_wires[ki].size(); ++itick){ 
-				float pedestal = median(TPC_wires[ki]);
+				float pedestal = Median(TPC_wires[ki]);
 				if (abs(TPC_wires[ki][itick]-pedestal) >  20){
 					skip_channel = true;
 					break;
 				}
-				x[itick] = TPC_wires[ki][itick];//-myADC[index].GetPedestal();//
-				y[itick] = TPC_wires[ki][itick];//-myADC[index].GetPedestal();
+				x[itick] = static_cast<double>(TPC_wires[ki][itick]);//-myADC[index].GetPedestal();//
+				y[itick] = static_cast<double>(TPC_wires[ki][itick]);//-myADC[index].GetPedestal();
 ;//
 			}
 			vector<double> raw_channel_fft = FFT(y);
