@@ -164,6 +164,7 @@ void LoadRawDigits(TFile *inFile)
 
 	    while ((key = (TKey*)next())) {
 	        // Check if the object is a 2D histogram
+	        std::cout << "Key Name: " << key->GetName() << std::endl;
 	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
 	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
 	        	string hist_name =hist2D->GetName();
