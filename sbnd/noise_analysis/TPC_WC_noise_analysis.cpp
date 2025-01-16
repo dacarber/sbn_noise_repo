@@ -268,7 +268,7 @@ void LoadRawDigits(TFile *inFile)
 
 			//If channel is responsive the channel will grab the noise 
 			bool skip_channel = false;
-			vector<short> x(TPC_wires[ki].size(),0);
+			vector<double> x(TPC_wires[ki].size(),0);
 			vector<double> y(TPC_wires[ki].size(),0);
 			for (size_t itick=0; itick < TPC_wires[ki].size(); ++itick){ 
 				float pedestal = Median(TPC_wires[ki]);
