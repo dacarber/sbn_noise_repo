@@ -167,6 +167,7 @@ void LoadRawDigits(TFile *inFile)
 	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
 	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
 	        	string hist_name =hist2D->GetName();
+	        	std::cout << hist_name.substr(8) << std::endl;
 	        	int event = stoi(hist_name.substr(8));
 	        	if (e != event) continue;
 	            if (hist_name[3] != 'r') continue;
