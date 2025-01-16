@@ -89,7 +89,6 @@ vector<double> Coh_removal(vector<short> noise, vector<double> coh_noise){
 
 	return int_waveform;
 }
-
 vector<double> FFT(vector<double> noise_channel){
 	cout<<"Starting FFT"<<endl;
 	int vec_size = noise_channel.size();
@@ -127,228 +126,170 @@ vector<double> FFT(vector<double> noise_channel){
 	delete fft;
 	cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
-		
+}
+float median(vector<float> &vec) {
+    int n = vec.size();
+
+    // Sort the vector
+    sort(vec.begin(), vec.end());
+
+    if (n % 2 == 0) { 
+        // If the vector has an even number of elements, return the average of the middle two elements
+        return (vec[n / 2 - 1] + vec[n / 2]) / 2.0;
+    } else { 
+        // If the vector has an odd number of elements, return the middle element
+        return vec[n / 2];
+    }
 }
 
 void LoadRawDigits(TFile *inFile)
 {	
-	cout<<"Got Events"<<endl;
-	int events = 300;
-	T
-	TTreeReader Events("Events;1", inFile);
-	TTreeReaderValue<unsigned int> event_info(Events, "EventAuxiliary.id_.event_");
-	
-	
-	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_daq__TPCDECODER.obj"); //For Data
-	//TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_simtpc2d_daq_DetSim.obj"); //For MC
-	TTreeReaderArray<raw::RawDigit> myADC(Events, "raw::RawDigits_sptpc2d_raw_WCLSNF.obj"); //For Data Noise filter
-
+	int TOTAL_EVT=300;
 	int event_len = 3427;
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
-	vector<double> INT_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
-	vector<double> Raw_RMS_total(11264,0.0f); //Stores the Intrinsic noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
-	vector<int> Int_Entries(11264,0.0f);
 	vector<vector<double>> FFT_total(11264,vector<double>(event_len/2+2,0));
-	vector<vector<double>> Coh_FFT_total(11264,vector<double>(event_len/2+2,0));
-	vector<vector<double>> Raw_FFT_total(11264,vector<double>(event_len/2+2,0));
-	vector<int> Event(11264,0.0f);
-	//vector<vector<float>> RMS_wave_total(352,vector<float>(3415,0));
-	cout<<"Running Events"<<endl;
-	int evt = 0;
-	//while (Events.Next())
-	for (int event = 0;event <= events; event++)
-	{
-		//if (evt > 100){
-		//	continue;
-		//}
-		//unsigned int *event_num = event_info.Get();
-		//if (*event_num != 479){
-        //    continue;
-        //}
 
-        std::string message = std::format("hw_raw1;{}",event);
-        TH2F *hist = dynamic_cast<TH2F*>(infile->Get(message));
-        int nBinsX = hist->GetNbinsX();
-    	int nBinsY = hist->GetNbinsY();
-		cout<<myADC.GetSize()<<endl; //Grabs the number of channels
-		vector<short> ADC = myADC[1].ADCs();
-		cout<<"Grabbed ADCs"<<endl;
-		cout<<ADC.size()<<endl; //Grabs the number of time ticks
-		vector<vector<short>> channel_group;
-		vector<vector<short>> int_channel_group;
-		vector<short> noise_channels(ADC.size(),0);
-		bool responsive_channel = true;
-		vector<short> channels;
-		short group_size = 32;
 
-		//Puts all of the channel ids into a vector in the order the files have the events
-		for(int p=0; p<myADC.GetSize();p++){		
-            channels.push_back(myADC[p].Channel()); 
-        }
+	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
+	TIter next(file->GetListOfKeys());
+    TKey* key;
+    for (int e = 1; e <= TOTAL_EVT; ++e){
+	    vector<vector<double>> TPC_wires(11264,vector<double>(event_len,0));
+	    while ((key = (TKey*)next())) {
+	        // Check if the object is a 2D histogram
+	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
+	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
+	        `	string hist_name =hist2D->GetName()
+	        	event = stoi(hist_name.substr(9));
+	        	if (e != event) continue;
+	            if (hist_name[3] != 'r') continue;
+	            // Access 2D histogram data (e.g., print bin contents)
+	            int nBinsX = hist2D->GetNbinsX();
+	            int nBinsY = hist2D->GetNbinsY();
+
+	            vector<vector<double>> u0_wires();
+	            vector<vector<double>> v0_wires();
+	            vector<vector<double>> w0_wires();
+	            vector<vector<double>> u1_wires();
+	            vector<vector<double>> v1_wires();
+	            vector<vector<double>> w1_wires();
+
+	            if (hist_name[1] == 'u' && hist_name[7] == '0'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "U0: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	u0_wires.push_back(wire);
+	            	}
+	            }
+	            else if (hist_name[1] == 'v' && hist_name[7] == '0'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "V0: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	v0_wires.push_back(wire);
+	            	}
+	            }
+	            else if (hist_name[1] == 'w' && hist_name[7] == '0'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "W0: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	w0_wires.push_back(wire);
+	            	}
+	            }
+	            else if (hist_name[1] == 'u' && hist_name[7] == '1'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "U1: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	u1_wires.push_back(wire);
+	            	}
+	            }
+	            else if (hist_name[1] == 'v' && hist_name[7] == '1'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "V1: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	v1_wires.push_back(wire);
+	            	}
+	            }
+	            else if (hist_name[1] == 'w' && hist_name[7] == '1'){
+	            	for (int i = 1; i <= nBinsX; ++i) {
+	            		vector<float> wire();
+	                	for (int j = 1; j <= nBinsY; ++j) {
+	                    	double binContent = hist2D->GetBinContent(i, j);
+	                    	wire.push_back(j);
+	                    	std::cout << "W1: (" << i << ", " << j << "): " << binContent << std::endl;
+	                	}
+	                	w1_wires.push_back(wire);
+	            	}
+	            }   
+	    	}
+    	}
+    	TPC_wires.insert(TPC_wires.end(), u0_wires.begin(), u0_wires.end());
+    	TPC_wires.insert(TPC_wires.end(), v0_wires.begin(), v0_wires.end());
+    	TPC_wires.insert(TPC_wires.end(), w0_wires.begin(), w0_wires.end());
+    	TPC_wires.insert(TPC_wires.end(), u1_wires.begin(), u1_wires.end());
+    	TPC_wires.insert(TPC_wires.end(), v1_wires.begin(), v1_wires.end());
+    	TPC_wires.insert(TPC_wires.end(), w1_wires.begin(), w1_wires.end());
+    
+	
+	
+		cout<<"Running Events"<<endl;
+		int evt = 0;
 
         //Goes over all of the channels and does the analysis
 		for(int ki=0; ki<11264;ki++){
-			auto in = find(channels.begin(),channels.end(), ki); //finds the the location of the channel corresponding to ki
-            int index = in-channels.begin();
-			responsive_channel = true;
-			short channel = myADC[index].Channel();
-			cout<<"Channel index: "<<index<<" Channel: "<< myADC[index].Channel()<<endl;
+			cout<<" Channel: "<<ki<<endl;
 			cout<<"Channel size: "<<myADC[index].NADC()<<endl;
-
-
-			//Checks if the channel is dead
-			if (myADC[index].Samples() != event_len && (ki+1)%group_size != 0){
-				responsive_channel = false;
-				int_channel_group.push_back(vector<short>(event_len,0));
-				continue;
-			}
-			else if(myADC[index].Samples() != event_len && (ki+1)%group_size == 0){
-				if (channel_group.size() == 0){
-					channel_group.clear();
-					continue;				
-				}
-				vector<double> coherent_waveform = Coherent_RMS(channel_group);
-				double Coh_RMS = Noise_levels(coherent_waveform);
-				channel_group.clear();
-				cout<<"Coh RMS:"<<Coh_RMS<<endl;
-				for (int kh=0; kh < group_size; kh++){
-
-					RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
-					Entries[channel-kh] = Entries.at(channel-kh)+1;
-					if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
-						continue;
-					}
-					vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-					
-					double Int_RMS = Noise_levels(intrinsic_waveform);
-					cout<<"Int RMS:"<<Int_RMS<<endl;
-					INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
-					Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
-
-					//FFT calc
-
-					vector<double> coh_channel_fft = FFT(coherent_waveform);
-					transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
-					vector<double> channel_fft = FFT(intrinsic_waveform);
-					transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
-				}
-				int_channel_group.clear();
-				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<float>());
-
-				continue;
-			}
 
 			//If channel is responsive the channel will grab the noise 
 			bool skip_channel = false;
 			vector<short> x(myADC[index].Samples(),0);
 			vector<double> y(myADC[index].Samples(),0);
-			for (size_t itick=0; itick < myADC[index].Samples(); ++itick){ 
-				if (abs(myADC[index].ADC(itick)-myADC[index].GetPedestal()) >  20){
+			for (size_t itick=0; itick < TPC_wires[ki].size(); ++itick){ 
+				float pedestal = median(TPC_wires[ki])
+				if (abs(TPC_wires[ki][itick]-pedestal) >  20){
 					skip_channel = true;
-					int_channel_group.push_back(vector<short>(event_len,0));
 					break;
 				}
-				x[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal();//
-				y[itick] = myADC[index].ADC(itick);//-myADC[index].GetPedestal();
+				x[itick] = TPC_wires[ki][itick];//-myADC[index].GetPedestal();//
+				y[itick] = TPC_wires[ki][itick];//-myADC[index].GetPedestal();
 ;//
 			}
+			vector<double> raw_channel_fft = FFT(y);
+			transform(Raw_FFT_total[ki].begin(),Raw_FFT_total[ki].end(),raw_channel_fft.begin(),Raw_FFT_total[ki].begin(),plus<double>());
+			double RMS = Noise_levels(x);
+			Raw_RMS_total[ki] = Raw_RMS_total.at(ki)+RMS;
+			entries[ki] = entries.at(ki)+1;
 
-			if (skip_channel == false){
-				vector<double> raw_channel_fft = FFT(y);
-				transform(Raw_FFT_total[ki].begin(),Raw_FFT_total[ki].end(),raw_channel_fft.begin(),Raw_FFT_total[ki].begin(),plus<double>());
-			}
-
-			
-			//Finds the Coherent and Intrinsic components (FFT, rms)
-			if ((ki+1)%group_size == 0 && responsive_channel == true){
-				if (skip_channel == true){
-					if (channel_group.size() == 0){
-					channel_group.clear();
-					int_channel_group.clear();
-					continue;				
-				}
-					vector<double> coherent_waveform = Coherent_RMS(channel_group);
-					double Coh_RMS = Noise_levels(coherent_waveform);
-					channel_group.clear();
-					cout<<"Coh RMS:"<<Coh_RMS<<endl;
-					for (int kh=0; kh < group_size; kh++){
-						RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
-						Entries[channel-kh] = Entries.at(channel-kh)+1;
-						if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
-							continue;
-						}
-						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						double Int_RMS = Noise_levels(intrinsic_waveform);
-						cout<<"Int RMS:"<<Int_RMS<<endl;
-						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
-						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
-
-						//FFT calc
-
-						vector<double> coh_channel_fft = FFT(coherent_waveform);
-						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
-						vector<double> channel_fft = FFT(intrinsic_waveform);
-						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
-					}
-					int_channel_group.clear();
-				}
-				else{
-					if (channel_group.size() == 0){
-					channel_group.clear();
-					int_channel_group.clear();
-					continue;				
-				}
-					channel_group.push_back(x);
-					int_channel_group.push_back(x);
-					vector<double> coherent_waveform = Coherent_RMS(channel_group);
-					double Coh_RMS = Noise_levels(coherent_waveform);
-					channel_group.clear();
-					cout<<"Coh RMS:"<<Coh_RMS<<endl;
-					for (int kh=0; kh < group_size; kh++){
-						RMS_total[channel-kh] =  RMS_total.at(channel-kh)+Coh_RMS;
-						Entries[channel-kh] = Entries.at(channel-kh)+1;
-						if (accumulate(int_channel_group[kh].begin(),int_channel_group[kh].end(),0) == 0){
-							continue;
-						}
-						vector<double> intrinsic_waveform = Coh_removal(int_channel_group[kh],coherent_waveform);
-						double Int_RMS = Noise_levels(intrinsic_waveform);
-						cout<<"Int RMS:"<<Int_RMS<<endl;
-						INT_RMS_total[channel-kh] = INT_RMS_total.at(channel-kh)+Int_RMS;
-						Int_Entries[channel-kh] = Int_Entries.at(channel-kh)+1;
-
-						//FFT calc
-
-						vector<double> coh_channel_fft = FFT(coherent_waveform);
-						transform(Coh_FFT_total[channel-kh].begin(),Coh_FFT_total[channel-kh].end(),coh_channel_fft.begin(),Coh_FFT_total[channel-kh].begin(),plus<double>());
-						vector<double> channel_fft = FFT(intrinsic_waveform);
-						transform(FFT_total[channel-kh].begin(),FFT_total[channel-kh].end(),channel_fft.begin(),FFT_total[channel-kh].begin(),plus<double>());
-					}
-					int_channel_group.clear();
-				}
-				
-				//transform(RMS_wave_total[channel/7].begin(),RMS_wave_total[channel/7].end(),coherent_waveform.begin(),RMS_wave_total[channel/31].begin(),plus<short>());
-				//cout<<"combine waveform"<<endl;
-			}
-			else{
-				if (skip_channel == true){ 
-					continue;
-				}
-				cout<<"Adding another channel "<<x[100]<<endl; 
-				channel_group.push_back(x);
-				int_channel_group.push_back(x);
-			}
 
 		}
 
-		evt+=1;
-		cout<<"Event:"<<evt<<endl;
+		cout<<"Event:"<<e<<endl;
 		//break;
 	}
 	
-	TFile* file = new TFile("noise_output_coh.root", "RECREATE");
+	TFile* file = new TFile("noise_output_fft.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
-	float avg_rms;
+	float raw_rms;
 	int entries;
 	float int_rms;
 	int int_entries;
@@ -357,66 +298,27 @@ void LoadRawDigits(TFile *inFile)
 	float raw_FFT;
 
 	//vector<float> avg_FFT;
-	tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
+	//tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
 	tree->Branch("entries", &entries, "entries/I");
-	tree->Branch("int_rms", &int_rms, "int_rms/F");
-	tree->Branch("int_entries", &int_entries, "int_entries/I");
-	tree->Branch("int_FFT", &int_FFT, "int_FFT/F");
-	tree->Branch("coh_FFT", &coh_FFT, "coh_FFT/F");
+	tree->Branch("raw_rms", &raw_rms, "raw_rms/F");
 	tree->Branch("raw_FFT", &raw_FFT, "raw_FFT/F");
-	tree->SetBranchStatus("int_FFT", 0);
-	tree->SetBranchStatus("raw_FFT", 0);
-	tree->SetBranchStatus("coh_FFT", 0);
-	tree->SetBranchStatus("coh_rms", 1);
+	tree->SetBranchStatus("raw_rms", 1);
     tree->SetBranchStatus("entries", 0);
-    tree->SetBranchStatus("int_rms", 0);
-    tree->SetBranchStatus("int_entries", 0);
+    tree->SetBranchStatus("raw_FFT", 0);
 	for(int ch = 0; ch<RMS_total.size(); ch++){
-		avg_rms = RMS_total.at(ch)/Entries.at(ch);
+		raw_rms = RMS_total.at(ch)/Entries.at(ch);
 		tree->Fill();	
 	}
-	tree->SetBranchStatus("coh_rms", 0);
+	tree->SetBranchStatus("raw_rms", 0);
     tree->SetBranchStatus("entries", 1);
 	for(int ch = 0; ch<Entries.size(); ch++){
 		entries = Entries.at(ch);
 		tree->Fill();	
 	}
-	tree->SetBranchStatus("int_rms", 1);
+	tree->SetBranchStatus("raw_FFT", 1);
     tree->SetBranchStatus("entries", 0);
-	for(int ch = 0; ch<INT_RMS_total.size(); ch++){
-		int_rms = INT_RMS_total.at(ch)/Int_Entries.at(ch);
-		tree->Fill();	
-	}
-    tree->SetBranchStatus("entries", 1);
-    tree->SetBranchStatus("int_rms", 0);
-	for(int ch = 0; ch<Int_Entries.size(); ch++){
-		int_entries = Int_Entries.at(ch);
-
-		tree->Fill();	
-	}
-    tree->SetBranchStatus("entries", 0);
-    tree->SetBranchStatus("int_FFT", 1);
-	for(int ch = 0; ch<FFT_total.size(); ch++){
-		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
-
-			int_FFT = FFT_total[ch][c];
-			tree->Fill();
-        }
-    }
-    tree->SetBranchStatus("int_FFT", 0);
-    tree->SetBranchStatus("coh_FFT", 1);
-	for(int ch = 0; ch<Coh_FFT_total.size(); ch++){
-		for (size_t c = 0; c < Coh_FFT_total[ch].size(); ++c) {
-
-			coh_FFT = Coh_FFT_total[ch][c];
-			tree->Fill();
-        }
-    }
-    tree->SetBranchStatus("coh_FFT", 0);
-    tree->SetBranchStatus("raw_FFT", 1);
 	for(int ch = 0; ch<Raw_FFT_total.size(); ch++){
 		for (size_t c = 0; c < Raw_FFT_total[ch].size(); ++c) {
-
 			raw_FFT = Raw_FFT_total[ch][c];
 			tree->Fill();
         }
