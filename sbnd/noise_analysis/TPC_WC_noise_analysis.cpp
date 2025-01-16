@@ -148,7 +148,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<int> Entries(11264,0.0f);
 	vector<vector<double>> FFT_total(11264,vector<double>(event_len/2+2,0));
-
+	int entries = 0;
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
 	TIter next(inFile->GetListOfKeys());
@@ -264,14 +264,14 @@ void LoadRawDigits(TFile *inFile)
         //Goes over all of the channels and does the analysis
 		for(int ki=0; ki<11264;ki++){
 			cout<<" Channel: "<<ki<<endl;
-			cout<<"Channel size: "<<myADC[index].NADC()<<endl;
+
 
 			//If channel is responsive the channel will grab the noise 
 			bool skip_channel = false;
-			vector<short> x(myADC[index].Samples(),0);
-			vector<double> y(myADC[index].Samples(),0);
+			vector<short> x(TPC_wires[ki].size(),0);
+			vector<double> y(TPC_wires[ki].size(),0);
 			for (size_t itick=0; itick < TPC_wires[ki].size(); ++itick){ 
-				float pedestal = median(TPC_wires[ki])
+				float pedestal = median(TPC_wires[ki]);
 				if (abs(TPC_wires[ki][itick]-pedestal) >  20){
 					skip_channel = true;
 					break;
@@ -281,9 +281,9 @@ void LoadRawDigits(TFile *inFile)
 ;//
 			}
 			vector<double> raw_channel_fft = FFT(y);
-			transform(Raw_FFT_total[ki].begin(),Raw_FFT_total[ki].end(),raw_channel_fft.begin(),Raw_FFT_total[ki].begin(),plus<double>());
+			transform(FFT_total[ki].begin(),FFT_total[ki].end(),raw_channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
 			double RMS = Noise_levels(x);
-			Raw_RMS_total[ki] = Raw_RMS_total.at(ki)+RMS;
+			RMS_total[ki] = RMS_total.at(ki)+RMS;
 			entries[ki] = entries.at(ki)+1;
 		}
 
@@ -321,9 +321,9 @@ void LoadRawDigits(TFile *inFile)
 	}
 	tree->SetBranchStatus("raw_FFT", 1);
     tree->SetBranchStatus("entries", 0);
-	for(int ch = 0; ch<Raw_FFT_total.size(); ch++){
+	for(int ch = 0; ch<FFT_total.size(); ch++){
 		for (size_t c = 0; c < Raw_FFT_total[ch].size(); ++c) {
-			raw_FFT = Raw_FFT_total[ch][c];
+			raw_FFT = FFT_total[ch][c];
 			tree->Fill();
         }
     }
