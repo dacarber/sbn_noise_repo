@@ -175,8 +175,8 @@ void LoadRawDigits(TFile *inFile)
             		double binContent = hist2D->GetBinContent(x, y);
             		wire_ped.push_back(binContent);
             	}
-            	int pedestal = TMath::Median(wire_ped.begin(),wire_ped.end());
-    			wire = transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
+            	int pedestal = Median(wire_ped);
+    			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
     			auto max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
     			if (max_el > 20){
     				continue;
