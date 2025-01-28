@@ -143,189 +143,164 @@ float Median(vector<double> &vec) {
 
 void LoadRawDigits(TFile *inFile)
 {	
-	int TOTAL_EVT=300;
 	int event_len = 3427;
-	vector<double> RMS_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
-	vector<int> Entries(11264,0.0f);
-	vector<vector<double>> FFT_total(11264,vector<double>(event_len/2+2,0));
+	vector<double> RMS_orig_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<int> Entries_orig(11264,0.0f);
+	vector<vector<double>> FFT_orig_total(11264,vector<double>(event_len/2+2,0));
+	vector<double> RMS_raw_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<int> Entries_raw(11264,0.0f);
+	vector<vector<double>> FFT_raw_total(11264,vector<double>(event_len/2+2,0));
 
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
-	TIter next(inFile->GetListOfKeys());
-    TKey* key;
-    for (int e = 0; e <= TOTAL_EVT; ++e){
-	    vector<vector<double>> TPC_wires(11264,vector<double>(event_len,0));
-	    vector<vector<double>> u0_wires;
-        vector<vector<double>> v0_wires;
-        vector<vector<double>> w0_wires;
-        vector<vector<double>> u1_wires;
-        vector<vector<double>> v1_wires;
-        vector<vector<double>> w1_wires;
+    TIter next(inFile->GetListOfKeys());
+	TKey* key;
+    int i = 0;
+    while ((key = static_cast<TKey*>(next()))) {
+        // Check if the object is a 2D histogram
+        std::cout << "Key Name: " << key->GetName() << std::endl;
+        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
+            string hist_name = hist2D->GetName();
+        	std::cout <<hist_name[1]<<hist_name[3] <<hist_name.back() << std::endl;
 
-	    while ((key = (TKey*)next())) {
-	        // Check if the object is a 2D histogram
-	        std::cout << "Key Name: " << key->GetName() << std::endl;
-	        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
-	            std::cout << "2D Histogram: " << hist2D->GetName() << std::endl;
-	        	string hist_name =hist2D->GetName();
-	        	std::cout << hist_name.substr(7) << std::endl;
-	        	int event = stoi(hist_name.substr(7));
-	        	if (e != event) continue;
-	            if (hist_name[3] != 'r') continue;
-	            // Access 2D histogram data (e.g., print bin contents)
-	            int nBinsX = hist2D->GetNbinsX();
-	            int nBinsY = hist2D->GetNbinsY();
-
-	            u0_wires.clear();
-	            v0_wires.clear();
-	            w0_wires.clear();
-	            u1_wires.clear();
-	            v1_wires.clear();
-	            w1_wires.clear();
-
-	            if (hist_name[1] == 'u' && hist_name[7] == '0'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "U0: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	u0_wires.push_back(wire);
-	            	}
-	            }
-	            else if (hist_name[1] == 'v' && hist_name[7] == '0'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "V0: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	v0_wires.push_back(wire);
-	            	}
-	            }
-	            else if (hist_name[1] == 'w' && hist_name[7] == '0'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "W0: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	w0_wires.push_back(wire);
-	            	}
-	            }
-	            else if (hist_name[1] == 'u' && hist_name[7] == '1'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "U1: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	u1_wires.push_back(wire);
-	            	}
-	            }
-	            else if (hist_name[1] == 'v' && hist_name[7] == '1'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "V1: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	v1_wires.push_back(wire);
-	            	}
-	            }
-	            else if (hist_name[1] == 'w' && hist_name[7] == '1'){
-	            	for (int i = 1; i <= nBinsX; ++i) {
-	            		vector<double> wire;
-	                	for (int j = 1; j <= nBinsY; ++j) {
-	                    	double binContent = hist2D->GetBinContent(i, j);
-	                    	wire.push_back(j);
-	                    	std::cout << "W1: (" << i << ", " << j << "): " << binContent << std::endl;
-	                	}
-	                	w1_wires.push_back(wire);
-	            	}
-	            }   
-	    	}
+    		std::cout << "Found Histogram: " << hist_name
+            << ", Entries: " << hist2D->GetEntries() << std::endl;
+            int nBinsX = hist2D->GetNbinsX();
+        	int nBinsY = hist2D->GetNbinsY();
+        	vector<double> wire();
+        	vector<double> wire_ped();
+        	for (int x = 0; x <= nBinsX; ++x) {
+        		wire_ped.clear();
+        		for (int y = 0; y <= nBinsY; ++y) {
+            		double binContent = hist2D->GetBinContent(x, y);
+            		wire_ped.push_back(binContent);
+            	}
+            	int pedestal = TMath::Median(wire_ped.begin(),wire_ped.end());
+    			wire = transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
+    			auto max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
+    			if (max_el > 20){
+    				continue;
+    				//wire = fill(wire.begin(), wire.end(), 0);
+    			}
+    			if (accumulate(wire.begin(), wire.end(), 0) == 0){
+    				continue;
+    			}
+    			if (hist_name[3] == 'o'){
+            		if (hist_name[1] == 'u' and hist_name.back() == '0'){
+            			int channel_base = 0;
+            		}
+            		else if (hist_name[1] == 'v' and hist_name.back() == '0'){
+            			int channel_base = 1984;
+            		}
+            		else if (hist_name[1] == 'w' and hist_name.back() == '0'){
+            			int channel_base = 1984*2;
+            		}
+            		else if (hist_name[1] == 'u' and hist_name.back() == '1'){
+            			int channel_base = 1984*2+1670;
+            		}
+            		else if (hist_name[1] == 'v' and hist_name.back() == '1'){
+            			int channel_base = 1984*3+1670;
+            		}
+            		else if (hist_name[1] == 'w' and hist_name.back() == '1'){
+            			int channel_base = 1984*4+1670;
+            		}
+            		int channel = x+channel_base;
+        			vector<double> orig_channel_fft = FFT(wire);
+					transform(FFT_orig_total[channel].begin(),FFT_orig_total[channel].end(),raw_channel_fft.begin(),FFT_orig_total[channel].begin(),plus<double>());
+					double RMS_orig = Noise_levels(wire);
+					RMS_orig_total[channel] = RMS_orig_total.at(channel)+RMS_orig;
+					Entries_orig[channel] = Entries_orig.at(channel)+1;
+            	}
+            	else if (hist_name[3] == 'r'){
+            		if (hist_name[1] == 'u' and hist_name.back() == '0'){
+            			int channel_base = 0;
+            		}
+            		else if (hist_name[1] == 'v' and hist_name.back() == '0'){
+            			int channel_base = 1984;
+            		}
+            		else if (hist_name[1] == 'w' and hist_name.back() == '0'){
+            			int channel_base = 1984*2;
+            		}
+            		else if (hist_name[1] == 'u' and hist_name.back() == '1'){
+            			int channel_base = 1984*2+1670;
+            		}
+            		else if (hist_name[1] == 'v' and hist_name.back() == '1'){
+            			int channel_base = 1984*3+1670;
+            		}
+            		else if (hist_name[1] == 'w' and hist_name.back() == '1'){
+            			int channel_base = 1984*4+1670;
+            		}
+            		int channel = x+channel_base;
+        			vector<double> raw_channel_fft = FFT(wire);
+					transform(FFT_raw_total[channel].begin(),FFT_raw_total[channel].end(),raw_channel_fft.begin(),FFT_raw_total[channel].begin(),plus<double>());
+					double RMS_raw = Noise_levels(wire);
+					RMS_raw_total[channel] = RMS_raw_total.at(channel)+RMS_raw;
+					Entries_raw[channel] = Entries_raw.at(channel)+1;
+            	}
+        	}	
     	}
-    	TPC_wires.insert(TPC_wires.end(), u0_wires.begin(), u0_wires.end());
-    	TPC_wires.insert(TPC_wires.end(), v0_wires.begin(), v0_wires.end());
-    	TPC_wires.insert(TPC_wires.end(), w0_wires.begin(), w0_wires.end());
-    	TPC_wires.insert(TPC_wires.end(), u1_wires.begin(), u1_wires.end());
-    	TPC_wires.insert(TPC_wires.end(), v1_wires.begin(), v1_wires.end());
-    	TPC_wires.insert(TPC_wires.end(), w1_wires.begin(), w1_wires.end());
-    
-	
-	
-		cout<<"Running Events"<<endl;
-		int evt = 0;
-
-        //Goes over all of the channels and does the analysis
-		for(int ki=0; ki<11264;ki++){
-			cout<<" Channel: "<<ki<<endl;
-
-
-			//If channel is responsive the channel will grab the noise 
-			bool skip_channel = false;
-			vector<double> x(TPC_wires[ki].size(),0);
-			vector<double> y(TPC_wires[ki].size(),0);
-			for (size_t itick=0; itick < TPC_wires[ki].size(); ++itick){ 
-				float pedestal = Median(TPC_wires[ki]);
-				if (abs(TPC_wires[ki][itick]-pedestal) >  20){
-					skip_channel = true;
-					break;
-				}
-				x[itick] = static_cast<double>(TPC_wires[ki][itick]);//-myADC[index].GetPedestal();//
-				y[itick] = static_cast<double>(TPC_wires[ki][itick]);//-myADC[index].GetPedestal();
-;//
-			}
-			vector<double> raw_channel_fft = FFT(y);
-			transform(FFT_total[ki].begin(),FFT_total[ki].end(),raw_channel_fft.begin(),FFT_total[ki].begin(),plus<double>());
-			double RMS = Noise_levels(x);
-			RMS_total[ki] = RMS_total.at(ki)+RMS;
-			Entries[ki] = Entries.at(ki)+1;
-		}
-
-		cout<<"Event:"<<e<<endl;
-		//break;
 	}
 	
 	TFile* file = new TFile("noise_output_fft.root", "RECREATE");
 	TTree* tree = new TTree("tpc_noise", "tpc_noise");
 	float raw_rms;
-	int entries;
-	float int_rms;
-	int int_entries;
-	float int_FFT;
-	float coh_FFT;
+	int raw_entries;
+	float orig_rms;
+	int orig_entries;
+	float orig_FFT;
 	float raw_FFT;
 
 	//vector<float> avg_FFT;
 	//tree->Branch("coh_rms", &avg_rms, "avg_rms/F");
-	tree->Branch("entries", &entries, "entries/I");
+	tree->Branch("raw_entries", &raw_entries, "raw_entries/I");
 	tree->Branch("raw_rms", &raw_rms, "raw_rms/F");
 	tree->Branch("raw_FFT", &raw_FFT, "raw_FFT/F");
+
+	tree->Branch("orig_entries", &orig_entries, "orig_entries/I");
+	tree->Branch("orig_rms", &orig_rms, "orig_rms/F");
+	tree->Branch("orig_FFT", &orig_FFT, "orig_FFT/F");
+
 	tree->SetBranchStatus("raw_rms", 1);
-    tree->SetBranchStatus("entries", 0);
+    tree->SetBranchStatus("raw_entries", 0);
     tree->SetBranchStatus("raw_FFT", 0);
-	for(int ch = 0; ch<RMS_total.size(); ch++){
-		raw_rms = RMS_total.at(ch)/Entries.at(ch);
+    tree->SetBranchStatus("orig_rms", 0);
+    tree->SetBranchStatus("orig_entries", 0);
+    tree->SetBranchStatus("orig_FFT", 0);
+	for(int ch = 0; ch<RMS_raw_total.size(); ch++){
+		raw_rms = RMS_raw_total.at(ch)/Entries.at(ch);
 		tree->Fill();	
 	}
 	tree->SetBranchStatus("raw_rms", 0);
-    tree->SetBranchStatus("entries", 1);
-	for(int ch = 0; ch<Entries.size(); ch++){
-		entries = Entries.at(ch);
+    tree->SetBranchStatus("raw_entries", 1);
+	for(int ch = 0; ch<Entries_raw.size(); ch++){
+		raw_entries = Entries_raw.at(ch);
 		tree->Fill();	
 	}
 	tree->SetBranchStatus("raw_FFT", 1);
-    tree->SetBranchStatus("entries", 0);
+    tree->SetBranchStatus("raw_entries", 0);
 	for(int ch = 0; ch<FFT_total.size(); ch++){
-		for (size_t c = 0; c < FFT_total[ch].size(); ++c) {
-			raw_FFT = FFT_total[ch][c];
+		for (size_t c = 0; c < FFT_raw_total[ch].size(); ++c) {
+			raw_FFT = FFT_raw_total[ch][c];
+			tree->Fill();
+        }
+    }
+    tree->SetBranchStatus("orig_rms", 1);
+    tree->SetBranchStatus("raw_FFT", 0);
+    for(int ch = 0; ch<RMS_orig_total.size(); ch++){
+		orig_rms = RMS_orig_total.at(ch)/Entries_orig.at(ch);
+		tree->Fill();	
+	}
+	tree->SetBranchStatus("orig_rms", 0);
+    tree->SetBranchStatus("orig_entries", 1);
+	for(int ch = 0; ch<Entries.size(); ch++){
+		orig_entries = Entries_orig.at(ch);
+		tree->Fill();	
+	}
+	tree->SetBranchStatus("orig_FFT", 1);
+    tree->SetBranchStatus("orig_entries", 0);
+	for(int ch = 0; ch<FFT_total.size(); ch++){
+		for (size_t c = 0; c < FFT_orig_total[ch].size(); ++c) {
+			orig_FFT = FFT_orig_total[ch][c];
 			tree->Fill();
         }
     }
