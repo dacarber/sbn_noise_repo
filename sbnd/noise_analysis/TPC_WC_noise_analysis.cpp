@@ -177,8 +177,8 @@ void LoadRawDigits(TFile *inFile)
             	}
             	int pedestal = Median(wire_ped);
     			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
-    			double max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
-    			if (max_el > 20.0){
+    			auto max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
+    			if (max_el[0] > 20.0){
     				continue;
     				//wire = fill(wire.begin(), wire.end(), 0);
     			}
