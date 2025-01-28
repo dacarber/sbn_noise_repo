@@ -150,7 +150,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<double> RMS_raw_total(11264,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<int> Entries_raw(11264,0.0f);
 	vector<vector<double>> FFT_raw_total(11264,vector<double>(event_len/2+2,0));
-
+	int channel_base = 0;
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
     TIter next(inFile->GetListOfKeys());
@@ -177,7 +177,7 @@ void LoadRawDigits(TFile *inFile)
             	}
             	int pedestal = Median(wire_ped);
     			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
-    			auto max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
+    			int max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
     			if (max_el > 20){
     				continue;
     				//wire = fill(wire.begin(), wire.end(), 0);
@@ -206,7 +206,7 @@ void LoadRawDigits(TFile *inFile)
             		}
             		int channel = x+channel_base;
         			vector<double> orig_channel_fft = FFT(wire);
-					transform(FFT_orig_total[channel].begin(),FFT_orig_total[channel].end(),raw_channel_fft.begin(),FFT_orig_total[channel].begin(),plus<double>());
+					transform(FFT_orig_total[channel].begin(),FFT_orig_total[channel].end(),orig_channel_fft.begin(),FFT_orig_total[channel].begin(),plus<double>());
 					double RMS_orig = Noise_levels(wire);
 					RMS_orig_total[channel] = RMS_orig_total.at(channel)+RMS_orig;
 					Entries_orig[channel] = Entries_orig.at(channel)+1;
@@ -267,7 +267,7 @@ void LoadRawDigits(TFile *inFile)
     tree->SetBranchStatus("orig_entries", 0);
     tree->SetBranchStatus("orig_FFT", 0);
 	for(int ch = 0; ch<RMS_raw_total.size(); ch++){
-		raw_rms = RMS_raw_total.at(ch)/Entries.at(ch);
+		raw_rms = RMS_raw_total.at(ch)/Entries_raw.at(ch);
 		tree->Fill();	
 	}
 	tree->SetBranchStatus("raw_rms", 0);
@@ -278,7 +278,7 @@ void LoadRawDigits(TFile *inFile)
 	}
 	tree->SetBranchStatus("raw_FFT", 1);
     tree->SetBranchStatus("raw_entries", 0);
-	for(int ch = 0; ch<FFT_total.size(); ch++){
+	for(int ch = 0; ch<FFT_raw_total.size(); ch++){
 		for (size_t c = 0; c < FFT_raw_total[ch].size(); ++c) {
 			raw_FFT = FFT_raw_total[ch][c];
 			tree->Fill();
@@ -292,13 +292,13 @@ void LoadRawDigits(TFile *inFile)
 	}
 	tree->SetBranchStatus("orig_rms", 0);
     tree->SetBranchStatus("orig_entries", 1);
-	for(int ch = 0; ch<Entries.size(); ch++){
+	for(int ch = 0; ch<Entries_orig.size(); ch++){
 		orig_entries = Entries_orig.at(ch);
 		tree->Fill();	
 	}
 	tree->SetBranchStatus("orig_FFT", 1);
     tree->SetBranchStatus("orig_entries", 0);
-	for(int ch = 0; ch<FFT_total.size(); ch++){
+	for(int ch = 0; ch<FFT_orig_total.size(); ch++){
 		for (size_t c = 0; c < FFT_orig_total[ch].size(); ++c) {
 			orig_FFT = FFT_orig_total[ch][c];
 			tree->Fill();
