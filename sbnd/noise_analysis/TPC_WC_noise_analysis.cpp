@@ -167,7 +167,7 @@ void LoadRawDigits(TFile *inFile)
             << ", Entries: " << hist2D->GetEntries() << std::endl;
             int nBinsX = hist2D->GetNbinsX();
         	int nBinsY = hist2D->GetNbinsY();
-        	vector<double> wire;
+        	
         	vector<double> wire_ped;
         	for (int x = 0; x <= nBinsX; ++x) {
         		wire_ped.clear();
@@ -175,10 +175,11 @@ void LoadRawDigits(TFile *inFile)
             		double binContent = hist2D->GetBinContent(x, y);
             		wire_ped.push_back(binContent);
             	}
+            	vector<double> wire(wire_ped.size());
             	int pedestal = Median(wire_ped);
-    			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](int elem) { return elem - pedestal; });
-    			auto max_el = max_element(wire.begin(), wire.end(), [](int a, int b) {return std::abs(a) < std::abs(b);});
-    			if (max_el[0] > 20.0){
+    			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](double elem) { return elem - pedestal; });
+    			auto max_el = max_element(wire.begin(), wire.end(), [](double a, double b) {return std::abs(a) < std::abs(b);});
+    			if (max_el > 20.0){
     				continue;
     				//wire = fill(wire.begin(), wire.end(), 0);
     			}
