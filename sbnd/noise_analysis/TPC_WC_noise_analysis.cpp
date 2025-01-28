@@ -167,8 +167,8 @@ void LoadRawDigits(TFile *inFile)
             << ", Entries: " << hist2D->GetEntries() << std::endl;
             int nBinsX = hist2D->GetNbinsX();
         	int nBinsY = hist2D->GetNbinsY();
-        	vector<double> wire();
-        	vector<double> wire_ped();
+        	vector<double> wire;
+        	vector<double> wire_ped;
         	for (int x = 0; x <= nBinsX; ++x) {
         		wire_ped.clear();
         		for (int y = 0; y <= nBinsY; ++y) {
