@@ -144,12 +144,12 @@ float Median(vector<double> &vec) {
 void LoadRawDigits(TFile *inFile)
 {	
 	int event_len = 3427;
-	vector<double> RMS_orig_total(11276,0.0f); //Stores the Coherent noise levels for entire TPC
-	vector<int> Entries_orig(11276,0.0f);
-	vector<vector<double>> FFT_orig_total(11276,vector<double>(event_len/2+2,0));
-	vector<double> RMS_raw_total(11276,0.0f); //Stores the Coherent noise levels for entire TPC
-	vector<int> Entries_raw(11276,0.0f);
-	vector<vector<double>> FFT_raw_total(11276,vector<double>(event_len/2+2,0));
+	vector<double> RMS_orig_total(12276,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<int> Entries_orig(12276,0.0f);
+	vector<vector<double>> FFT_orig_total(12276,vector<double>(event_len/2+2,0));
+	vector<double> RMS_raw_total(12276,0.0f); //Stores the Coherent noise levels for entire TPC
+	vector<int> Entries_raw(12276,0.0f);
+	vector<vector<double>> FFT_raw_total(12276,vector<double>(event_len/2+2,0));
 	int channel_base = 0;
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
