@@ -176,10 +176,11 @@ void LoadRawDigits(TFile *inFile)
             		wire_ped.push_back(binContent);
             	}
             	vector<double> wire(wire_ped.size());
-            	int pedestal = Median(wire_ped);
-    			transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](double elem) { return elem - pedestal; });
+            	//int pedestal = Median(wire_ped);
+    			//transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](double elem) { return elem - pedestal; });
     			auto max_el = max_element(wire.begin(), wire.end(), [](double a, double b) {return std::abs(a) < std::abs(b);});
-    			if (max_el > 20.0){
+    			wire = wire_ped;
+    			if (max_el[0] > 20.0){
     				continue;
     				//wire = fill(wire.begin(), wire.end(), 0);
     			}
@@ -188,22 +189,22 @@ void LoadRawDigits(TFile *inFile)
     			}
     			if (hist_name[3] == 'o'){
             		if (hist_name[1] == 'u' and hist_name.back() == '0'){
-            			int channel_base = 0;
+            			channel_base = 0;
             		}
             		else if (hist_name[1] == 'v' and hist_name.back() == '0'){
-            			int channel_base = 1984;
+            			channel_base = 1984;
             		}
             		else if (hist_name[1] == 'w' and hist_name.back() == '0'){
-            			int channel_base = 1984*2;
+            			channel_base = 1984*2;
             		}
             		else if (hist_name[1] == 'u' and hist_name.back() == '1'){
-            			int channel_base = 1984*2+1670;
+            			channel_base = 1984*2+1670;
             		}
             		else if (hist_name[1] == 'v' and hist_name.back() == '1'){
-            			int channel_base = 1984*3+1670;
+            			channel_base = 1984*3+1670;
             		}
             		else if (hist_name[1] == 'w' and hist_name.back() == '1'){
-            			int channel_base = 1984*4+1670;
+            			channel_base = 1984*4+1670;
             		}
             		int channel = x+channel_base;
         			vector<double> orig_channel_fft = FFT(wire);
@@ -214,27 +215,27 @@ void LoadRawDigits(TFile *inFile)
             	}
             	else if (hist_name[3] == 'r'){
             		if (hist_name[1] == 'u' and hist_name.back() == '0'){
-            			int channel_base = 0;
+            			channel_base = 0;
             		}
             		else if (hist_name[1] == 'v' and hist_name.back() == '0'){
-            			int channel_base = 1984;
+            			channel_base = 1984;
             		}
             		else if (hist_name[1] == 'w' and hist_name.back() == '0'){
-            			int channel_base = 1984*2;
+            			channel_base = 1984*2;
             		}
             		else if (hist_name[1] == 'u' and hist_name.back() == '1'){
-            			int channel_base = 1984*2+1670;
+            			channel_base = 1984*2+1670;
             		}
             		else if (hist_name[1] == 'v' and hist_name.back() == '1'){
-            			int channel_base = 1984*3+1670;
+            			channel_base = 1984*3+1670;
             		}
             		else if (hist_name[1] == 'w' and hist_name.back() == '1'){
-            			int channel_base = 1984*4+1670;
+            			channel_base = 1984*4+1670;
             		}
             		int channel = x+channel_base;
-        			vector<double> raw_channel_fft = FFT(wire);
+        			vector<double> raw_channel_fft = FFT(wire_ped);
 					transform(FFT_raw_total[channel].begin(),FFT_raw_total[channel].end(),raw_channel_fft.begin(),FFT_raw_total[channel].begin(),plus<double>());
-					double RMS_raw = Noise_levels(wire);
+					double RMS_raw = Noise_levels(wire_ped);
 					RMS_raw_total[channel] = RMS_raw_total.at(channel)+RMS_raw;
 					Entries_raw[channel] = Entries_raw.at(channel)+1;
             	}
