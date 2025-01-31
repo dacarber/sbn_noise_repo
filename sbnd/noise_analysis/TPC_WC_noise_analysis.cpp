@@ -177,7 +177,7 @@ void LoadRawDigits(TFile *inFile)
         	int nBinsY = hist2D->GetNbinsY();
         	
         	vector<double> wire_ped;
-        	vector<double> wire_ped;
+        	vector<double> wire;
         	for (int x = 0; x <= nBinsX; ++x) {
         		wire_ped.clear();
         		wire.clear();
