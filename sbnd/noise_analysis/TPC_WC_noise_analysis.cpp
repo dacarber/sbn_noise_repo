@@ -46,7 +46,6 @@ double Noise_levels(vector<double> noise_channels){
 	
 	RMS =sqrt(sum/noise_channels.size());
 	//}
-	cout<<"Size:"<<mean<<endl;
 	return RMS;		
 }
 vector<double> Coherent_RMS(vector<vector<short>> noise_group){
@@ -89,7 +88,6 @@ vector<double> Coh_removal(vector<short> noise, vector<double> coh_noise){
 	return int_waveform;
 }
 vector<double> FFT(vector<double> noise_channel){
-	cout<<"Starting FFT"<<endl;
 	int vec_size = noise_channel.size();
 	Int_t size = vec_size;
 	double* inputSignalDouble = new double[vec_size];
@@ -123,7 +121,6 @@ vector<double> FFT(vector<double> noise_channel){
 
 	delete[] inputSignalDouble;
 	delete fft;
-	cout<<"Finished"<<fftMag[100]<<endl;
 	return fftMag;
 }
 float Median(vector<double> &vec) {
@@ -172,7 +169,7 @@ void LoadRawDigits(TFile *inFile)
         	std::cout <<hist_name[1]<<hist_name[3] <<hist_name.back() << std::endl;
 
     		std::cout << "Found Histogram: " << hist_name
-            << ", Entries: " << hist2D->GetEntries() << std::endl;
+            << ", Entries: " << hist2D->GetNbinsX() << std::endl;
             int nBinsX = hist2D->GetNbinsX();
         	int nBinsY = hist2D->GetNbinsY();
         	
