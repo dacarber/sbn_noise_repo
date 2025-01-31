@@ -184,7 +184,7 @@ void LoadRawDigits(TFile *inFile)
         		for (int y = 0; y <= nBinsY; ++y) {
             		double binContent = hist2D->GetBinContent(x, y);
             		wire_ped.push_back(binContent);
-            		wire.push_back
+            		wire.push_back(binContent);
             	}
             	
             	int pedestal = Median(wire_ped);
