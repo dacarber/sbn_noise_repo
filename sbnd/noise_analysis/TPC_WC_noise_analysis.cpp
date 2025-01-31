@@ -140,26 +140,34 @@ float Median(vector<double> &vec) {
         return vec[n / 2];
     }
 }
+void getMemoryUsage() {
+    struct rusage usage;
+    getrusage(RUSAGE_SELF, &usage);
 
+    long memoryUsage = usage.ru_maxrss; // in kilobytes
+    std::cout << "Memory usage: " << memoryUsage << " KB" << std::endl;
+}
 void LoadRawDigits(TFile *inFile)
 {	
 	int event_len = 3427;
 	vector<double> RMS_orig_total(12276,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<int> Entries_orig(12276,0.0f);
-	vector<vector<double>> FFT_orig_total(12276,vector<double>(event_len/2+2,0));
+	vector<vector<double>> FFT_orig_total(12276,vector<double>(event_len/2+3,0));
 	vector<double> RMS_raw_total(12276,0.0f); //Stores the Coherent noise levels for entire TPC
 	vector<int> Entries_raw(12276,0.0f);
-	vector<vector<double>> FFT_raw_total(12276,vector<double>(event_len/2+2,0));
+	vector<vector<double>> FFT_raw_total(12276,vector<double>(event_len/2+3,0));
 	int channel_base = 0;
 
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
     TIter next(inFile->GetListOfKeys());
 	TKey* key;
     int i = 0;
-    while ((key = static_cast<TKey*>(next()))) {
+    while ((key = (TKey*)next())) {
         // Check if the object is a 2D histogram
+        getMemoryUsage();
         std::cout << "Key Name: " << key->GetName() << std::endl;
-        if (TH2* hist2D = dynamic_cast<TH2*>(key->ReadObj())) {
+        TObject* obj = key->ReadObj();
+        TH2D* hist2D = (TH2D*)key->ReadObj();
             string hist_name = hist2D->GetName();
         	std::cout <<hist_name[1]<<hist_name[3] <<hist_name.back() << std::endl;
 
@@ -174,13 +182,13 @@ void LoadRawDigits(TFile *inFile)
         		for (int y = 0; y <= nBinsY; ++y) {
             		double binContent = hist2D->GetBinContent(x, y);
             		wire_ped.push_back(binContent);
+            		wire.push_back
             	}
-            	vector<double> wire(wire_ped.size());
-            	//int pedestal = Median(wire_ped);
-    			//transform(wire_ped.begin(), wire_ped.end(), wire_ped.begin(),[pedestal](double elem) { return elem - pedestal; });
+            	
+            	int pedestal = Median(wire_ped);
+    			transform(wire.begin(), wire.end(), wire.begin(),[pedestal](double elem) { return elem - pedestal; });
     			auto max_el = max_element(wire.begin(), wire.end(), [](double a, double b) {return std::abs(a) < std::abs(b);});
-    			wire = wire_ped;
-    			if (max_el[0] > 20.0){
+    			if (abs(max_el[0]) > 20.0){
     				continue;
     				//wire = fill(wire.begin(), wire.end(), 0);
     			}
@@ -233,14 +241,16 @@ void LoadRawDigits(TFile *inFile)
             			channel_base = 1984*4+1670;
             		}
             		int channel = x+channel_base;
-        			vector<double> raw_channel_fft = FFT(wire_ped);
+        			vector<double> raw_channel_fft = FFT(wire);
 					transform(FFT_raw_total[channel].begin(),FFT_raw_total[channel].end(),raw_channel_fft.begin(),FFT_raw_total[channel].begin(),plus<double>());
-					double RMS_raw = Noise_levels(wire_ped);
+					double RMS_raw = Noise_levels(wire);
 					RMS_raw_total[channel] = RMS_raw_total.at(channel)+RMS_raw;
 					Entries_raw[channel] = Entries_raw.at(channel)+1;
             	}
         	}	
-    	}
+    	delete key;
+        delete hist2D;
+        delete obj;
 	}
 	
 	TFile* file = new TFile("noise_output_fft.root", "RECREATE");
