@@ -171,16 +171,18 @@ void LoadRawDigits(TFile *inFile)
         TH2D* hist2D = (TH2D*)key->ReadObj();
             string hist_name = hist2D->GetName();
         	std::cout <<hist_name[1]<<hist_name[3] <<hist_name.back() << std::endl;
-        	if hist_name[3] == 'r':
+        	if (hist_name[3] == 'r'){
         		delete key;
         		delete hist2D;
         		delete obj;
         		continue;
+        	}
         	string name = "h"+hist_name[1]+"_raw"+hist_name.back()+";"+to_string((numKeys/12)-1-event);
         	TObject* obj_raw = inFile->Get(name);
         	TH2D* hist2D_raw = (TH2D*)key->ReadObj();
     		std::cout << "Found Histogram: " << hist_name
             << ", Entries: " << hist2D->GetNbinsX() << std::endl;
+            std::cout << "Key Name: " << key->GetName() << std::endl;
             int nBinsX = hist2D->GetNbinsX();
         	int nBinsY = hist2D->GetNbinsY();
         	int nBinsX_raw = hist2D_raw->GetNbinsX();
@@ -269,6 +271,8 @@ void LoadRawDigits(TFile *inFile)
     	delete key;
         delete hist2D;
         delete obj;
+        delete hist2D_raw;
+        delete obj_raw;
 	}
 	
 	TFile* file = new TFile("noise_output_fft.root", "RECREATE");
