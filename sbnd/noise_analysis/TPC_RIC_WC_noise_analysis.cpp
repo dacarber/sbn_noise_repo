@@ -198,21 +198,21 @@ void LoadRawDigits(TFile *inFile)
         	for (int x = 0; x <= nBinsX; ++x) {
         		wire_ped.clear();
         		wire.clear();
+        		wire_ped_raw.clear();
+	        		wire_raw.clear();
         		for (int y = 0; y <= nBinsY; ++y) {
             		double binContent = hist2D->GetBinContent(x, y);
             		if (binContent == 0){continue;};
             		wire_ped.push_back(binContent);
             		wire.push_back(binContent);
             	}
-            for (int x = 0; x <= nBinsX_raw; ++x) {
-        		wire_ped_raw.clear();
-        		wire_raw.clear();
-        		for (int y = 0; y <= nBinsY_raw; ++y) {
-            		double binContent = hist2D_raw->GetBinContent(x, y);
-            		if (binContent == 0){continue;};
-            		wire_ped_raw.push_back(binContent);
-            		wire_raw.push_back(binContent);
-            	}
+            	
+	        		for (int y = 0; y <= nBinsY_raw; ++y) {
+	            		double binContent = hist2D_raw->GetBinContent(x, y);
+	            		if (binContent == 0){continue;};
+	            		wire_ped_raw.push_back(binContent);
+	            		wire_raw.push_back(binContent);
+	            	}
 
 
             	//Cleaning up the channels
