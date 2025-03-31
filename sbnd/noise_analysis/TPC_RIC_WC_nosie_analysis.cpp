@@ -177,7 +177,8 @@ void LoadRawDigits(TFile *inFile)
         		delete obj;
         		continue;
         	}
-        	string name = "h"+to_string(hist_name[1])+"_raw"+to_string(hist_name.back())+";"+to_string((numKeys/12)-1-event);
+        	int cycle = key->GetCycle();  // Get cycle number
+        	string name = "h"+to_string(hist_name[1])+"_raw"+to_string(hist_name.back())+";"+to_string(cycle);
         	TH2D* hist2D_raw = (TH2D*)inFile->Get(name);
     		std::cout << "Found Histogram: " << hist_name
             << ", Entries: " << hist2D->GetNbinsX() << std::endl;
