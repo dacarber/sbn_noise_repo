@@ -157,7 +157,7 @@ void LoadRawDigits(TFile *inFile)
 	vector<vector<double>> FFT_coh_total(12276,vector<double>(event_len/2+3,0));
 
 	int channel_base = 0;
-
+	int event = 0;
 	//Grabs the histograms and merges the wire info into a 2D vector for all the wire info of an event
     TIter next(inFile->GetListOfKeys());
     int numKeys = inFile->GetNkeys();
@@ -177,7 +177,7 @@ void LoadRawDigits(TFile *inFile)
         		delete obj;
         		continue;
         	}
-        	string name = "h"+hist_name[1]+"_raw"+hist_name.back()+";"+to_string((numKeys/12)-1-event);
+        	string name = "h"+to_string(hist_name[1])+"_raw"+to_string(hist_name.back())+";"+to_string((numKeys/12)-1-event);
         	TObject* obj_raw = inFile->Get(name);
         	TH2D* hist2D_raw = (TH2D*)key->ReadObj();
     		std::cout << "Found Histogram: " << hist_name
@@ -187,7 +187,7 @@ void LoadRawDigits(TFile *inFile)
         	int nBinsY = hist2D->GetNbinsY();
         	int nBinsX_raw = hist2D_raw->GetNbinsX();
         	int nBinsY_raw = hist2D_raw->GetNbinsY();
-        	
+        	event+=1;
         	
         	vector<double> wire_ped;
         	vector<double> wire;
