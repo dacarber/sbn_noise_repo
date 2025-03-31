@@ -178,8 +178,8 @@ void LoadRawDigits(TFile *inFile)
         		continue;
         	}
         	int cycle = key->GetCycle();  // Get cycle number
-        	string name = "h"+to_string(hist_name[1])+"_raw"+to_string(hist_name.back())+";"+to_string(cycle);
-        	TH2D* hist2D_raw = (TH2D*)inFile->Get(name);
+            string name = "h"+ string(1,hist_name[1]) +"_raw"+ string(1,hist_name.back()) +";"+to_string(cycle);
+            TH2D* hist2D_raw = (TH2D*)inFile->Get(name.c_str());
     		std::cout << "Found Histogram: " << hist_name
             << ", Entries: " << hist2D->GetNbinsX() << std::endl;
             std::cout << "Key Name: " << key->GetName() << std::endl;
@@ -191,6 +191,8 @@ void LoadRawDigits(TFile *inFile)
         	
         	vector<double> wire_ped;
         	vector<double> wire;
+        	vector<double> wire_ped_raw;
+        	vector<double> wire_raw;
 
 
         	for (int x = 0; x <= nBinsX; ++x) {
