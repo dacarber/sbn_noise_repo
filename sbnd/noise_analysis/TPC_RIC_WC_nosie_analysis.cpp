@@ -261,7 +261,7 @@ void LoadRawDigits(TFile *inFile)
 					RMS_raw_total[channel] = RMS_raw_total.at(channel)+RMS_raw;
 					Entries_raw[channel] = Entries_raw.at(channel)+1;
 
-					vector<double> coh_wave = Int_removal(wire,wire_raw)
+					vector<double> coh_wave = Int_removal(wire,wire_raw);
 					vector<double> coh_channel_fft = FFT(coh_wave);
 					transform(FFT_coh_total[channel].begin(),FFT_coh_total[channel].end(),coh_channel_fft.begin(),FFT_coh_total[channel].begin(),plus<double>());
 					double RMS_coh = Noise_levels(coh_wave);
@@ -380,7 +380,7 @@ void LoadRawDigits(TFile *inFile)
 }
 
 //void TPC_coherent_noise(TString inputFile="/exp/sbnd/data/users/dcarber/prodgenie_cosmic_rockbox_sbnd_GenieGen-20241015T135353_G4-20241015T140624_DetSim-20241017T143903.root")
-void TPC_WC_noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/sbnd-data-check.root")
+void TPC_RIC_WC_noise_analysis(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/sbnd-data-check.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
