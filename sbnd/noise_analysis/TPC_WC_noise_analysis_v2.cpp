@@ -126,10 +126,10 @@ void LoadRawDigits(TFile *inFile)
     while ((key = (TKey*)next())) {
         // Fix: Check inheritance first, read once
         TObject* obj = key->ReadObj();
-        if (!obj->InheritsFrom("TH2D")) {
-            delete obj;
-            continue; 
-        }
+        //if (!obj->InheritsFrom("TH2D")) {
+        //    delete obj;
+        //    continue; 
+        //}
         TH2D* hist2D = (TH2D*)obj;
         
         string hist_name = hist2D->GetName();
