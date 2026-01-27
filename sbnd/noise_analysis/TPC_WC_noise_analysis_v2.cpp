@@ -312,7 +312,7 @@ std::cout << std::endl; // Move to next line when done
 
 
 
-void TPC_WC_noise_analysis_v2(TString inputFile="/exp/sbnd/data/users/dcarber/tpcnoise/run17470/sbnd-data-check.root")
+void TPC_WC_noise_analysis_v2(TString inputFile="sbnd-data-check.root")
 {	
 	cout<<"Get ready for the rollercoaster of me learning Root and C++"<<endl;
 	
