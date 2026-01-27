@@ -227,6 +227,7 @@ void LoadRawDigits(TFile *inFile)
         }
          
         delete hist2D; // Only delete the object we casted
+        counter++;
         if (counter % 10 == 0 || counter == total_keys) { 
         Double_t time_elapsed = timer.RealTime();
         timer.Continue(); // Resume the timer
