@@ -28,6 +28,19 @@
 //#include <bits/stdc++.h> 
 
 using namespace std;
+double Noise_levels(const vector<double>& noise_channels){
+    if (noise_channels.empty()) return 0.0;
+    double sum = 0.0;
+    double sum_sq = 0.0;
+    for (double val : noise_channels) {
+        sum += val;
+        sum_sq += val * val;
+    }
+    double n = (double)noise_channels.size();
+    double mean = sum / n;
+    double variance = (sum_sq / n) - (mean * mean);
+    return sqrt(abs(variance));     
+}
 
 float Median(vector<double> vec) { 
     size_t n = vec.size();
@@ -87,8 +100,6 @@ void LoadRawDigits(TFile *inFile)
     vector<double> fft_output_buffer(event_len/2 + 2);
 
     // Standard pre-allocations
-    vector<double> wire_ped; wire_ped.reserve(event_len);
-    vector<double> wire;     wire.reserve(event_len);
     vector<double> wire_ped; 
     wire_ped.reserve(event_len);
     vector<double> wire; 
@@ -109,6 +120,8 @@ void LoadRawDigits(TFile *inFile)
     TKey* key;
     int total_keys = inFile->GetListOfKeys()->GetSize();
 	int counter = 0;
+	TStopwatch timer;
+	timer.Start();
     // --- READING LOOP ---
     while ((key = (TKey*)next())) {
         // Fix: Check inheritance first, read once
