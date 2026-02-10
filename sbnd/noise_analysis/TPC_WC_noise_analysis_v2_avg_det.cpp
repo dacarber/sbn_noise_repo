@@ -135,10 +135,10 @@ void LoadRawDigits(TFile *inFile)
         // 1. Read Object
         TObject* obj = key->ReadObj();
         // Safety check to ensure it's a histogram
-        if (!obj->InheritsFrom("TH2D")) {
-            delete obj;
-            continue; 
-        }
+        //if (!obj->InheritsFrom("TH2D")) {
+        //    delete obj;
+        //    continue; 
+        //}
         TH2D* hist2D = (TH2D*)obj;
         b_hist_name = hist2D->GetName();
 
@@ -255,7 +255,7 @@ void LoadRawDigits(TFile *inFile)
     cout << "Done. Saved to noise_output_event_avg.root" << endl;
 }
 
-void TPC_WC_noise_analysis_v2(TString inputFile="sbnd-data-check.root")
+void TPC_WC_noise_analysis_v2_avg_det(TString inputFile="sbnd-data-check.root")
 {   
     cout<<"Starting Event-Wise Analysis..."<<endl;
     TFile *inFile = TFile::Open(inputFile.Data());
