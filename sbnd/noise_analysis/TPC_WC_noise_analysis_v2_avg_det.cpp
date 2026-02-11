@@ -146,8 +146,8 @@ void LoadRawDigits(TFile *inFile)
         // Assuming format like: "h_orig_..._plane_u_tpc_0"
         
         // Determine Type
-        if (b_hist_name.find("_orig_") != std::string::npos) b_type = "orig";
-        else if (b_hist_name.find("_raw_") != std::string::npos) b_type = "raw";
+        if (b_hist_name.find("orig") != std::string::npos) b_type = "orig";
+        else if (b_hist_name.find("raw") != std::string::npos) b_type = "raw";
         else b_type = "unknown";
 
         // Determine Plane
