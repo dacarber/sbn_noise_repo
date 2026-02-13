@@ -97,7 +97,7 @@ void LoadRawDigits(TFile *inFile)
     int b_plane;        // 0=u, 1=v, 2=w
     float b_avg_rms;    // The average RMS of all wires in this event
     int b_num_wires;    // How many wires contributed to this average
-    vector<float> b_avg_fft; // The average FFT spectrum for this event
+    //vector<float> b_avg_fft; // The average FFT spectrum for this event
 
     // --- Branch Definitions ---
     tree->Branch("hist_name", &b_hist_name);
@@ -106,14 +106,14 @@ void LoadRawDigits(TFile *inFile)
     tree->Branch("plane", &b_plane, "plane/I");
     tree->Branch("avg_rms", &b_avg_rms, "avg_rms/F");
     tree->Branch("num_wires", &b_num_wires, "num_wires/I");
-    tree->Branch("avg_fft", &b_avg_fft);
+    //tree->Branch("avg_fft", &b_avg_fft);
 
     // --- FFT Setup ---
     int event_len = 3427; 
     Int_t n_size = event_len;
-    TVirtualFFT* fft_planner = TVirtualFFT::FFT(1, &n_size, "R2C ES K");
-    double* fft_input_buffer = new double[event_len];
-    vector<double> fft_output_buffer(event_len/2 + 2);
+    //TVirtualFFT* fft_planner = TVirtualFFT::FFT(1, &n_size, "R2C ES K");
+    //double* fft_input_buffer = new double[event_len];
+    //vector<double> fft_output_buffer(event_len/2 + 2);
 
     // Temp vectors for processing
     vector<double> wire_ped; 
@@ -169,11 +169,11 @@ void LoadRawDigits(TFile *inFile)
         
         // We need a vector to sum the FFTs. Initialize with 0s.
         // Size depends on output of FFT function
-        vector<double> event_sum_fft(event_len/2 + 2, 0.0);
+        //vector<double> event_sum_fft(event_len/2 + 2, 0.0);
 
         int nBinsX = hist2D->GetNbinsX();
         int nBinsY = hist2D->GetNbinsY();
-
+        int passed_wires = 0;
         // 4. Loop over Wires (X-axis) in this Histogram
         for (int x = 0; x <= nBinsX; ++x) {
             wire_ped.clear();
@@ -207,17 +207,19 @@ void LoadRawDigits(TFile *inFile)
             event_sum_rms += this_rms;
 
             // FFT
+            /*
             FFT(wire, fft_output_buffer, fft_planner, fft_input_buffer);
             for(size_t k=0; k < fft_output_buffer.size(); k++) {
                 if(k < event_sum_fft.size()) {
                     event_sum_fft[k] += fft_output_buffer[k];
                 }
             }
-
+            */
             b_num_wires++;
         } // End Wire Loop
 
         // 5. Finalize and Fill Tree
+        /*
         if (b_num_wires > 0) {
             b_avg_rms = event_sum_rms / b_num_wires;
 
@@ -229,7 +231,7 @@ void LoadRawDigits(TFile *inFile)
 
             tree->Fill();
         }
-
+        */
         // Cleanup current object
         delete hist2D;
 
