@@ -249,8 +249,8 @@ void LoadRawDigits(TFile *inFile)
     } // End Key Loop
 
     std::cout << std::endl << "Writing file..." << std::endl;
-    delete[] fft_input_buffer;
-    delete fft_planner; 
+    //delete[] fft_input_buffer;
+    //delete fft_planner; 
     
     outFile->Write();
     outFile->Close();
