@@ -76,7 +76,9 @@ void ProcessFast(TFile *inFile)
         // --- THE SECRET WEAPON: RAW ARRAY ACCESS ---
         // Instead of GetBinContent(), we get the pointer to the raw data block.
         // ROOT stores TH2D data linearly: index = y * (nWires + 2) + x
+        std::cout<<"1"<<std::endl;
         double* raw_data = hist2D->GetArray();
+        std::cout<<"2"<<std::endl;
         int stride = nWires + 2; // +2 includes overflow/underflow bins
 
         // Parse Channel Base
