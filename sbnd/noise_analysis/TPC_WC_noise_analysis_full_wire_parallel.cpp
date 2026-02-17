@@ -30,6 +30,7 @@ double FastMedian(vector<double> vec) {
 void LoadRawDigitsOptimized(TFile *inFile)
 {   
     // --- 1. SETUP OUTPUT ---
+    cout << "Setting up output TTree..." << endl;
     TFile* outFile = new TFile("noise_rms_optimized.root", "RECREATE");
     TTree* tree = new TTree("tpc_noise", "RMS per wire per event");
 
@@ -145,10 +146,12 @@ void LoadRawDigitsOptimized(TFile *inFile)
 
 void TPC_WC_noise_analysis_full_wire_parallel(TString inputFile="sbnd-data-check.root")
 {   
+    cout<<"Starting Per-Event RMS Analysis..."<<endl;
     TFile *inFile = TFile::Open(inputFile.Data());
     if (!inFile || inFile->IsZombie()) {
         cout << "Error opening file!" << endl;
         return;
     }
+    cout<<"Got File"<<endl;
     LoadRawDigitsOptimized(inFile);
 }
