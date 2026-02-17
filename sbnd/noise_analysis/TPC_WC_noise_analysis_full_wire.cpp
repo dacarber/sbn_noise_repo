@@ -1,41 +1,142 @@
-#include "TRandom.h"
 #include "TFile.h"
+#include "TTree.h"
+#include "TH2.h"
+#include "TKey.h"
+#include "TStopwatch.h"
 #include <iostream>
 #include <vector>
-#include "TString.h"
-#include "TTree.h"
 #include <algorithm>
-#include <TH2D.h>
-#include "TStopwatch.h"
-#include "TKey.h"
+#include <cmath>
 
 using namespace std;
 
-// --- OPTIMIZED MEDIAN ---
-// This sorts the vector IN PLACE. 
-// It destroys the time-ordering of the waveform, but preserves the values.
-// This is fine for RMS/Max calculation and saves copying memory.
-double GetMedianInPlace(vector<double>& vec) { 
+// --- Helper: Fast Median ---
+template <typename T>
+double GetMedianInPlace(vector<T>& vec) { 
     size_t n = vec.size();
     if (n == 0) return 0.0;
-    
     auto target = vec.begin() + n / 2;
     std::nth_element(vec.begin(), target, vec.end());
-    
-    if (n % 2 != 0) return *target; 
-    
-    // For even numbers, we need the average of the two middle elements
+    if (n % 2 != 0) return (double)*target; 
     auto target_neighbor = std::max_element(vec.begin(), target);
-    return (*target + *target_neighbor) / 2.0;
+    return ((double)*target + (double)*target_neighbor) / 2.0;
 }
 
-void ProcessFast(TFile *inFile)
+// --- Templated Processor ---
+template <typename HistType, typename DataType>
+void ProcessHistogram(TObject* obj, TTree* tree, 
+                      int& b_event_idx, string& b_hist_name, 
+                      vector<int>& b_channels, vector<float>& b_rms) 
+{
+    HistType* hist = (HistType*)obj;
+    
+    // Metadata
+    b_hist_name = hist->GetName();
+    b_channels.clear();
+    b_rms.clear();
+
+    int nWires = hist->GetNbinsX();
+    int nTicks = hist->GetNbinsY();
+    
+    // --- SAFETY CHECKS ---
+    // 1. Get the raw array pointer
+    DataType* raw_data = hist->GetArray();
+    
+    // 2. Calculate the required size
+    // ROOT TH2 structure: (XBins + 2) * (YBins + 2)
+    Long64_t required_size = (Long64_t)(nWires + 2) * (Long64_t)(nTicks + 2);
+    int stride = nWires + 2;
+
+    // 3. Determine if we can use Fast Access
+    bool use_fast_access = true;
+    
+    if (!raw_data) {
+        // Pointer is null -> Empty histogram or weird allocation
+        use_fast_access = false; 
+    } 
+    else if (hist->GetSize() < required_size) {
+        // The array is smaller than the bins say it should be.
+        // This indicates a corrupted header.
+        // We will fallback to standard GetBinContent which handles bounds checking.
+        use_fast_access = false;
+    }
+
+    // --- DECODING CHANNEL MAPPING ---
+    int channel_base = 0;
+    string h_name = b_hist_name;
+    if (h_name.length() > 5) {
+        char plane = h_name[1]; 
+        char tpc = h_name.back();
+        if (tpc == '0') {
+            if (plane == 'u') channel_base = 0;
+            else if (plane == 'v') channel_base = 1984;
+            else if (plane == 'w') channel_base = 1984*2;
+        } else if (tpc == '1') {
+            if (plane == 'u') channel_base = 1984*2 + 1670;
+            else if (plane == 'v') channel_base = 1984*3 + 1670;
+            else if (plane == 'w') channel_base = 1984*4 + 1670;
+        }
+    }
+
+    // Pre-allocate buffer
+    vector<DataType> waveform_buffer;
+    waveform_buffer.reserve(nTicks);
+
+    // --- LOOP ---
+    for (int x = 1; x <= nWires; ++x) {
+        waveform_buffer.clear();
+
+        if (use_fast_access) {
+            // FAST PATH: Pointer Arithmetic
+            // We iterate Y (ticks) for a fixed X (wire)
+            for (int y = 1; y <= nTicks; ++y) {
+                // Determine index
+                Long64_t idx = (Long64_t)y * stride + x;
+                DataType val = raw_data[idx];
+                if (val != 0) waveform_buffer.push_back(val);
+            }
+        } else {
+            // SLOW (SAFE) PATH: Standard ROOT function calls
+            // Use this if the array pointer looked suspicious
+            for (int y = 1; y <= nTicks; ++y) {
+                DataType val = (DataType)hist->GetBinContent(x, y);
+                if (val != 0) waveform_buffer.push_back(val);
+            }
+        }
+
+        // Quality Cuts
+        if (waveform_buffer.size() < (size_t)(nTicks - 50)) continue;
+
+        // Calc Stats
+        double pedestal = GetMedianInPlace(waveform_buffer);
+        
+        double sum_sq = 0.0;
+        double max_val = 0.0;
+
+        for (DataType val : waveform_buffer) {
+            double v = (double)val - pedestal;
+            if (std::abs(v) > max_val) max_val = std::abs(v);
+            sum_sq += v * v;
+        }
+
+        if (max_val > 20.0) continue; 
+
+        // Save
+        int ch_id = (x - 1) + channel_base;
+        if (ch_id >= 0) {
+            b_channels.push_back(ch_id);
+            b_rms.push_back((float)std::sqrt(sum_sq / waveform_buffer.size()));
+        }
+    }
+    
+    if (!b_channels.empty()) tree->Fill();
+}
+
+void ProcessSafe(TFile *inFile)
 {   
-    // 1. Setup Output
-    TFile* outFile = new TFile("noise_rms_fast_serial.root", "RECREATE");
+    TFile* outFile = new TFile("noise_rms_robust.root", "RECREATE");
     TTree* tree = new TTree("tpc_noise", "RMS per wire per event");
 
-    // Variables
     std::string b_hist_name;
     int b_event_idx;
     std::vector<int> b_channels;
@@ -46,107 +147,37 @@ void ProcessFast(TFile *inFile)
     tree->Branch("channels", &b_channels);
     tree->Branch("rms", &b_rms);
 
-    // 2. Loop Prep
     TIter next(inFile->GetListOfKeys());
     TKey* key;
-    int total_keys = inFile->GetListOfKeys()->GetSize();
     int counter = 0;
+    int total_keys = inFile->GetListOfKeys()->GetSize();
     
-    // PRE-ALLOCATE MEMORY to avoid creating/destroying vectors millions of times
-    vector<double> waveform_buffer;
-    waveform_buffer.reserve(4000); 
-
     TStopwatch timer;
     timer.Start();
 
     while ((key = (TKey*)next())) {
         
         TObject* obj = key->ReadObj();
-        //if (!obj->InheritsFrom("TH2D")) { delete obj; continue; }
-        TH2D* hist2D = (TH2D*)obj;
         
-        b_hist_name = hist2D->GetName();
-        b_event_idx = counter;
-        b_channels.clear();
-        b_rms.clear();
-
-        int nWires = hist2D->GetNbinsX();
-        int nTicks = hist2D->GetNbinsY();
-        
-        // --- THE SECRET WEAPON: RAW ARRAY ACCESS ---
-        // Instead of GetBinContent(), we get the pointer to the raw data block.
-        // ROOT stores TH2D data linearly: index = y * (nWires + 2) + x
-        std::cout<<"1"<<std::endl;
-        double* raw_data = hist2D->GetArray();
-        std::cout<<"2"<<std::endl;
-        int stride = nWires + 2; // +2 includes overflow/underflow bins
-
-        // Parse Channel Base
-        int channel_base = 0;
-        string h_name = b_hist_name;
-        if (h_name.length() > 5) {
-            char plane = h_name[1]; 
-            char tpc = h_name.back();
-            if (tpc == '0') {
-                if (plane == 'u') channel_base = 0;
-                else if (plane == 'v') channel_base = 1984;
-                else if (plane == 'w') channel_base = 1984*2;
-            } else if (tpc == '1') {
-                if (plane == 'u') channel_base = 1984*2 + 1670;
-                else if (plane == 'v') channel_base = 1984*3 + 1670;
-                else if (plane == 'w') channel_base = 1984*4 + 1670;
-            }
-        }
-
-        // Loop over wires (Columns)
-        for (int x = 1; x <= nWires; ++x) {
-            
-            // Clear the buffer, but keep the memory reserved (very fast)
-            waveform_buffer.clear(); 
-
-            // Copy raw data from the array stride
-            // This is much faster than function calls
-            for (int y = 1; y <= nTicks; ++y) {
-                double val = raw_data[y * stride + x];
-                if (val != 0) waveform_buffer.push_back(val);
-            }
-
-            if (waveform_buffer.size() < (size_t)(nTicks - 50)) continue;
-
-            // 1. Calculate Pedestal (Sorts buffer in place)
-            // Note: After this, the waveform is SCRAMBLED (not time-ordered).
-            double pedestal = GetMedianInPlace(waveform_buffer);
-
-            // 2. Calculate RMS & Max on the scrambled buffer
-            // (RMS doesn't care about time order, so this is valid!)
-            double sum_sq = 0.0;
-            double max_val = 0.0;
-            
-            for (double val : waveform_buffer) {
-                val -= pedestal;
-                double abs_val = std::abs(val);
-                if (abs_val > max_val) max_val = abs_val;
-                sum_sq += val * val;
-            }
-
-            // Signal Rejection
-            if (max_val > 20.0) continue;
-
-            // Save
-            int ch_id = (x - 1) + channel_base;
-            if (ch_id >= 0) {
-                b_channels.push_back(ch_id);
-                b_rms.push_back((float)std::sqrt(sum_sq / waveform_buffer.size()));
-            }
+        // Handle TH2D (Double Precision)
+        if (obj->InheritsFrom("TH2D")) {
+            b_event_idx = counter;
+            ProcessHistogram<TH2D, double>(obj, tree, b_event_idx, b_hist_name, b_channels, b_rms);
         } 
-
-        if (!b_channels.empty()) tree->Fill();
-        delete hist2D; 
+        // Handle TH2F (Float Precision)
+        else if (obj->InheritsFrom("TH2F")) {
+            b_event_idx = counter;
+            ProcessHistogram<TH2F, float>(obj, tree, b_event_idx, b_hist_name, b_channels, b_rms);
+        }
+        
+        delete obj;
         counter++;
 
-        // Simple Progress Bar
         if (counter % 10 == 0) {
-             std::cout << "\rProcessed " << counter << " / " << total_keys << " events" << std::flush;
+             double rate = counter / (timer.RealTime() + 0.001);
+             timer.Continue();
+             std::cout << "\rProgress: " << int((float)counter/total_keys * 100) << "% " 
+                       << "| Rate: " << (int)rate << " ev/s" << std::flush;
         }
     }
 
@@ -159,5 +190,5 @@ void TPC_WC_noise_analysis_full_wire(TString inputFile="sbnd-data-check.root")
 {   
     TFile *inFile = TFile::Open(inputFile.Data());
     if (!inFile || inFile->IsZombie()) return;
-    ProcessFast(inFile);
+    ProcessSafe(inFile);
 }
