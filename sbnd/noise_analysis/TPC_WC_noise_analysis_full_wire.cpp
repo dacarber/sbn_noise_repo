@@ -108,10 +108,10 @@ void LoadRawDigits(TFile *inFile)
     wire.reserve(event_len);
 
     // FFT Setup (Initialized but not used to save space/time unless requested)
-    Int_t n_size = event_len;
-    TVirtualFFT* fft_planner = TVirtualFFT::FFT(1, &n_size, "R2C ES K");
-    double* fft_input_buffer = new double[event_len];
-    vector<double> fft_output_buffer(event_len/2 + 2);
+    //Int_t n_size = event_len;
+    //TVirtualFFT* fft_planner = TVirtualFFT::FFT(1, &n_size, "R2C ES K");
+    //double* fft_input_buffer = new double[event_len];
+    //vector<double> fft_output_buffer(event_len/2 + 2);
 
     // Iteration Setup
     TIter next(inFile->GetListOfKeys());
@@ -229,8 +229,8 @@ void LoadRawDigits(TFile *inFile)
     }
 
     std::cout << std::endl;
-    delete[] fft_input_buffer;
-    delete fft_planner; 
+    //delete[] fft_input_buffer;
+    //delete fft_planner; 
 
     // Save and Close
     cout << "Writing to file..." << endl;
