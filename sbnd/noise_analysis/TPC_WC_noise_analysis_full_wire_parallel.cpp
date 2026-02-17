@@ -58,7 +58,7 @@ void LoadRawDigitsOptimized(TFile *inFile)
     while ((key = (TKey*)next())) {
         
         TObject* obj = key->ReadObj();
-        if (!obj->InheritsFrom("TH2D")) { delete obj; continue; }
+        //if (!obj->InheritsFrom("TH2D")) { delete obj; continue; }
         TH2D* hist2D = (TH2D*)obj;
         
         // Reset Variables
