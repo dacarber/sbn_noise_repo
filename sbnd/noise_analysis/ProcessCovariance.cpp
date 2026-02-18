@@ -52,10 +52,10 @@ void ProcessCovariance(TString inputFile)
         TObject* obj = key->ReadObj();
         
         // Ensure we are looking at a 2D Histogram (Event)
-        if (!obj->InheritsFrom("TH2D")) {
-             delete obj;
-             continue; 
-        }
+        //if (!obj->InheritsFrom("TH2D")) {
+        //     delete obj;
+        //     continue; 
+        //}
         TH2D* hist2D = (TH2D*)obj;
         TString histName = hist2D->GetName();
 
