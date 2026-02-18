@@ -25,7 +25,7 @@ double GetMedian(vector<double> vec) {
     return median;
 }
 
-void ProcessCovariance(TString inputFile)
+void ProcessCovariance(TString inputFile="sbnd-data-check.root")
 {
     // Open Input
     TFile *inFile = TFile::Open(inputFile);
